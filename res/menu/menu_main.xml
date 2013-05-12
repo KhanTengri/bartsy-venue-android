@@ -6,17 +6,12 @@
 	
    	<item 
    	    android:id="@+id/action_profile"
-        android:title="Profile..."
-        android:icon="@android:drawable/ic_menu_manage"
-        android:showAsAction="never" />
-    
-    <item android:id="@+id/action_payment_types"
-        android:title="Payment types..."
+        android:title="Venue Profile..."
         android:icon="@android:drawable/ic_menu_manage"
         android:showAsAction="never" />
     
     <item android:id="@+id/action_previous_orders"
-        android:title="Previous orders..."
+        android:title="Past orders..."
         android:icon="@android:drawable/ic_menu_manage"
         android:showAsAction="never" />
     

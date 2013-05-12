@@ -45,12 +45,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.android.gcm.GCMRegistrar;
-import com.kellislabs.bartsy.ConnectivityService.BusAttachmentState;
-import com.kellislabs.bartsy.ConnectivityService.HostChannelState;
-import com.kellislabs.bartsy.ConnectivityService.UseChannelState;
-import com.kellislabs.bartsy.db.DatabaseManager;
+import com.kellislabs.bartsy.model.Order;
 import com.kellislabs.bartsy.model.Profile;
 import com.kellislabs.bartsy.model.Venue;
+import com.kellislabs.bartsy.service.ConnectivityService;
+import com.kellislabs.bartsy.service.ConnectivityService.BusAttachmentState;
+import com.kellislabs.bartsy.service.ConnectivityService.HostChannelState;
+import com.kellislabs.bartsy.service.ConnectivityService.UseChannelState;
+import com.kellislabs.bartsy.utils.Constants;
 import com.kellislabs.bartsy.utils.Utilities;
 
 /**
@@ -105,22 +107,20 @@ public class BartsyApplication extends Application implements AppObservable {
     public void onCreate() {
         Log.i(TAG, "onCreate()");
         PACKAGE_NAME = getApplicationContext().getPackageName();
-        Intent intent = new Intent(this, ConnectivityService.class);
-        mRunningService = startService(intent);
-        if (mRunningService == null) {
-            Log.i(TAG, "onCreate(): failed to startService()");
+        
+        // Start the background connectivity service if running on Alljoyn
+        if (Constants.USE_ALLJOYN) {
+	        Intent intent = new Intent(this, ConnectivityService.class);
+	        mRunningService = startService(intent);
+	        if (mRunningService == null) {
+	            Log.i(TAG, "onCreate(): failed to startService()");
+	        }
         }
         
-        // load user profile if it exists. this is an application-wide variable.
-        loadUserProfile();
         
         // load venue profile if it exists. this is an application-wide variable.
         loadVenueProfile();
         
-		// DataBase initialization - First activity should call this method
-		MDBM = DatabaseManager.getNewInstance(this);
-
-		
 		// GCM registration code
 		GCMRegistrar.checkDevice(this);
 		GCMRegistrar.checkManifest(this);
@@ -135,52 +135,7 @@ public class BartsyApplication extends Application implements AppObservable {
 		registerReceiver(mHandleMessageReceiver, new IntentFilter(
 				Utilities.DISPLAY_MESSAGE_ACTION));
 
-		startProperActivity();
-
 	}
-    
-	private void startProperActivity() {
-		SharedPreferences sharedPref = getSharedPreferences(getResources()
-				.getString(R.string.config_shared_preferences_name),
-				Context.MODE_PRIVATE);
-
-		Intent intent;
-		// Start the right activity depending on whether we're a tablet or a
-		// phone
-		if (getResources().getBoolean(R.bool.isTablet)) {
-
-			String venueId = sharedPref.getString("RegisteredVenueId", null);
-
-			if (venueId == null)
-				intent = new Intent().setClass(this, VenueRegistration.class);
-			else
-				intent = new Intent().setClass(this, VenueActivity.class);
-		} else {
-			// If the user profile has no been set, start the init, if it has,
-			// start Bartsy
-			if (sharedPref
-					.getString(
-							getResources().getString(
-									R.string.config_user_account_name), "")
-					.equalsIgnoreCase("")) {
-				// Profile not set
-				intent = new Intent().setClass(this, InitActivity.class);
-			} else {
-				// Start Bartsy - for now we start it here so that we can go
-				// back and see
-				// what is happening using the Alljoyn stub tab host activity
-				// which logs messages
-				intent = new Intent().setClass(this, MainActivity.class);
-			}
-		}
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		this.startActivity(intent);
-		
-	}
-	
-	
-    // Database manager is a global variable
-    DatabaseManager MDBM = null;
 
     /** 
      * 
@@ -196,59 +151,15 @@ public class BartsyApplication extends Application implements AppObservable {
 	    venueProfileID = sharedPref.getString("RegisteredVenueId", null);
 	    venueProfileName = sharedPref.getString("RegisteredVenueName", null);
     }
-    
-    /** 
-     * 
-     * The active venue is the venue where the user is checked in or null if the user is not checked in
-     * 
-     */
-    
-    Venue activeVenue = null;
-    
-    
-    /*** 
-     * 
-     * The user profile is saved in the application state. It's small
-     * enough that it shouldn't cause memory issues
-     * 
-     */
-    
-    Profile mProfile;
-  
-  void loadUserProfile () {
-	    SharedPreferences sharedPref = getSharedPreferences(getResources().getString(R.string.config_shared_preferences_name), Context.MODE_PRIVATE);
-		mProfile = null;
 
-		Log.d(TAG, "Loading user profile from " + getFilesDir()+File.separator + getResources().getString(R.string.config_user_profile_picture));
-	    
-	    Bitmap image = null;
-		try {
-			image = BitmapFactory.decodeFile(getFilesDir()+File.separator + getResources().getString(R.string.config_user_profile_picture));
-		} catch (Exception e) {
-			e.printStackTrace();
-			Log.d(TAG, "Could not load profile image");
-			return;
-		}
-	    
-		Log.d(TAG, "Profile image found, creating profile...");
-
-		
-	    mProfile = new Profile(
-	    		sharedPref.getString(getResources().getString(R.string.config_user_account_name), ""), 
-	    		sharedPref.getString(getResources().getString(R.string.config_user_name), ""),
-	    	    sharedPref.getString(getResources().getString(R.string.config_user_location), ""), 
-	    		sharedPref.getString(getResources().getString(R.string.config_user_info), ""),
-	    		sharedPref.getString(getResources().getString(R.string.config_user_description), ""),
-	    		image);
-  	}    
-
+    
   	/*****
   	 * 
   	 *  The list of people present (when checked in) is also saved here, in the global state
   	 *  
   	 */
   
-	ArrayList<Profile> mPeople = new ArrayList<Profile>();
+	public ArrayList<Profile> mPeople = new ArrayList<Profile>();
 
 	/*** 
 	 * 
@@ -270,7 +181,7 @@ public class BartsyApplication extends Application implements AppObservable {
   	 * 
   	 */
   
-	ArrayList<Order> mOrders = new ArrayList<Order>();
+	public ArrayList<Order> mOrders = new ArrayList<Order>();
   
   
   
@@ -346,7 +257,7 @@ public class BartsyApplication extends Application implements AppObservable {
      */
     public void checkin() {
         Log.i(TAG, "checkin()");
-    	if (mRunningService == null) {
+    	if (Constants.USE_ALLJOYN && mRunningService == null) {
             Log.i(TAG, "checkin():  Starting the AllJoynService");
             Intent intent = new Intent(this, ConnectivityService.class);
             mRunningService = startService(intent);
