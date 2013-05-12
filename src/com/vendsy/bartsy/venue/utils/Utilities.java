@@ -32,8 +32,8 @@ public final class Utilities {
 	/**
 	 * Google API project id registered to use GCM.
 	 */
-//	public static final String SENDER_ID = "84381847947";
-	public static final String SENDER_ID = "411111237095"; //public server
+	public static final String SENDER_ID = "84381847947";
+//	public static final String SENDER_ID = "411111237095"; //public server
 	
 
 	/**
@@ -45,7 +45,7 @@ public final class Utilities {
 	/**
 	 * Intent used to display a message in the screen.
 	 */
-	public static final String DISPLAY_MESSAGE_ACTION = "com.kellislabs.bartsy.DISPLAY_MESSAGE";
+	public static final String DISPLAY_MESSAGE_ACTION = "com.vendsy.bartsy.venue.DISPLAY_MESSAGE";
 
 	/**
 	 * Intent's extra that contains the message to be displayed.

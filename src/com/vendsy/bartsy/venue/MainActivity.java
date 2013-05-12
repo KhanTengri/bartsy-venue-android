@@ -6,14 +6,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Locale;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -32,23 +36,28 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.analytics.tracking.android.EasyTracker;
+import com.google.android.gcm.GCMRegistrar;
 import com.google.android.gms.plus.model.people.Person;
-import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.dialog.PeopleDialogFragment;
 import com.vendsy.bartsy.venue.model.AppObservable;
 import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.model.Profile;
 import com.vendsy.bartsy.venue.utils.CommandParser;
 import com.vendsy.bartsy.venue.utils.CommandParser.BartsyCommand;
+import com.vendsy.bartsy.venue.utils.Constants;
+import com.vendsy.bartsy.venue.utils.Utilities;
+import com.vendsy.bartsy.venue.utils.WebServices;
 import com.vendsy.bartsy.venue.view.AppObserver;
 import com.vendsy.bartsy.venue.view.BartenderSectionFragment;
 import com.vendsy.bartsy.venue.view.InventorySectionFragment;
 import com.vendsy.bartsy.venue.view.PeopleSectionFragment;
 
 public class MainActivity extends FragmentActivity implements
-		ActionBar.TabListener, PeopleDialogFragment.UserDialogListener, AppObserver {
+		ActionBar.TabListener, PeopleDialogFragment.UserDialogListener,
+		AppObserver {
 
 	/****************
 	 * 
@@ -60,6 +69,20 @@ public class MainActivity extends FragmentActivity implements
 	public static final String TAG = "Bartsy";
 	private BartenderSectionFragment mBartenderFragment = null;
 	private PeopleSectionFragment mPeopleFragment = null;
+
+	private final BroadcastReceiver mHandleMessageReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			System.out.println("in broadcast receiver:::::::");
+			String newMessage = intent.getExtras().getString(
+					Utilities.EXTRA_MESSAGE);
+			System.out.println("the message is ::::" + newMessage);
+
+			processPushNotification(newMessage);
+
+		}
+
+	};
 
 	public void appendStatus(String status) {
 		Log.d(TAG, status);
@@ -134,25 +157,30 @@ public class MainActivity extends FragmentActivity implements
 
 		// Log function call
 		Log.i(TAG, this.toString() + "onCreate()");
- 
-		
+
 		// Setup application pointer
 		mApp = (BartsyApplication) getApplication();
 
 		// Set base view for the activity
 		setContentView(R.layout.activity_main);
 
-		// Initialize bartender view
-		if (mBartenderFragment == null) {
-			mBartenderFragment = new BartenderSectionFragment();
-			mBartenderFragment.mApp = mApp;
-		}
+		initializeFragments();
 
-		// Initialize people view
-		if (mPeopleFragment == null) {
-			mPeopleFragment = new PeopleSectionFragment();
-			mPeopleFragment.mApp = mApp;
+		// GCM registration
+		//--------------------------------------------------
+		GCMRegistrar.checkDevice(this);
+		GCMRegistrar.checkManifest(this);
+		final String regId = GCMRegistrar.getRegistrationId(this);
+		if (regId.equals("")) {
+			GCMRegistrar.register(this, Utilities.SENDER_ID);
+		} else {
+			Log.v(TAG, "Already registered");
 		}
+		System.out.println("the registration id is:::::" + regId);
+
+		registerReceiver(mHandleMessageReceiver, new IntentFilter(
+				Utilities.DISPLAY_MESSAGE_ACTION));
+		//--------------------------------------------
 
 		// Set up the action bar custom view
 		final ActionBar actionBar = getActionBar();
@@ -191,6 +219,40 @@ public class MainActivity extends FragmentActivity implements
 		}
 	}
 
+	private void initializeFragments() {
+		// Initialize bartender view
+		if (mBartenderFragment == null) {
+			mBartenderFragment = new BartenderSectionFragment();
+			mBartenderFragment.mApp = mApp;
+		}
+
+		// Initialize people view
+		if (mPeopleFragment == null) {
+			mPeopleFragment = new PeopleSectionFragment();
+			mPeopleFragment.mApp = mApp;
+		}
+	}
+
+	private void processPushNotification(String message) {
+		initializeFragments();
+
+		try {
+			Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+
+			JSONObject json = new JSONObject(message);
+			if (json.has("messageType")) {
+				if (json.getString("messageType").equals("placeOrder")) {
+					Order order = new Order(json);
+					mBartenderFragment.addOrder(order);
+					updateOrdersCount();
+				}
+			}
+			json.getString("");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Override
 	public void onStart() {
 		super.onStart();
@@ -221,18 +283,20 @@ public class MainActivity extends FragmentActivity implements
 		// update the state of the action bar depending on our connection state.
 		updateActionBarStatus();
 		updateOrdersCount();
-		
-		// If the tablet hasn't yet been registered started the registration activity
+
+		// If the tablet hasn't yet been registered started the registration
+		// activity
 		SharedPreferences sharedPref = getSharedPreferences(getResources()
 				.getString(R.string.config_shared_preferences_name),
 				Context.MODE_PRIVATE);
 		String venueId = sharedPref.getString("RegisteredVenueId", null);
 		if (venueId == null) {
 			Log.i(TAG, "Unregistered device. Starting Venue Registration...");
-			Intent intent = new Intent().setClass(this, VenueRegistrationActivity.class);
+			Intent intent = new Intent().setClass(this,
+					VenueRegistrationActivity.class);
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			this.startActivity(intent);
-//			finish();
+			// finish();
 			return;
 		} else {
 			Log.i(TAG, "Proceeding with startup...");
@@ -271,11 +335,12 @@ public class MainActivity extends FragmentActivity implements
 		switch (item.getItemId()) {
 
 		case R.id.action_profile:
-			Intent intent = new Intent().setClass(this, VenueRegistrationActivity.class);
+			Intent intent = new Intent().setClass(this,
+					VenueRegistrationActivity.class);
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			break;
-		
+
 		case R.id.action_settings:
 			Intent settingsActivity = new Intent(getBaseContext(),
 					SettingsActivity.class);
@@ -295,14 +360,15 @@ public class MainActivity extends FragmentActivity implements
 	private void updateActionBarStatus() {
 
 		Log.i(TAG, "updateChannelState()");
-		
+
 		if (mApp.venueProfileID == null || mApp.venueProfileName == null)
-			getActionBar().setTitle("Invalid venue configuration. Please uninstall then reinstall Bartsy.");
+			getActionBar()
+					.setTitle(
+							"Invalid venue configuration. Please uninstall then reinstall Bartsy.");
 		else
 			getActionBar().setTitle(mApp.venueProfileName);
 	}
 
-	
 	/**
 	 * Updates the action bar tab with the number of open orders
 	 */
@@ -310,7 +376,8 @@ public class MainActivity extends FragmentActivity implements
 	void updateOrdersCount() {
 		// Update tab title with the number of orders - for now hardcode the tab
 		// at the right position
-		getActionBar().getTabAt(0).setText("Orders (" + mApp.mOrders.size() + ")");
+		getActionBar().getTabAt(0).setText(
+				"Orders (" + mApp.mOrders.size() + ")");
 	}
 
 	/***********
@@ -501,7 +568,6 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	public BartsyCommand parseMessage(String readMessage) {
-
 		appendStatus("Message received: " + readMessage);
 
 		// parse the command
@@ -564,7 +630,6 @@ public class MainActivity extends FragmentActivity implements
 	 * 
 	 */
 
-
 	void processCommandOrder(BartsyCommand command) {
 
 		appendStatus("Processing command for order:" + command.arguments.get(0));
@@ -610,16 +675,22 @@ public class MainActivity extends FragmentActivity implements
 		// end
 		appendStatus("Sending order response for order: " + order.serverID);
 
-		mApp.newLocalUserMessage("<command><opcode>order_status_changed</opcode>"
-				+ "<argument>" + order.status + "</argument>" + // arg(0) -
-																// status is
-																// already
-																// updated on
-																// this end
-				"<argument>" + order.serverID + "</argument>" + // arg(1)
-				"<argument>" + order.clientID + "</argument>" + // arg(2)
-				"<argument>" + order.orderSender.userID + "</argument>" + // arg(3)
-				"</command>");
+		if (Constants.USE_ALLJOYN) {
+
+			mApp.newLocalUserMessage("<command><opcode>order_status_changed</opcode>"
+					+ "<argument>" + order.status + "</argument>" + // arg(0) -
+																	// status is
+																	// already
+																	// updated
+																	// on
+																	// this end
+					"<argument>" + order.serverID + "</argument>" + // arg(1)
+					"<argument>" + order.clientID + "</argument>" + // arg(2)
+					"<argument>" + order.orderSender.userID + "</argument>" + // arg(3)
+					"</command>");
+		} else {
+			WebServices.orderStatusChanged(order, this);
+		}
 
 		// Update tab title with the number of open orders
 		updateOrdersCount();

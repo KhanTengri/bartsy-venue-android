@@ -19,7 +19,9 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.util.Log;
+
 import com.vendsy.bartsy.venue.R;
+import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.model.Profile;
 import com.vendsy.bartsy.venue.service.GCMIntentService;
 
@@ -165,6 +167,25 @@ public class WebServices {
 		}
 
 		return result;
+	}
+	
+	public static void orderStatusChanged(final Order order, final Context context){
+		new Thread() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					String response;
+					response = postRequest(Constants.URL_UPDATE_ORDER_STATUS,
+							order.statusChangedJSON(), context);
+					System.out.println("response :: " + response);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
 	}
 
 	public static void saveProfileData(Profile bartsyProfile, Context context) {

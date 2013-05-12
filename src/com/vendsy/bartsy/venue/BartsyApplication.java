@@ -117,19 +117,7 @@ public class BartsyApplication extends Application implements AppObservable {
         // load venue profile if it exists. this is an application-wide variable.
         loadVenueProfile();
         
-		// GCM registration code
-		GCMRegistrar.checkDevice(this);
-		GCMRegistrar.checkManifest(this);
-		final String regId = GCMRegistrar.getRegistrationId(this);
-		if (regId.equals("")) {
-			GCMRegistrar.register(this, Utilities.SENDER_ID);
-		} else {
-			Log.v(TAG, "Already registered");
-		}
-		System.out.println("the registration id is:::::" + regId);
-
-		registerReceiver(mHandleMessageReceiver, new IntentFilter(
-				Utilities.DISPLAY_MESSAGE_ACTION));
+		
 
 	}
 
@@ -178,50 +166,7 @@ public class BartsyApplication extends Application implements AppObservable {
   	 */
   
 	public ArrayList<Order> mOrders = new ArrayList<Order>();
-  
-  
-  
-//	Intent intent;
-
-	private final BroadcastReceiver mHandleMessageReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			System.out.println("in broadcast receiver:::::::");
-			String newMessage = intent.getExtras().getString(
-					Utilities.EXTRA_MESSAGE);
-			System.out.println("the message is ::::" + newMessage);
-			
-			processPushNotification(newMessage);
-			
-			// mDisplay.append(newMessage + "\n");
-
-		}
-
-	};
-	
-	private void processPushNotification(String message) {
-		try {
-			Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-			JSONObject json = new JSONObject(message);
-			if(json.has("messageType")){
-				if(json.getString("messageType").equals("placeOrder")){
-//					PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
-					
-//					Order order = new Order(json);
-//					mBartenderFragment.addOrder(order);
-//
-//					updateOrdersCount();
-				}
-			}
-			json.getString("");
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
-  
-  
-  
-    
+      
     
     ComponentName mRunningService = null;
     

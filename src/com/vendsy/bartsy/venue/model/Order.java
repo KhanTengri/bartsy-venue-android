@@ -127,6 +127,18 @@ public class Order  {
 
 	}
 	
+	public JSONObject statusChangedJSON(){
+		final JSONObject orderData = new JSONObject();
+		try {
+			orderData.put("orderId", id);
+			orderData.put("orderStatus", status);
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return orderData;
+	}
+	
 	public void updateView () {
 		
 		if (view == null) return;
