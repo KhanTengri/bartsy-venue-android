@@ -34,80 +34,55 @@ public class PeopleSectionFragment extends Fragment implements OnClickListener {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
  
-		if (mRootView == null) {
-			mRootView = inflater.inflate(R.layout.users_main, container, false);
-			mPeopleListView = (LinearLayout) mRootView.findViewById(R.id.view_singles);
-			
-			mInflater = inflater;
-			mContainer = container; 
-		
-//			loadUsers();
-//			ArrayList<User> mUsers = new ArrayList<User>();
-			
-			// Add any existing people in the layout, one by one
-			Log.d("Bartsy", "About to add people list to the View");
-			Log.d("Bartsy", "mUsers list size = " + mApp.mPeople.size());
+		Log.i("Bartsy", "PeopleSectionFragment.onCreateView()");
 
-			for (Profile profile : mApp.mPeople) {
-				Log.d("Bartsy", "Adding a user item to the layout");
-				profile.view = mInflater.inflate(R.layout.user_item, mContainer, false);
-				profile.updateView(this); // sets up view specifics and sets listener to this
-				mPeopleListView.addView(profile.view);
-			}
-		}
+		mInflater = inflater;
+		mContainer = container; 
+		mRootView = inflater.inflate(R.layout.users_main, container, false);
+		mPeopleListView = (LinearLayout) mRootView.findViewById(R.id.view_singles);
+		
+		updatePeopleView();
         
         return mRootView;
+	}
+	
+	/**
+	 * Updates the people view from scratch
+	 */
+	
+	public void updatePeopleView () {
+		
+		Log.i("Bartsy", "About to update people list view");
+
+		if (mPeopleListView == null)
+			return;
+
+		// Make sure the list view is empty
+		mPeopleListView.removeAllViews();
+
+		// Add any existing people in the layout, one by one
+		
+		Log.i("Bartsy", "mApp.mPeople list size = " + mApp.mPeople.size());
+
+		for (Profile profile : mApp.mPeople) {
+			Log.i("Bartsy", "Adding a user item to the layout");
+			profile.view = mInflater.inflate(R.layout.user_item, mContainer, false);
+			profile.updateView(this); // sets up view specifics and sets listener to this
+			mPeopleListView.addView(profile.view);
+		}
 	}
 	
 	@Override 
 	public void onDestroyView() {
 		super.onDestroyView();
+		
+		Log.i("Bartsy", "PeopleSectionFragment.onDestroyView()");
+
 		mRootView = null;
 		mPeopleListView = null;
 		mInflater = null;
 		mContainer = null;
 	}
-
-	public void addPerson(Profile person) {
-//		String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
-		
-		Log.d("Bartsy", "Adding new person to people list: " + person.userID);
-		
-		// Check to see if person is already "here" and don't add them if so
-		for (Profile p : mApp.mPeople) {
-			if (p.userID.equalsIgnoreCase(person.userID)) {
-				Log.d("Bartsy", "Profile already exists in the list, skip adding it");
-				return;
-			}
-		}
-		
-		if (mPeopleListView == null) {
-			
-			Log.d("Bartsy", "The people view in null. Adding to the people list only");
-			
-			mApp.mPeople.add(person);
-		} else {
-
-			Log.d("Bartsy", "The people view in not null. Adding to the people list and the view");
-
-			mApp.mPeople.add(person);
-			person.view = mInflater.inflate(R.layout.user_item, mContainer, false);
-			person.updateView(this);
-
-			mPeopleListView.addView(person.view);
-			
-			// Update header buttons
-//			((ToggleButton) mRootView.findViewById(R.id.button_orders_new)).setText("NEW (" + mOrders.size() + ")");
-//			((ToggleButton) mRootView.findViewById(R.id.button_orders_new)).setTextOn("NEW (" + mOrders.size() + ")");
-//			((ToggleButton) mRootView.findViewById(R.id.button_orders_new)).setTextOff("NEW (" + mOrders.size() + ")");
-
-			Log.d("Bartsy", "Added new person to people list View");
-//			((Bartsy)getActivity()).appendStatus("Added new order to order list view");
-		}
-		Log.d("Bartsy", "mPeople list size = " + mApp.mPeople.size());
-	}
-
-	
 	
     @Override
     public void onClick(View v) {

@@ -25,6 +25,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -139,23 +142,55 @@ public class BartsyApplication extends Application implements AppObservable {
     
   	/*****
   	 * 
-  	 *  The list of people present (when checked in) is also saved here, in the global state
+  	 *  The list of people present (when checked in) is also saved here, in the global state. 
+  	 *  We have all handling code here because the application always runs in the background.
+  	 *  If there is an activity that displays a view of that list listening, we will send an
+  	 *  update message, but this code will always correctly change the model so that we never 
+  	 *  lose orders even if hte phone (or tablet) is in sleep mode, etc.
   	 *  
   	 */
   
 	public ArrayList<Profile> mPeople = new ArrayList<Profile>();
+    public static final String PEOPLE_UPDATED = "PEOPLE_UPDATED";
 
-	/*** 
-	 * 
-	 * This is the global order id, incremented for each order. This should actually be managed by the host as it should be unique
-	 * across sessions
-	 * 
-	 */
-  
-    long mOrderIDs = 0 ;
-    long mSessionID = 0;
+    /*
+     * Called when we have a new person check in a venue
+     */
+    
+    void addPerson(String userid,
+    		String name,
+    		String location,
+    		String info,
+    		String description,
+    		String image			// base64 encoded image
+    		) {
+		Log.i(TAG, "New user checked in: " + name + " (" + userid + ")");
 
+		// Decode the user image and create a new incoming profile
+		byte[] decodedString = Base64.decode(image,
+				Base64.DEFAULT);
+		Bitmap img = BitmapFactory.decodeByteArray(decodedString, 0,
+				decodedString.length);
+		Profile profile = new Profile(userid,
+				name,
+				location,
+				info,
+				description,
+				img );
+    	
+    	mPeople.add(profile);
+    	notifyObservers(PEOPLE_UPDATED);
+    }
 	
+    /* 
+     * Called when we have a person check out of a venue
+     */
+    
+    void removePerson(Profile profile) {
+    	mPeople.remove(profile);
+    	notifyObservers(PEOPLE_UPDATED);
+    }
+    
   
   	/**********
   	 * 
@@ -167,7 +202,61 @@ public class BartsyApplication extends Application implements AppObservable {
   
 	public ArrayList<Order> mOrders = new ArrayList<Order>();
       
+    public static final String ORDERS_UPDATED = "ORDERS_UPDATED";
+
+    /*
+     * This add a new order after verifying the person placing it is 
+     * currently checked in this venue 
+     */
     
+    void addOrder(
+    		String client_side_order_number,
+    		String title,
+    		String description,
+    		String price,
+    		String userid) {
+    	
+    	Log.i(TAG, "New " + title + " for: " + userid);
+
+		// Find the person who placed the order in the list of people in this
+		// bar. If not found, don't accept the order
+		Profile person = null;
+		for (Profile p : mPeople) {
+			if (p.userID.equalsIgnoreCase(userid)) {
+				// User found
+				person = p;
+				break;
+			}
+		}
+		if (person == null) {
+			Log.i(TAG, "Error processing command. user not checked in: " + userid);
+			return;
+		}
+    	
+		// Create a new order
+		Order order = new Order();
+		order.initialize(Long.parseLong(client_side_order_number),
+				mSessionID++, 			// server-side order number
+				title, 					// Title
+				description, 			// Description
+				price, 					// Price
+				"", 					// Image resource
+				person); 				// Order sender ID
+		
+		
+    	mOrders.add(order);
+    	notifyObservers(ORDERS_UPDATED);
+    }
+    
+	/*
+	 * This is the global order id, incremented for each order. This should actually be managed by the host as it should be unique
+	 * across sessions
+	 */
+  
+    long mOrderIDs = 0 ;
+    long mSessionID = 0;
+
+	
     ComponentName mRunningService = null;
     
     /**

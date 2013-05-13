@@ -70,20 +70,6 @@ public class MainActivity extends FragmentActivity implements
 	private BartenderSectionFragment mBartenderFragment = null;
 	private PeopleSectionFragment mPeopleFragment = null;
 
-	private final BroadcastReceiver mHandleMessageReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			System.out.println("in broadcast receiver:::::::");
-			String newMessage = intent.getExtras().getString(
-					Utilities.EXTRA_MESSAGE);
-			System.out.println("the message is ::::" + newMessage);
-
-			processPushNotification(newMessage);
-
-		}
-
-	};
-
 	public void appendStatus(String status) {
 		Log.d(TAG, status);
 	}
@@ -113,6 +99,8 @@ public class MainActivity extends FragmentActivity implements
 	private static final int HANDLE_HISTORY_CHANGED_EVENT = 1;
 	private static final int HANDLE_USE_CHANNEL_STATE_CHANGED_EVENT = 2;
 	private static final int HANDLE_ALLJOYN_ERROR_EVENT = 3;
+	private static final int HANDLE_ORDERS_UPDATED_EVENT = 4;
+	private static final int HANDLE_PEOPLE_UPDATED_EVENT = 5;
 
 	/**************************************
 	 * 
@@ -178,8 +166,6 @@ public class MainActivity extends FragmentActivity implements
 		}
 		System.out.println("the registration id is:::::" + regId);
 
-		registerReceiver(mHandleMessageReceiver, new IntentFilter(
-				Utilities.DISPLAY_MESSAGE_ACTION));
 		//--------------------------------------------
 
 		// Set up the action bar custom view
@@ -230,26 +216,6 @@ public class MainActivity extends FragmentActivity implements
 		if (mPeopleFragment == null) {
 			mPeopleFragment = new PeopleSectionFragment();
 			mPeopleFragment.mApp = mApp;
-		}
-	}
-
-	private void processPushNotification(String message) {
-		initializeFragments();
-
-		try {
-			Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-
-			JSONObject json = new JSONObject(message);
-			if (json.has("messageType")) {
-				if (json.getString("messageType").equals("placeOrder")) {
-					Order order = new Order(json);
-					mBartenderFragment.addOrder(order);
-					updateOrdersCount();
-				}
-			}
-			json.getString("");
-		} catch (JSONException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -369,7 +335,7 @@ public class MainActivity extends FragmentActivity implements
 			getActionBar().setTitle(mApp.venueProfileName);
 	}
 
-	/**
+	/*
 	 * Updates the action bar tab with the number of open orders
 	 */
 
@@ -380,6 +346,18 @@ public class MainActivity extends FragmentActivity implements
 				"Orders (" + mApp.mOrders.size() + ")");
 	}
 
+	/*
+	 * Updates the action bar tab with the number of open orders
+	 */
+
+	void updatePeopleCount() {
+		// Update tab title with the number of orders - for now hardcode the tab
+		// at the right position
+		getActionBar().getTabAt(1).setText(
+				"People (" + mApp.mPeople.size() + ")");
+	}
+
+	
 	/***********
 	 * 
 	 * TODO - Views management
@@ -510,6 +488,14 @@ public class MainActivity extends FragmentActivity implements
 			Message message = mHandler
 					.obtainMessage(HANDLE_ALLJOYN_ERROR_EVENT);
 			mHandler.sendMessage(message);
+		} else if (qualifier.equals(BartsyApplication.ORDERS_UPDATED)) {
+			Message message = mHandler
+					.obtainMessage(HANDLE_ORDERS_UPDATED_EVENT);
+			mHandler.sendMessage(message);
+		} else if (qualifier.equals(BartsyApplication.PEOPLE_UPDATED)) {
+			Message message = mHandler
+					.obtainMessage(HANDLE_PEOPLE_UPDATED_EVENT);
+			mHandler.sendMessage(message);
 		}
 	}
 
@@ -551,6 +537,20 @@ public class MainActivity extends FragmentActivity implements
 						"BartsyActivity.mhandler.handleMessage(): HANDLE_ALLJOYN_ERROR_EVENT");
 				alljoynError();
 			}
+				break;
+			case HANDLE_ORDERS_UPDATED_EVENT: 
+				Log.i(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_ORDERS_UPDATED_EVENT");
+				if (mBartenderFragment != null) {
+					mBartenderFragment.updateOrdersView();
+					updateOrdersCount();
+				}
+				break;
+			case HANDLE_PEOPLE_UPDATED_EVENT: 
+				Log.i(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_PEOPLE_UPDATED_EVENT");
+				if (mBartenderFragment != null) {
+					mPeopleFragment.updatePeopleView();
+					updatePeopleCount();
+				}
 				break;
 			default:
 				break;
@@ -632,37 +632,13 @@ public class MainActivity extends FragmentActivity implements
 
 	void processCommandOrder(BartsyCommand command) {
 
-		appendStatus("Processing command for order:" + command.arguments.get(0));
-
-		// Find the person who placed the order in the list of people in this
-		// bar. If not found, don't accept the order
-		Profile person = null;
-		for (Profile p : mApp.mPeople) {
-			if (p.userID.equalsIgnoreCase(command.arguments.get(6))) {
-				// User found
-				person = p;
-				break;
-			}
-		}
-		if (person == null) {
-			appendStatus("Error processing command. Profile placing order is missing from the list");
-			return;
-		}
-
-		// Create a new order
-		Order order = new Order();
-		order.initialize(Integer.parseInt(command.arguments.get(0)), // client
-																		// order
-																		// ID
-				mApp.mSessionID++, // server order ID
+		mApp.addOrder(
+				command.arguments.get(0), // client order number
 				command.arguments.get(2), // Title
 				command.arguments.get(3), // Description
-				command.arguments.get(4), // Price
-				command.arguments.get(5), // Image resource
-				person); // Order sender ID
-		mBartenderFragment.addOrder(order);
-
-		updateOrdersCount();
+				command.arguments.get(4), // Price)
+				command.arguments.get(6)  // userid
+				);
 	}
 
 	/*
@@ -736,35 +712,12 @@ public class MainActivity extends FragmentActivity implements
 	 */
 
 	void processProfile(BartsyCommand command) {
-
 		appendStatus("Process command: " + command.opcode);
-
-		// Decode the user image and create a new incoming profile
-		byte[] decodedString = Base64.decode(command.arguments.get(5),
-				Base64.DEFAULT);
-		Bitmap image = BitmapFactory.decodeByteArray(decodedString, 0,
-				decodedString.length);
-		Profile profile = new Profile(command.arguments.get(0), // userid
-				command.arguments.get(1), // username
-				command.arguments.get(2), // location
-				command.arguments.get(3), // info
-				command.arguments.get(4), // description
-				image // image
-		);
-
-		// Add the person to the list of people in the bar (this method doesn't
-		// add duplicates)
-		mPeopleFragment.addPerson(profile);
+		mApp.addPerson(command.arguments.get(0), 
+				command.arguments.get(1), 
+				command.arguments.get(2), 
+				command.arguments.get(3), 
+				command.arguments.get(4), 
+				command.arguments.get(5));
 	}
-
-	public static String readFileAsString(String filePath)
-			throws java.io.IOException {
-		BufferedReader reader = new BufferedReader(new FileReader(filePath));
-		String line, results = "";
-		while ((line = reader.readLine()) != null)
-			results += line;
-		reader.close();
-		return results;
-	}
-
 }

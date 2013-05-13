@@ -42,7 +42,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		Log.d("Bartsy", "OrdersSectionFragment.onCreateView()");
+		Log.i("Bartsy", "OrdersSectionFragment.onCreateView()");
 
 		mInflater = inflater;
 		mContainer = container;
@@ -58,21 +58,21 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 	}
 
 	/***
-	 * Upddates the orders view on both the phone and the tablet
+	 * Updates the orders view on both the phone and the tablet
 	 */
 	
 	public void updateOrdersView() {
 		
+		Log.i("Bartsy", "About update orders list view");
+
 		// Make sure the list view is empty
 		mNewOrdersView.removeAllViews();
 		
-
 		// Add any existing orders in the layout, one by one
-		Log.d("Bartsy", "About to add orders list to the View");
-		Log.d("Bartsy", "mApp.mOrders list size = " + mApp.mOrders.size());
+		Log.i("Bartsy", "mApp.mOrders list size = " + mApp.mOrders.size());
 
 		for (Order order : mApp.mOrders) {
-			Log.d("Bartsy", "Adding an item to the layout");
+			Log.i("Bartsy", "Adding an item to the layout");
 			order.view = mInflater.inflate(R.layout.bartender_order, mContainer, false);
 			order.updateView();
 			order.view.findViewById(R.id.view_order_button_positive).setOnClickListener(this);
@@ -101,26 +101,18 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 	public void onDestroyView() {
 		super.onDestroyView();
 
-		Log.d("Bartsy", "OrdersSectionFragment.onDestroyView()");
+		Log.i("Bartsy", "OrdersSectionFragment.onDestroyView()");
 		
 		mRootView = null;
 		mNewOrdersView = null;
 		mInflater = null;
 		mContainer = null;
 	}
-	
-	@Override 
-	public void onDestroy() {
-		super.onDestroy();
-
-		Log.d("Bartsy", "OrdersSectionFragment.onDestroy()");
-	}
 		
-		
-	public void addOrder(Order order) {
+	public void addOrders(Order order) {
 //		String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
 		
-		Log.d("Bartsy", "Adding new order to orders list: " + order.title);
+		Log.i("Bartsy", "Adding new order to orders list: " + order.title);
 		
 		if (mNewOrdersView == null) {
 			
