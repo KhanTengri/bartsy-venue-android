@@ -20,10 +20,10 @@ import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.util.Log;
 
+import com.vendsy.bartsy.venue.GCMIntentService;
 import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.model.Profile;
-import com.vendsy.bartsy.venue.service.GCMIntentService;
 
 public class WebServices {
 

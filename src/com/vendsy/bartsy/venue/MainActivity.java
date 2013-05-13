@@ -154,20 +154,6 @@ public class MainActivity extends FragmentActivity implements
 
 		initializeFragments();
 
-		// GCM registration
-		//--------------------------------------------------
-		GCMRegistrar.checkDevice(this);
-		GCMRegistrar.checkManifest(this);
-		final String regId = GCMRegistrar.getRegistrationId(this);
-		if (regId.equals("")) {
-			GCMRegistrar.register(this, Utilities.SENDER_ID);
-		} else {
-			Log.v(TAG, "Already registered");
-		}
-		System.out.println("the registration id is:::::" + regId);
-
-		//--------------------------------------------
-
 		// Set up the action bar custom view
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);

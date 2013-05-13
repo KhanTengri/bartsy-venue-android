@@ -4,7 +4,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.vendsy.bartsy.venue.R;
-import com.vendsy.bartsy.venue.service.GCMIntentService;
 import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.WebServices;
 
