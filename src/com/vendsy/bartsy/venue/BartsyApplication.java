@@ -257,6 +257,21 @@ public class BartsyApplication extends Application implements AppObservable {
     long mSessionID = 0;
 
 	
+    
+    
+    
+    /************************************************************************
+     * 
+     * 
+     * 
+     * TODO - This is the AllJoyn code
+     * 
+     * 
+     * 
+     */
+	
+    
+    
     ComponentName mRunningService = null;
     
     /**

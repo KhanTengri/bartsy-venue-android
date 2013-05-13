@@ -547,7 +547,7 @@ public class MainActivity extends FragmentActivity implements
 				break;
 			case HANDLE_PEOPLE_UPDATED_EVENT: 
 				Log.i(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_PEOPLE_UPDATED_EVENT");
-				if (mBartenderFragment != null) {
+				if (mPeopleFragment != null) {
 					mPeopleFragment.updatePeopleView();
 					updatePeopleCount();
 				}
