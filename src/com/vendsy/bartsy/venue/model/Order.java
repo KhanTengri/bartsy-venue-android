@@ -145,14 +145,23 @@ public class Order  {
 
 		((TextView) view.findViewById(R.id.view_order_title)).setText(this.title);
 		((TextView) view.findViewById(R.id.view_order_description)).setText(this.description);
-		((TextView) view.findViewById(R.id.view_order_time)).setText(DateFormat.getTimeInstance().format(this.state_transitions[ORDER_STATUS_NEW]));
-		((TextView) view.findViewById(R.id.view_order_date)).setText(DateFormat.getDateInstance().format(this.state_transitions[ORDER_STATUS_NEW]));
+		if(this.state_transitions[ORDER_STATUS_NEW]!=null){
+			((TextView) view.findViewById(R.id.view_order_time))
+					.setText(DateFormat.getTimeInstance().format(
+							this.state_transitions[ORDER_STATUS_NEW]));
+			((TextView) view.findViewById(R.id.view_order_date)).setText(DateFormat.getDateInstance().format(this.state_transitions[ORDER_STATUS_NEW]));
+		}else{
+			//TODO Need to format updatedDate string value to date and time
+		}
+		
 		((TextView) view.findViewById(R.id.view_order_price)).setText("" + (int) this.price); // use int for now
 //		((ImageView)view.findViewById(R.id.view_order_image_resource)).setImageResource(this.image_resource);
 		
-		// Update sender profile section
-		((ImageView)view.findViewById(R.id.view_order_profile_picture)).setImageBitmap(this.orderSender.image);
-		((TextView) view.findViewById(R.id.view_order_profile_name)).setText(this.orderSender.username);
+		if(this.orderSender!=null){
+			// Update sender profile section
+			((ImageView)view.findViewById(R.id.view_order_profile_picture)).setImageBitmap(this.orderSender.image);
+			((TextView) view.findViewById(R.id.view_order_profile_name)).setText(this.orderSender.username);
+		}
 
 		String positive="", negative="";
 		switch (this.status) {
