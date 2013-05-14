@@ -180,13 +180,30 @@ public class BartsyApplication extends Application implements AppObservable {
 		mPeople.add(profile);
 		notifyObservers(PEOPLE_UPDATED);
 	}
+	
+	public void addPerson(Profile profile) {
 
-	/*
+//		// Decode the user image and create a new incoming profile
+//		byte[] decodedString = Base64.decode(image, Base64.DEFAULT);
+//		Bitmap img = BitmapFactory.decodeByteArray(decodedString, 0,
+//				decodedString.length);
+
+		mPeople.add(profile);
+		notifyObservers(PEOPLE_UPDATED);
+	}
+
+	
+	/**
 	 * Called when we have a person check out of a venue
 	 */
-
-	void removePerson(Profile profile) {
-		mPeople.remove(profile);
+	void removePerson(String profileId) {
+		for (Profile profile : mPeople) {
+			if(profileId.equals(profile.userID)){
+				mPeople.remove(profile);
+				break;
+			}
+		}
+		
 		notifyObservers(PEOPLE_UPDATED);
 	}
 
