@@ -3,6 +3,9 @@
 
     <string name="app_name">Bartsy Venue</string>
     
+    <!-- Venue Registration -->
+    <string name="paypal_id_label">Paypal ID</string>
+    
     <!--  Config items -->
     <string name="config_shared_preferences_name">bartsy_preferences</string>
     <string name="config_user_profile_picture">user_profile_picture</string>

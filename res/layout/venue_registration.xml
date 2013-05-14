@@ -45,6 +45,7 @@
                     android:id="@+id/locuId"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="49be3dcf7e507f6b4775"
                     android:ems="14" >
                 </EditText>
             </LinearLayout>
@@ -59,37 +60,17 @@
                     android:id="@+id/textView1"
                     android:layout_width="120dp"
                     android:layout_height="wrap_content"
-                    android:text="Bank Name"
+                    android:text="@string/paypal_id_label"
                     android:textColor="#000000" />
 
                 <EditText
-                    android:id="@+id/bankNameEdit"
+                    android:id="@+id/paypalEdit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ems="14" >
                 </EditText>
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal" >
-
-                <TextView
-                    android:id="@+id/textView1"
-                    android:layout_width="120dp"
-                    android:layout_height="wrap_content"
-                    android:text="Bank AccountNo."
-                    android:textColor="#000000" />
-
-                <EditText
-                    android:id="@+id/bankAccount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ems="14" >
-                </EditText>
-            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

@@ -24,7 +24,7 @@ import android.widget.Toast;
 
 public class VenueRegistrationActivity extends Activity implements OnClickListener {
 
-	private EditText locuId, bankname, bankAccountNo, wifiName, wifiPassword;
+	private EditText locuId, paypal, wifiName, wifiPassword;
 	private RadioGroup typeOfAuthentication, wifiPresent;
 	
 	private Handler handler = new Handler();
@@ -35,8 +35,7 @@ public class VenueRegistrationActivity extends Activity implements OnClickListen
 		setContentView(R.layout.venue_registration);
 
 		locuId = (EditText) findViewById(R.id.locuId);
-		bankname = (EditText) findViewById(R.id.bankNameEdit);
-		bankAccountNo = (EditText) findViewById(R.id.bankAccount);
+		paypal = (EditText) findViewById(R.id.paypalEdit);
 		wifiName = (EditText) findViewById(R.id.wifiName);
 		wifiPassword = (EditText) findViewById(R.id.wifiPassword);
 		typeOfAuthentication = (RadioGroup) findViewById(R.id.authentication);
@@ -48,15 +47,14 @@ public class VenueRegistrationActivity extends Activity implements OnClickListen
 
 	@Override
 	public void onClick(View arg0) {
-		Intent intent = new Intent(this, MainActivity.class);
+//		Intent intent = new Intent(this, MainActivity.class);
 
 		// Perform registration - for now assume all will go well
-		registration(arg0);
-		
+		registrationAction();
 		Log.d("Bartsy", "Clicked on submit button");
 	}
 	
-	public void registration(View v) {
+	public void registrationAction() {
 
 		int selectedWifiPresent = wifiPresent.getCheckedRadioButtonId();
 
@@ -81,8 +79,7 @@ public class VenueRegistrationActivity extends Activity implements OnClickListen
 			postData.put("wifiPassword", wifiPassword.getText().toString());
 			postData.put("typeOfAuthentication", typeOfAuthentication == null ? "" :
 				typeOfAuthentication.getText().toString());
-			postData.put("bankName", bankname.getText().toString());
-			postData.put("accountNumber", bankAccountNo.getText().toString());
+			postData.put("paypalId", paypal.getText().toString());
 			postData.put("deviceType", "0");
 
 			if (wifi == null? false : wifi.getText().toString().equalsIgnoreCase("Yes"))
