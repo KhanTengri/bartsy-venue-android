@@ -2,6 +2,9 @@ package com.vendsy.bartsy.venue.model;
 
 import java.util.ArrayList;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.graphics.Bitmap;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -42,6 +45,18 @@ public class Profile  {
 		this.info = info;
 		this.description = description;
 	}
+	
+	public Profile(JSONObject json){
+		try {
+			userID = json.getString("bartsyId");
+			gender = json.getString("gender");
+			name = json.getString("name");
+			userID = json.getString("bartsyId");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public String getSocialNetworkId() {
 		return socialNetworkId;
 	}

@@ -34,6 +34,7 @@ import android.util.Log;
 import com.google.android.gcm.GCMBaseIntentService;
 import com.google.android.gcm.GCMRegistrar;
 import com.vendsy.bartsy.venue.model.Order;
+import com.vendsy.bartsy.venue.model.Profile;
 import com.vendsy.bartsy.venue.utils.Utilities;
 //import static com.vendsy.bartsy.venue.utils.Utilities.displayMessage;
 
@@ -94,6 +95,11 @@ public class GCMIntentService extends GCMBaseIntentService {
 					Order order = new Order(json);
 					app.addOrder(order);
 					messageTypeMSG = "User placed an Order";
+				}else if(json.getString("messageType").equals("userCheckIn")){
+					Profile profile = new Profile(json);
+					app.addPerson(profile);
+				}else if(json.getString("messageType").equals("userCheckOut")){
+					app.removePerson(json.getString("bartsyId"));
 				}
 			}
 		} catch (JSONException e) {
