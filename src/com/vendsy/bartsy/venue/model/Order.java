@@ -32,6 +32,7 @@ public class Order  {
 	public double total;
 	public String updatedDate;
 	
+	public String profileId;
 	
 	// Each order contains the sender and the recipient (another single in the bar or a friend to pick the order up)
 	public Profile orderSender;
@@ -95,11 +96,10 @@ public class Order  {
 			id = Long.valueOf(json.getString("orderId"));
 			tipAmount = Float.valueOf(json.getString("tipPercentage"));
 			total = Double.valueOf(json.getString("totalPrice"));
+			profileId = json.getString("bartsyId");
 		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -159,7 +159,7 @@ public class Order  {
 		
 		if(this.orderSender!=null){
 			// Update sender profile section
-			((ImageView)view.findViewById(R.id.view_order_profile_picture)).setImageBitmap(this.orderSender.image);
+//			((ImageView)view.findViewById(R.id.view_order_profile_picture)).setImageBitmap(this.orderSender.image);
 			((TextView) view.findViewById(R.id.view_order_profile_name)).setText(this.orderSender.username);
 		}
 

@@ -260,6 +260,13 @@ public class BartsyApplication extends Application implements AppObservable {
 	}
 	
 	public void addOrder(Order order) {
+		for (Profile p : mPeople) {
+			if (p.userID.equalsIgnoreCase(order.profileId)) {
+				// User found
+				order.orderSender = p;
+				break;
+			}
+		}
 		mOrders.add(order);
 		notifyObservers(ORDERS_UPDATED);
 	}

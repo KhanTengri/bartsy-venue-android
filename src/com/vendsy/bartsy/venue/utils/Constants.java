@@ -1,9 +1,9 @@
 package com.vendsy.bartsy.venue.utils;
 
 public class Constants {
-	public static final String DOMAIN_NAME = "http://192.168.0.172:8080";
+//	public static final String DOMAIN_NAME = "http://192.168.0.109:8080";
 
-//	 public static final String DOMAIN_NAME = "http://54.235.76.180:8080";
+	 public static final String DOMAIN_NAME = "http://54.235.76.180:8080";
 
 	public static final boolean USE_ALLJOYN = false;
 
@@ -29,7 +29,7 @@ public class Constants {
 
 	// For saveVenueDetails for bartender
 	public static final String URL_SAVE_VENUEDETAILS = DOMAIN_NAME
-			+ "/Bartsy/venue/saveVenueDetailsTest";
+			+ "/Bartsy/venue/saveVenueDetails";
 	
 	// For Order status for bartender
 	public static final String URL_UPDATE_ORDER_STATUS = DOMAIN_NAME

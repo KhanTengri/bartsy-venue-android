@@ -108,7 +108,7 @@ public class Profile  {
 	
 	public void updateView (OnClickListener listener) {
 		((ImageView) view.findViewById(R.id.view_user_list_image_resource)).setImageBitmap(this.image);
-		((TextView) view.findViewById(R.id.view_user_list_name)).setText(this.username);
+		((TextView) view.findViewById(R.id.view_user_list_name)).setText(this.name);
 
 		view.setOnClickListener(listener);
 		
