@@ -668,12 +668,12 @@ public class MainActivity extends FragmentActivity implements
 	public void onUserDialogPositiveClick(DialogFragment dialog) {
 		// User touched the dialog's positive button
 
-		Person user = ((PeopleDialogFragment) dialog).mUser;
+		Profile user = ((PeopleDialogFragment) dialog).mUser;
 
-		appendStatus("Sending drink to: " + user.getNickname());
+		appendStatus("Sending drink to: " + user.getDisplayName());
 
 		mApp.newLocalUserMessage("<command><opcode>message</opcode>"
-				+ "<argument>" + user.getNickname() + "</argument>"
+				+ "<argument>" + user.getDisplayName()+ "</argument>"
 				+ "<argument>" + "hi buddy" + "</argument>" + "</command>");
 		appendStatus("Placed drink order");
 	}
@@ -682,12 +682,12 @@ public class MainActivity extends FragmentActivity implements
 	public void onUserDialogNegativeClick(DialogFragment dialog) {
 		// User touched the dialog's positive button
 
-		Person user = ((PeopleDialogFragment) dialog).mUser;
+		Profile user = ((PeopleDialogFragment) dialog).mUser;
 
-		appendStatus("Sending message to: " + user.getNickname());
+		appendStatus("Sending message to: " + user.getDisplayName());
 
 		mApp.newLocalUserMessage("<command><opcode>message</opcode>"
-				+ "<argument>" + user.getNickname() + "</argument>"
+				+ "<argument>" + user.getDisplayName() + "</argument>"
 				+ "<argument>" + "hi buddy" + "</argument>" + "</command>");
 		appendStatus("Sent message");
 	}

@@ -10,6 +10,7 @@ import java.net.URL;
 
 import com.google.android.gms.plus.model.people.Person;
 import com.vendsy.bartsy.venue.R;
+import com.vendsy.bartsy.venue.model.Profile;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -32,7 +33,7 @@ import android.widget.TextView;
  */
 public class PeopleDialogFragment extends DialogFragment  {
 
-	public Person mUser = null;
+	public Profile mUser = null;
 	
 	
     /* The activity that creates an instance of this dialog fragment must
@@ -123,21 +124,20 @@ public class PeopleDialogFragment extends DialogFragment  {
         		return null;
         	
     	    try {
-    			Log.d("Bartsy", "About to decode image for dialog from URL: " + mUser.getImage().getUrl());
 
-    		    bitmap = BitmapFactory.decodeStream((InputStream)new URL(mUser.getImage().getUrl()).getContent());
+    		    bitmap = BitmapFactory.decodeStream((InputStream)new URL(mUser.getProfileImageUrl()).getContent());
         	} catch (MalformedURLException e) {
     			e.printStackTrace();
-    			Log.d("Bartsy", "Bad URL: " + mUser.getImage().getUrl());
+    			Log.d("Bartsy", "Bad URL: " + mUser. getProfileImageUrl());
     			return null;
         	} catch (IOException e) {
         		e.printStackTrace();
-    			Log.d("Bartsy", "Could not download image from URL: " + mUser.getImage().getUrl());
+    			Log.d("Bartsy", "Could not download image from URL: " + mUser.getProfileImageUrl());
     			return null;
         	}
     	    
     	    
-			Log.d("Bartsy", "Image decompress successfully for dialog: " + mUser.getImage().getUrl());
+			Log.d("Bartsy", "Image decompress successfully for dialog: " + mUser.getProfileImageUrl());
 
     	    
 			return bitmap;

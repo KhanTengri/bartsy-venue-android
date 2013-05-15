@@ -93,7 +93,7 @@ public class PeopleSectionFragment extends Fragment implements OnClickListener {
         
         // Create an instance of the dialog fragment and show it
         PeopleDialogFragment dialog = new PeopleDialogFragment();
-        dialog.mUser = (Person) v.getTag();
+        dialog.mUser = (Profile) v.getTag();
         dialog.show(getActivity().getSupportFragmentManager(), "User profile");
     }
 	
