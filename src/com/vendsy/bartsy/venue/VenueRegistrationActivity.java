@@ -154,11 +154,11 @@ public class VenueRegistrationActivity extends Activity implements
 											.show();
 									BartsyApplication app;
 									switch (errorCode) {
-									case 2:
+									case 1:
 										// venue already exists - still save the
 										// profile locally for now
-										venueName = "Chaya Venice";
-										venueId = "5a0999dda39f9fe07a44";
+//										venueName = "Chaya Venice";
+//										venueId = "5a0999dda39f9fe07a44";
 									case 0:
 										// Save the venue id in shared
 										// preferences

@@ -65,8 +65,13 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		
 		Log.i("Bartsy", "About update orders list view");
 
-		// Make sure the list view is empty
+		if (mNewOrdersView == null || mAcceptedOrdersView == null || mCompletedOrdersView == null)
+			return;
+		
+		// Make sure the list views are all empty
 		mNewOrdersView.removeAllViews();
+		mAcceptedOrdersView.removeAllViews();
+		mCompletedOrdersView.removeAllViews();
 		
 		// Add any existing orders in the layout, one by one
 		Log.i("Bartsy", "mApp.mOrders list size = " + mApp.mOrders.size());
