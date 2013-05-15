@@ -224,7 +224,7 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * checked in this venue
 	 */
 
-	void addOrder(String client_side_order_number, String title,
+	void addOrder(String serverOrderID, String title,
 			String description, String price, String userid) {
 
 		Log.i(TAG, "New " + title + " for: " + userid);
@@ -240,15 +240,15 @@ public class BartsyApplication extends Application implements AppObservable {
 			}
 		}
 		if (person == null) {
-			Log.i(TAG, "Error processing command. user not checked in: "
+			Log.d(TAG, "Error processing command. user not checked in: "
 					+ userid);
 			return;
 		}
 
 		// Create a new order
 		Order order = new Order();
-		order.initialize(Long.parseLong(client_side_order_number),
-				mSessionID++, // server-side order number
+		order.initialize( 
+				serverOrderID, // server-side order number
 				title, // Title
 				description, // Description
 				price, // Price
@@ -260,6 +260,9 @@ public class BartsyApplication extends Application implements AppObservable {
 	}
 	
 	public void addOrder(Order order) {
+		// Find the person who placed the order in the list of people in this
+		// bar. If not found, don't accept the order
+		order.orderSender = null;
 		for (Profile p : mPeople) {
 			if (p.userID.equalsIgnoreCase(order.profileId)) {
 				// User found
@@ -267,17 +270,17 @@ public class BartsyApplication extends Application implements AppObservable {
 				break;
 			}
 		}
+		if (order.orderSender == null) {
+			Log.d(TAG, "Error processing command. user not checked in: "
+					+ order.profileId);
+			return;
+		}
+		
+		// Add the order to the list of orders
 		mOrders.add(order);
 		notifyObservers(ORDERS_UPDATED);
 	}
 
-	/*
-	 * This is the global order id, incremented for each order. This should
-	 * actually be managed by the host as it should be unique across sessions
-	 */
-
-	long mOrderIDs = 0;
-	long mSessionID = 0;
 
 	/************************************************************************
 	 * 

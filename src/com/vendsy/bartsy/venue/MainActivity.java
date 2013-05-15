@@ -647,7 +647,7 @@ public class MainActivity extends FragmentActivity implements
 																	// on
 																	// this end
 					"<argument>" + order.serverID + "</argument>" + // arg(1)
-					"<argument>" + order.clientID + "</argument>" + // arg(2)
+					"<argument>" + order.serverID + "</argument>" + // arg(2)
 					"<argument>" + order.orderSender.userID + "</argument>" + // arg(3)
 					"</command>");
 		} else {

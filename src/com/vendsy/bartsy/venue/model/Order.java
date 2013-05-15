@@ -16,10 +16,8 @@ import android.widget.TextView;
 public class Order  {
 
 	// Each order has an ID that is unique within a session number
-	public long clientID, serverID; 
+	public String serverID; 
 	
-	public long id;
-
 	// Title and description are arbitrary strings
 	public String title, description;
 	public String itemId;
@@ -66,9 +64,8 @@ public class Order  {
 	 * When an order is initialized the state transition times are undefined except for the 
 	 * first state, which is when the order is received
 	 */
-	public void initialize (long client_id, long server_id, String title, String description, 
+	public void initialize (String server_id, String title, String description, 
 			String price, String image_resource, Profile order_sender) {
-		this.clientID = client_id;
 		this.serverID = server_id;
 		this.title = title;
 		this.description = description;
@@ -93,7 +90,7 @@ public class Order  {
 			title = json.getString("itemName");
 			updatedDate = json.getString("orderTime");
 			price = Float.valueOf(json.getString("basePrice"));
-			serverID = id = Long.valueOf(json.getString("orderId"));
+			serverID = json.getString("orderId");
 			tipAmount = Float.valueOf(json.getString("tipPercentage"));
 			total = Double.valueOf(json.getString("totalPrice"));
 			profileId = json.getString("bartsyId");
@@ -130,7 +127,7 @@ public class Order  {
 	public JSONObject statusChangedJSON(){
 		final JSONObject orderData = new JSONObject();
 		try {
-			orderData.put("orderId", id);
+			orderData.put("orderId", serverID);
 			orderData.put("orderStatus", status);
 			
 		} catch (JSONException e) {
