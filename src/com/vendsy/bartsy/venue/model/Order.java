@@ -93,7 +93,7 @@ public class Order  {
 			title = json.getString("itemName");
 			updatedDate = json.getString("orderTime");
 			price = Float.valueOf(json.getString("basePrice"));
-			id = Long.valueOf(json.getString("orderId"));
+			serverID = id = Long.valueOf(json.getString("orderId"));
 			tipAmount = Float.valueOf(json.getString("tipPercentage"));
 			total = Double.valueOf(json.getString("totalPrice"));
 			profileId = json.getString("bartsyId");

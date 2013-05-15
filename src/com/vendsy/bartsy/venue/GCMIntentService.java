@@ -127,7 +127,7 @@ public class GCMIntentService extends GCMBaseIntentService {
         if(message==null){
         	message = "";
         }else{
-        	processPushNotification(message);
+        	notifyMSG =  processPushNotification(message);
         }
         
 //        displayMessage(context, message);
