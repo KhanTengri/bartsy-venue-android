@@ -51,6 +51,8 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		mAcceptedOrdersView = (LinearLayout) mRootView.findViewById(R.id.view_accepted_order_list);
 		mCompletedOrdersView = (LinearLayout) mRootView.findViewById(R.id.view_completed_order_list);
 		
+		mApp = (BartsyApplication) getActivity().getApplication();
+		
 		updateOrdersView();
 		
 		return mRootView;
@@ -112,6 +114,9 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		mNewOrdersView = null;
 		mInflater = null;
 		mContainer = null;
+		
+		// Because the fragment may be destroyed while the activity persists, remove pointer from activity
+		((MainActivity) getActivity()).mBartenderFragment = null;
 	}
 		
 	public void addOrders(Order order) {

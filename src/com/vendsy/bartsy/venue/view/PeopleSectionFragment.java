@@ -4,6 +4,7 @@
 package com.vendsy.bartsy.venue.view;
 
 import com.google.android.gms.plus.model.people.Person;
+import com.vendsy.bartsy.venue.MainActivity;
 import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.BartsyApplication;
 import com.vendsy.bartsy.venue.dialog.PeopleDialogFragment;
@@ -27,7 +28,7 @@ public class PeopleSectionFragment extends Fragment implements OnClickListener {
 	View mRootView = null;
 	LayoutInflater mInflater = null;
 	ViewGroup mContainer = null;
-	 LinearLayout mPeopleListView = null;
+	LinearLayout mPeopleListView = null;
 	public BartsyApplication mApp = null;
 
 	@Override
@@ -41,6 +42,8 @@ public class PeopleSectionFragment extends Fragment implements OnClickListener {
 		mRootView = inflater.inflate(R.layout.users_main, container, false);
 		mPeopleListView = (LinearLayout) mRootView.findViewById(R.id.view_singles);
 		
+		mApp = (BartsyApplication) getActivity().getApplication();
+
 		updatePeopleView();
         
         return mRootView;
@@ -82,6 +85,9 @@ public class PeopleSectionFragment extends Fragment implements OnClickListener {
 		mPeopleListView = null;
 		mInflater = null;
 		mContainer = null;
+		
+		// Because the fragment may be destroyed while the activity persists, remove pointer from activity
+		((MainActivity) getActivity()).mPeopleFragment = null;
 	}
 	
     @Override

@@ -67,8 +67,8 @@ public class MainActivity extends FragmentActivity implements
 	 */
 
 	public static final String TAG = "Bartsy";
-	private BartenderSectionFragment mBartenderFragment = null;
-	private PeopleSectionFragment mPeopleFragment = null;
+	public BartenderSectionFragment mBartenderFragment = null; 	// make sure the set this to null when fragment is destroyed
+	public PeopleSectionFragment mPeopleFragment = null;		// make sure the set this to null when fragment is destroyed
 
 	public void appendStatus(String status) {
 		Log.d(TAG, status);
@@ -193,16 +193,12 @@ public class MainActivity extends FragmentActivity implements
 
 	private void initializeFragments() {
 		// Initialize bartender view
-		if (mBartenderFragment == null) {
+		if (mBartenderFragment == null) 
 			mBartenderFragment = new BartenderSectionFragment();
-			mBartenderFragment.mApp = mApp;
-		}
 
 		// Initialize people view
-		if (mPeopleFragment == null) {
+		if (mPeopleFragment == null) 
 			mPeopleFragment = new PeopleSectionFragment();
-			mPeopleFragment.mApp = mApp;
-		}
 	}
 
 	@Override
