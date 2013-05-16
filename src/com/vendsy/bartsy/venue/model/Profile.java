@@ -70,7 +70,7 @@ public class Profile {
 			gender = json.getString("gender");
 			name = json.getString("name");
 			profileImageUrl = json.getString("userImagePath");
-			this.profileImageUrl = "http://54.235.76.180:8080/"
+			this.profileImageUrl = Constants.DOMAIN_NAME
 					+ profileImageUrl.trim();
 
 			System.out.println("profileImageUrl " + profileImageUrl);
