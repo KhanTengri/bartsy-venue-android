@@ -14,7 +14,10 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
@@ -99,8 +102,8 @@ public class WebServices {
 
 	}
 
-	public static String userCheckInOrOut(final Context context, String venueId,
-			String url) {
+	public static String userCheckInOrOut(final Context context,
+			String venueId, String url) {
 		String response = null;
 		SharedPreferences sharedPref = context.getSharedPreferences(
 				context.getResources().getString(
@@ -168,8 +171,9 @@ public class WebServices {
 
 		return result;
 	}
-	
-	public static void orderStatusChanged(final Order order, final Context context){
+
+	public static void orderStatusChanged(final Order order,
+			final Context context) {
 		new Thread() {
 
 			@Override
@@ -243,4 +247,18 @@ public class WebServices {
 		}
 
 	}
+
+	// alert box
+	public static void alertbox(final String message, final Activity a) {
+
+		new AlertDialog.Builder(a).setMessage(message).setCancelable(false)
+				.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int whichButton) {
+
+						return;
+					}
+				}).show();
+	}
+
 }

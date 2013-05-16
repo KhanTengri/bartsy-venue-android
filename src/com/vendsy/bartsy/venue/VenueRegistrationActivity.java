@@ -102,117 +102,128 @@ public class VenueRegistrationActivity extends Activity implements
 		String deviceToken = settings.getString("RegId", "");
 
 		System.out.println("sumbit");
-		final JSONObject postData = new JSONObject();
-		try {
-			postData.put("locuId", locuId.getText().toString());
-			postData.put("deviceToken", deviceToken);
-			postData.put("wifiName", wifiName.getText().toString());
-			postData.put("wifiPassword", wifiPassword.getText().toString());
-			postData.put("typeOfAuthentication",
-					typeOfAuthentication == null ? "" : typeOfAuthentication
-							.getText().toString());
-			postData.put("paypalId", paypal.getText().toString());
-			postData.put("deviceType", "0");
 
-			if (wifi == null ? false : wifi.getText().toString()
-					.equalsIgnoreCase("Yes"))
-				postData.put("wifiPresent", "1");
-			else
-				postData.put("wifiPresent", "0");
+		if (deviceToken.trim().length() > 0) {
 
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			final JSONObject postData = new JSONObject();
+			try {
+				postData.put("locuId", locuId.getText().toString());
+				postData.put("deviceToken", deviceToken);
+				postData.put("wifiName", wifiName.getText().toString());
+				postData.put("wifiPassword", wifiPassword.getText().toString());
+				postData.put("typeOfAuthentication",
+						typeOfAuthentication == null ? ""
+								: typeOfAuthentication.getText().toString());
+				postData.put("paypalId", paypal.getText().toString());
+				postData.put("deviceType", "0");
 
-		new Thread() {
-			@Override
-			public void run() {
+				if (wifi == null ? false : wifi.getText().toString()
+						.equalsIgnoreCase("Yes"))
+					postData.put("wifiPresent", "1");
+				else
+					postData.put("wifiPresent", "0");
 
-				try {
-					String response = WebServices.postRequest(
-							Constants.URL_SAVE_VENUEDETAILS, postData,
-							VenueRegistrationActivity.this);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
-					Log.d("Bartsy", "response :: " + response);
+			new Thread() {
+				@Override
+				public void run() {
 
-					if (response != null) {
-						final JSONObject json = new JSONObject(response);
+					try {
+						String response = WebServices.postRequest(
+								Constants.URL_SAVE_VENUEDETAILS, postData,
+								VenueRegistrationActivity.this);
 
-						handler.post(new Runnable() {
+						Log.d("Bartsy", "response :: " + response);
 
-							@Override
-							public void run() {
-								try {
-									int errorCode = Integer.parseInt(json
-											.getString("errorCode"));
-									String errorMessage = json
-											.getString("errorMessage");
-									String venueName = null, venueId = null;
-									Toast.makeText(getApplicationContext(),
-											errorMessage, Toast.LENGTH_LONG)
-											.show();
-									BartsyApplication app;
-									switch (errorCode) {
-									case 1:
-										// venue already exists - still save the
-										// profile locally for now
-//										venueName = "Chaya Venice";
-//										venueId = "5a0999dda39f9fe07a44";
-									case 0:
-										// Save the venue id in shared
-										// preferences
-										venueId = venueId == null ? json
-												.getString("venueId") : venueId;
-										venueName = venueName == null ? json
-												.getString("venueName")
-												: venueName;
-										SharedPreferences sharedPref = getSharedPreferences(
-												getResources()
-														.getString(
-																R.string.config_shared_preferences_name),
-												Context.MODE_PRIVATE);
-										SharedPreferences.Editor editor = sharedPref
-												.edit();
-										editor.putString("RegisteredVenueId",
-												venueId);
-										editor.putString("RegisteredVenueName",
-												venueName);
-										app = (BartsyApplication) getApplication();
-										app.venueProfileID = venueId;
-										app.venueProfileName = venueName;
+						if (response != null) {
+							final JSONObject json = new JSONObject(response);
 
-										editor.commit();
+							handler.post(new Runnable() {
 
-										Intent intent = new Intent(
-												VenueRegistrationActivity.this,
-												MainActivity.class);
-										intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-										startActivity(intent);
-										finish();
+								@Override
+								public void run() {
+									try {
+										int errorCode = Integer.parseInt(json
+												.getString("errorCode"));
+										String errorMessage = json
+												.getString("errorMessage");
+										String venueName = null, venueId = null;
+										Toast.makeText(getApplicationContext(),
+												errorMessage, Toast.LENGTH_LONG)
+												.show();
+										BartsyApplication app;
+										switch (errorCode) {
+										case 1:
+											// venue already exists - still save
+											// the
+											// profile locally for now
+											// venueName = "Chaya Venice";
+											// venueId = "5a0999dda39f9fe07a44";
+										case 0:
+											// Save the venue id in shared
+											// preferences
+											venueId = venueId == null ? json
+													.getString("venueId")
+													: venueId;
+											venueName = venueName == null ? json
+													.getString("venueName")
+													: venueName;
+											SharedPreferences sharedPref = getSharedPreferences(
+													getResources()
+															.getString(
+																	R.string.config_shared_preferences_name),
+													Context.MODE_PRIVATE);
+											SharedPreferences.Editor editor = sharedPref
+													.edit();
+											editor.putString(
+													"RegisteredVenueId",
+													venueId);
+											editor.putString(
+													"RegisteredVenueName",
+													venueName);
+											app = (BartsyApplication) getApplication();
+											app.venueProfileID = venueId;
+											app.venueProfileName = venueName;
+
+											editor.commit();
+
+											Intent intent = new Intent(
+													VenueRegistrationActivity.this,
+													MainActivity.class);
+											intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+											startActivity(intent);
+											finish();
+										}
+									} catch (NumberFormatException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									} catch (NotFoundException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									} catch (JSONException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
 									}
-								} catch (NumberFormatException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (NotFoundException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (JSONException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
+
 								}
+							});
 
-							}
-						});
+						}
 
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
-
-			}
-		}.start();
+			}.start();
+		} else {
+			WebServices.alertbox("Please try again....",
+					VenueRegistrationActivity.this);
+		}
 	}
 }
