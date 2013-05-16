@@ -224,9 +224,6 @@ public class Profile {
 
 	public static void DownloadImage(String URL, ImageView imageView) {
 
-		Random r = new Random();
-		@SuppressWarnings("unused")
-		int i = r.nextInt(4);
 		downloadFile(URL, imageView);
 		Log.i("im url", URL);
 

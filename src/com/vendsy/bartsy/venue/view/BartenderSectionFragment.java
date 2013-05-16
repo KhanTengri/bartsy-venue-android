@@ -3,18 +3,30 @@
  */
 package com.vendsy.bartsy.venue.view;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
+
 import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.BartsyApplication;
 import com.vendsy.bartsy.venue.MainActivity;
 import com.vendsy.bartsy.venue.model.Order;
 
 import android.support.v4.app.Fragment;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 /**
@@ -65,6 +77,10 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 	
 	public void updateOrdersView() {
 		
+		mNewOrdersView = (LinearLayout) mRootView.findViewById(R.id.view_new_order_list);
+		mAcceptedOrdersView = (LinearLayout) mRootView.findViewById(R.id.view_accepted_order_list);
+		mCompletedOrdersView = (LinearLayout) mRootView.findViewById(R.id.view_completed_order_list);
+		
 		Log.i("Bartsy", "About update orders list view");
 
 		if (mNewOrdersView == null || mAcceptedOrdersView == null || mCompletedOrdersView == null)
@@ -101,7 +117,12 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 				break;
 			}
 		}
+		
+		
 	}
+	
+
+	
 	
 	
 	@Override 

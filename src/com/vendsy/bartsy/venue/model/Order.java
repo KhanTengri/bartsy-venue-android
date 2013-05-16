@@ -1,13 +1,24 @@
 package com.vendsy.bartsy.venue.model;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.vendsy.bartsy.venue.R;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -156,7 +167,9 @@ public class Order  {
 		
 		if(this.orderSender!=null){
 			// Update sender profile section
-//			((ImageView)view.findViewById(R.id.view_order_profile_picture)).setImageBitmap(this.orderSender.image);
+			ImageView profileImageView = ((ImageView)view.findViewById(R.id.view_order_profile_picture));
+			image(this.orderSender.getProfileImageUrl(), profileImageView);
+			
 			((TextView) view.findViewById(R.id.view_order_profile_name)).setText(this.orderSender.username);
 		}
 
@@ -185,6 +198,89 @@ public class Order  {
 		((Button) view.findViewById(R.id.view_order_button_negative)).setTag(this);
 		view.setTag(this);
 		
+	}
+	
+	/*
+	 * This method is used to retrieve image from webservices
+	 */
+	public static void image(String image3, ImageView imageView) {
+
+		ArrayList<String> al = new ArrayList<String>();
+		StringTokenizer st = new StringTokenizer(image3, ":");
+		String s = null;
+		while (st.hasMoreTokens()) {
+			s = st.nextToken();
+			al.add(s);
+
+		}
+		// if (al.get(0).equalsIgnoreCase("http")) {
+		//
+		// image3 = al.get(0) + "s:" + al.get(1);
+		// DownloadImage(image3, imageView);
+		//
+		// } else {
+		DownloadImage(image3, imageView);
+		// }
+
+	}
+
+	public static void DownloadImage(String URL, ImageView imageView) {
+
+		downloadFile(URL, imageView);
+		Log.i("im url", URL);
+
+	}
+
+	static void downloadFile(final String fileUrl, final ImageView imageView) {
+
+		System.out.println("download file");
+		new AsyncTask<String, Void, Bitmap>() {
+			Bitmap bmImg;
+
+			protected void onPreExecute() {
+				// TODO Auto-generated method stub
+				super.onPreExecute();
+
+			}
+
+			protected Bitmap doInBackground(String... params) {
+				// TODO Auto-generated method stub
+
+				System.out.println("doing back ground");
+				URL myFileUrl = null;
+				try {
+					myFileUrl = new URL(fileUrl);
+				} catch (MalformedURLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+
+					HttpURLConnection conn = (HttpURLConnection) myFileUrl
+							.openConnection();
+					conn.setDoInput(true);
+					conn.connect();
+					InputStream is = conn.getInputStream();
+					bmImg = BitmapFactory.decodeStream(is);
+
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				return bmImg;
+			}
+
+			protected void onPostExecute(Bitmap result) {
+				// TODO Auto-generated method stub
+				System.out.println("on post ******************");
+
+				imageView.setImageBitmap(result);
+
+			}
+
+		}.execute();
+
 	}
 	
 }
