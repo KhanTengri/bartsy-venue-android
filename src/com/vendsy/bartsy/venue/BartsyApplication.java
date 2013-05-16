@@ -23,11 +23,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Application;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -187,9 +183,17 @@ public class BartsyApplication extends Application implements AppObservable {
 //		byte[] decodedString = Base64.decode(image, Base64.DEFAULT);
 //		Bitmap img = BitmapFactory.decodeByteArray(decodedString, 0,
 //				decodedString.length);
-
-		mPeople.add(profile);
-		notifyObservers(PEOPLE_UPDATED);
+		Profile existingPeople = null;
+		for (Profile people : mPeople) {
+			if(profile.userID.equals(people.userID)){
+				existingPeople = people;
+				break;
+			}
+		}
+		if(existingPeople==null){
+			mPeople.add(profile);
+			notifyObservers(PEOPLE_UPDATED);
+		}
 	}
 
 	
