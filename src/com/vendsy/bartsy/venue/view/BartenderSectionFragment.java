@@ -122,9 +122,6 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 	}
 	
 
-	
-	
-	
 	@Override 
 	public void onDestroyView() {
 		super.onDestroyView();
@@ -135,11 +132,20 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		mNewOrdersView = null;
 		mInflater = null;
 		mContainer = null;
-		
+	}
+	
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+
+		Log.i("Bartsy", "BartenderSectionFragment.onDestroy()");
+				
 		// Because the fragment may be destroyed while the activity persists, remove pointer from activity
 		((MainActivity) getActivity()).mBartenderFragment = null;
 	}
 		
+	
 	public void addOrders(Order order) {
 //		String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
 		
