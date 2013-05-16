@@ -191,7 +191,7 @@ public class Order  {
 			view.findViewById(R.id.view_order_header).setBackgroundResource(R.drawable.rounded_corner_green);
 			break;
 		}
-		((TextView) view.findViewById(R.id.view_order_number)).setText("Order " + this.serverID);
+		((TextView) view.findViewById(R.id.view_order_number)).setText(this.serverID);
 		((Button) view.findViewById(R.id.view_order_button_positive)).setText(positive);
 		((Button) view.findViewById(R.id.view_order_button_positive)).setTag(this);
 		((Button) view.findViewById(R.id.view_order_button_negative)).setText(negative);
