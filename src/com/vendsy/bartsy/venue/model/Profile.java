@@ -42,7 +42,6 @@ public class Profile {
 	private String birthday;
 	private String aboutMe;
 	private String relationshipStatus;
-	
 
 	ArrayList<Profile> likes = new ArrayList<Profile>();
 	ArrayList<Profile> favorites = new ArrayList<Profile>();
@@ -71,7 +70,7 @@ public class Profile {
 			gender = json.getString("gender");
 			name = json.getString("name");
 			profileImageUrl = json.getString("userImagePath");
-			this.profileImageUrl = Constants.DOMAIN_NAME.trim() + "/Bartsy/"
+			this.profileImageUrl = "http://54.235.76.180:8080/"
 					+ profileImageUrl.trim();
 
 			System.out.println("profileImageUrl " + profileImageUrl);
@@ -80,7 +79,6 @@ public class Profile {
 		}
 	}
 
-	
 	public String getDisplayName() {
 		return displayName;
 	}
