@@ -1,21 +1,11 @@
 package com.vendsy.bartsy.venue.model;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Random;
-import java.util.StringTokenizer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -23,6 +13,7 @@ import android.widget.TextView;
 
 import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.utils.Constants;
+import com.vendsy.bartsy.venue.utils.WebServices;
 
 public class Profile {
 
@@ -191,93 +182,23 @@ public class Profile {
 
 		ImageView profileImageView = (ImageView) view
 				.findViewById(R.id.ImageView16);
-		image(this.profileImageUrl, profileImageView);
+		if(image==null){
+			WebServices.downloadImage(this.profileImageUrl, this, profileImageView);
+		}else{
+			profileImageView.setImageBitmap(image);
+		}
 		view.setOnClickListener(listener);
 
 		view.setTag(this);
 
 	}
 
-	/*
-	 * This method is used to retrieve image from webservices
-	 */
-	public static void image(String image3, ImageView imageView) {
-
-		ArrayList<String> al = new ArrayList<String>();
-		StringTokenizer st = new StringTokenizer(image3, ":");
-		String s = null;
-		while (st.hasMoreTokens()) {
-			s = st.nextToken();
-			al.add(s);
-
-		}
-		// if (al.get(0).equalsIgnoreCase("http")) {
-		//
-		// image3 = al.get(0) + "s:" + al.get(1);
-		// DownloadImage(image3, imageView);
-		//
-		// } else {
-		DownloadImage(image3, imageView);
-		// }
-
+	public Bitmap getImage() {
+		return image;
 	}
 
-	public static void DownloadImage(String URL, ImageView imageView) {
-
-		downloadFile(URL, imageView);
-		Log.i("im url", URL);
-
+	public void setImage(Bitmap image) {
+		this.image = image;
 	}
-
-	static void downloadFile(final String fileUrl, final ImageView imageView) {
-
-		System.out.println("download file");
-		new AsyncTask<String, Void, Bitmap>() {
-			Bitmap bmImg;
-
-			protected void onPreExecute() {
-				// TODO Auto-generated method stub
-				super.onPreExecute();
-
-			}
-
-			protected Bitmap doInBackground(String... params) {
-				// TODO Auto-generated method stub
-
-				System.out.println("doing back ground");
-				URL myFileUrl = null;
-				try {
-					myFileUrl = new URL(fileUrl);
-				} catch (MalformedURLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				try {
-
-					HttpURLConnection conn = (HttpURLConnection) myFileUrl
-							.openConnection();
-					conn.setDoInput(true);
-					conn.connect();
-					InputStream is = conn.getInputStream();
-					bmImg = BitmapFactory.decodeStream(is);
-
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-				return bmImg;
-			}
-
-			protected void onPostExecute(Bitmap result) {
-				// TODO Auto-generated method stub
-				System.out.println("on post ******************");
-
-				imageView.setImageBitmap(result);
-
-			}
-
-		}.execute();
-
-	}
+	
 }

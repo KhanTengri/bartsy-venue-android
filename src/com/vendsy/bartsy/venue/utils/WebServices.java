@@ -1,8 +1,13 @@
 package com.vendsy.bartsy.venue.utils;
 
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -20,8 +25,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
+import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.vendsy.bartsy.venue.GCMIntentService;
 import com.vendsy.bartsy.venue.R;
@@ -99,6 +108,61 @@ public class WebServices {
 
 		}
 		return response;
+
+	}
+	
+	public static void downloadImage(final String fileUrl, final Object model, final ImageView imageView) {
+
+		System.out.println("download file");
+		new AsyncTask<String, Void, Bitmap>() {
+			Bitmap bmImg;
+
+			protected void onPreExecute() {
+				// TODO Auto-generated method stub
+				super.onPreExecute();
+
+			}
+
+			protected Bitmap doInBackground(String... params) {
+				// TODO Auto-generated method stub
+
+				System.out.println("doing back ground");
+				URL myFileUrl = null;
+				try {
+					myFileUrl = new URL(fileUrl);
+				} catch (MalformedURLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+
+					HttpURLConnection conn = (HttpURLConnection) myFileUrl
+							.openConnection();
+					conn.setDoInput(true);
+					conn.connect();
+					InputStream is = conn.getInputStream();
+					bmImg = BitmapFactory.decodeStream(is);
+
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				return bmImg;
+			}
+
+			protected void onPostExecute(Bitmap result) {
+				// TODO Auto-generated method stub
+				System.out.println("on post ******************");
+				if(model instanceof Profile){
+					Profile profile = (Profile)model;
+					profile.setImage(result);
+				}
+				imageView.setImageBitmap(result);
+
+			}
+
+		}.execute();
 
 	}
 
