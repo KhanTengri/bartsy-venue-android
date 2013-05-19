@@ -8,24 +8,23 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.google.android.gms.plus.model.people.Person;
-import com.vendsy.bartsy.venue.R;
-import com.vendsy.bartsy.venue.model.Profile;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.support.v4.app.DialogFragment;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.vendsy.bartsy.venue.R;
+import com.vendsy.bartsy.venue.model.Profile;
 
 /**
  * @author peterkellis

@@ -2,7 +2,7 @@ package com.vendsy.bartsy.venue.model;
 
 public class Venue {
 
-	private String id;
+	private String id; // Unique key which is generated in the server
 	private String name;
 	private String latitude;
 	private String longitude;

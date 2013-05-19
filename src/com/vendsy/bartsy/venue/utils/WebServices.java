@@ -110,12 +110,18 @@ public class WebServices {
 		return response;
 
 	}
-	
+	/**
+	 * To download image from the url and save in the model(Object)
+	 * 
+	 * @param fileUrl
+	 * @param model
+	 * @param imageView
+	 */
 	public static void downloadImage(final String fileUrl, final Object model, final ImageView imageView) {
 
 		System.out.println("download file");
 		new AsyncTask<String, Void, Bitmap>() {
-			Bitmap bmImg;
+			Bitmap bitmapImg;
 
 			protected void onPreExecute() {
 				// TODO Auto-generated method stub
@@ -141,14 +147,14 @@ public class WebServices {
 					conn.setDoInput(true);
 					conn.connect();
 					InputStream is = conn.getInputStream();
-					bmImg = BitmapFactory.decodeStream(is);
+					bitmapImg = BitmapFactory.decodeStream(is);
 
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
-				return bmImg;
+				return bitmapImg;
 			}
 
 			protected void onPostExecute(Bitmap result) {
@@ -165,7 +171,14 @@ public class WebServices {
 		}.execute();
 
 	}
-
+	/**
+	 * Service call for the user check in or out
+	 * 
+	 * @param context
+	 * @param venueId
+	 * @param url
+	 * @return
+	 */
 	public static String userCheckInOrOut(final Context context,
 			String venueId, String url) {
 		String response = null;
@@ -235,14 +248,18 @@ public class WebServices {
 
 		return result;
 	}
-
+	/**
+	 * Service call to change order status
+	 * 
+	 * @param order
+	 * @param context
+	 */
 	public static void orderStatusChanged(final Order order,
 			final Context context) {
 		new Thread() {
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				try {
 					String response;
 					response = postRequest(Constants.URL_UPDATE_ORDER_STATUS,
@@ -254,62 +271,6 @@ public class WebServices {
 				}
 			}
 		}.start();
-	}
-
-	public static void saveProfileData(Profile bartsyProfile, Context context) {
-		try {
-			// To get GCM reg ID from the Shared Preference
-			SharedPreferences settings = context.getSharedPreferences(
-					GCMIntentService.REG_ID, 0);
-			String deviceToken = settings.getString("RegId", "");
-
-			int deviceType = Constants.DEVICE_Type;
-			JSONObject json = new JSONObject();
-			json.put("userName", bartsyProfile.getUsername());
-			json.put("name", bartsyProfile.getName());
-			json.put("loginId", bartsyProfile.getSocialNetworkId());
-			json.put("loginType", bartsyProfile.getType());
-			json.put("gender", bartsyProfile.getGender());
-			json.put("deviceType", deviceType);
-			json.put("deviceToken", deviceToken);
-
-			try {
-				String responses = WebServices.postRequest(
-						Constants.URL_POST_PROFILE_DATA, json,
-						context.getApplicationContext());
-				System.out.println("responses   " + responses);
-				if (bartsyProfile != null) {
-					int bartsyUserId = 0;
-					JSONObject resultJson = new JSONObject(responses);
-					String errorCode = resultJson.getString("errorCode");
-					String errorMessage = resultJson.getString("errorMessage");
-					if (resultJson.has("bartsyUserId"))
-						bartsyUserId = resultJson.getInt("bartsyUserId");
-
-					System.out.println("bartsyUserId " + bartsyUserId);
-
-					if (bartsyUserId > 0) {
-						SharedPreferences sharedPref = context
-								.getSharedPreferences(
-										context.getResources()
-												.getString(
-														R.string.config_shared_preferences_name),
-										Context.MODE_PRIVATE);
-						Resources r = context.getResources();
-
-						SharedPreferences.Editor editor = sharedPref.edit();
-						editor.putInt(r.getString(R.string.bartsyUserId),
-								bartsyUserId);
-						editor.commit();
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
 	}
 
 	// alert box

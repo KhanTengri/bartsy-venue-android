@@ -176,7 +176,11 @@ public class BartsyApplication extends Application implements AppObservable {
 		mPeople.add(profile);
 		notifyObservers(PEOPLE_UPDATED);
 	}
-	
+	/**
+	 * To add profile to the existing checked in people list
+	 * 
+	 * @param profile
+	 */
 	public void addPerson(Profile profile) {
 
 //		// Decode the user image and create a new incoming profile
@@ -262,7 +266,11 @@ public class BartsyApplication extends Application implements AppObservable {
 		mOrders.add(order);
 		notifyObservers(ORDERS_UPDATED);
 	}
-	
+	/**
+	 * Called from the push notification when the order receives from the user
+	 * 
+	 * @param order
+	 */
 	public void addOrder(Order order) {
 		// Find the person who placed the order in the list of people in this
 		// bar. If not found, don't accept the order

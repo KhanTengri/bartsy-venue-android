@@ -145,7 +145,11 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		((MainActivity) getActivity()).mBartenderFragment = null;
 	}
 		
-	
+	/**
+	 * To add order to the existing orders list and update in the list view
+	 * 
+	 * @param order
+	 */
 	public void addOrders(Order order) {
 //		String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
 		

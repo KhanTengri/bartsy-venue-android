@@ -80,10 +80,16 @@ public class Order  {
 		
 		calculateTotalPrice();
 	}
-	
+	/**
+	 *  Default constructor
+	 */
 	public Order() {
 	}
-	
+	/**
+	 * Constructor to parse all the information from the JSON
+	 * 
+	 * @param json
+	 */
 	public Order(JSONObject json) {
 		
 		try {
@@ -102,7 +108,9 @@ public class Order  {
 		}
 		
 	}
-	
+	/**
+	 * To process next positive state for the 0rder
+	 */
 	public void nextPositiveState() {
 		switch (this.status) {
 		case ORDER_STATUS_NEW:
@@ -116,7 +124,10 @@ public class Order  {
 			break;
 		}
 	}
-	
+	/**
+	 * It will calculates the total price based on price, quantity and tipAmount
+	 * 
+	 */
 	public void calculateTotalPrice() {
 		float actualPrice = (price * quantity);
 		float subTotal =  actualPrice * ((tipAmount + 8) / 100);
@@ -124,7 +135,9 @@ public class Order  {
 		total = actualPrice + subTotal;
 
 	}
-	
+	/**
+	 * It will returns JSON format to update order status
+	 */
 	public JSONObject statusChangedJSON(){
 		final JSONObject orderData = new JSONObject();
 		try {
