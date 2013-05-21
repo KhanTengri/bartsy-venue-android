@@ -229,7 +229,7 @@ public class MainActivity extends FragmentActivity implements
 							return;
 						}
 						// To parse checked in users
-						if(json.has("checkedInUsers")){
+						if(json.has("checkedInUsers") && mApp.mPeople.size()==0){
 							JSONArray users = json.getJSONArray("checkedInUsers");
 							
 							for(int i=0; i<users.length() ; i++){
@@ -237,7 +237,7 @@ public class MainActivity extends FragmentActivity implements
 							}
 						}
 						// To parse orders from JSON object
-						if(json.has("orders")){
+						if(json.has("orders") && mApp.mOrders.size()==0){
 							JSONArray orders = json.getJSONArray("orders");
 							
 							for(int j=0; j<orders.length();j++){
