@@ -175,20 +175,21 @@ public class Profile {
 	}
 
 	public void updateView(OnClickListener listener) {
-		((ImageView) view.findViewById(R.id.view_user_list_image_resource))
-				.setImageBitmap(this.image);
+
 		((TextView) view.findViewById(R.id.view_user_list_name))
 				.setText(this.name);
 
+		// Update the profile image - if the image doesn't exist locally, get it from the server
 		ImageView profileImageView = (ImageView) view
-				.findViewById(R.id.ImageView16);
-		if(image==null){
+				.findViewById(R.id.view_user_list_image_resource);
+		if (image == null){
 			WebServices.downloadImage(this.profileImageUrl, this, profileImageView);
-		}else{
+		} else {
 			profileImageView.setImageBitmap(image);
 		}
 		view.setOnClickListener(listener);
 
+		// We use the view's tag as a pointer to the class so we can easily find the class from the UI
 		view.setTag(this);
 
 	}
