@@ -292,6 +292,32 @@ public class BartsyApplication extends Application implements AppObservable {
 		mOrders.add(order);
 		notifyObservers(ORDERS_UPDATED);
 	}
+	
+	/**
+	 * Order updated with orderSender profile and add to the orders list
+	 * 
+	 * @param order
+	 */
+	public void addOrderWithOutNotify(Order order) {
+		// Find the person who placed the order in the list of people in this
+		// bar. If not found, don't accept the order
+		order.orderSender = null;
+		for (Profile p : mPeople) {
+			if (p.userID.equalsIgnoreCase(order.profileId)) {
+				// User found
+				order.orderSender = p;
+				break;
+			}
+		}
+		if (order.orderSender == null) {
+			Log.d(TAG, "Error processing command. user not checked in: "
+					+ order.profileId);
+			return;
+		}
+		
+		// Add the order to the list of orders
+		mOrders.add(order);
+	}
 
 
 	/************************************************************************

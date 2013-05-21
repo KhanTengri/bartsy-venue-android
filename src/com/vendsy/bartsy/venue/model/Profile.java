@@ -64,7 +64,6 @@ public class Profile {
 			this.profileImageUrl = Constants.DOMAIN_NAME
 					+ profileImageUrl.trim();
 
-			System.out.println("profileImageUrl " + profileImageUrl);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

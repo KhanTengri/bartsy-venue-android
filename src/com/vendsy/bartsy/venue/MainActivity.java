@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Locale;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParserException;
@@ -14,6 +15,7 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -70,6 +72,11 @@ public class MainActivity extends FragmentActivity implements
 	public BartenderSectionFragment mBartenderFragment = null; 	// make sure the set this to null when fragment is destroyed
 	public PeopleSectionFragment mPeopleFragment = null;		// make sure the set this to null when fragment is destroyed
 
+	// Progress dialog
+	private ProgressDialog progressDialog;
+	// Handler 
+	private Handler handler = new Handler();
+	
 	public void appendStatus(String status) {
 		Log.d(TAG, status);
 	}
@@ -195,7 +202,87 @@ public class MainActivity extends FragmentActivity implements
 		 * from other components.
 		 */
 		mApp.addObserver(this);
+		
 
+		if (!Constants.USE_ALLJOYN && (mApp.mOrders.size()==0 || mApp.mPeople.size()==0) ) {
+			// Start progress dialog from here
+			handler.post(new Runnable() {
+				
+				@Override
+				public void run() {
+					progressDialog = Utilities.progressDialog(MainActivity.this);
+					progressDialog.show();
+				}
+			});
+			
+
+			// Call web service in the background
+			new Thread() {
+				@Override
+				public void run() {
+					try {
+						// Web service call to get lost local data from server
+						JSONObject json = WebServices.syncWithServer(
+								mApp.venueProfileID, MainActivity.this);
+						// Error Handling
+						if(json==null){
+							return;
+						}
+						// To parse checked in users
+						if(json.has("checkedInUsers")){
+							JSONArray users = json.getJSONArray("checkedInUsers");
+							
+							for(int i=0; i<users.length() ; i++){
+								mApp.mPeople.add(new Profile(users.getJSONObject(i)));
+							}
+						}
+						// To parse orders from JSON object
+						if(json.has("orders")){
+							JSONArray orders = json.getJSONArray("orders");
+							
+							for(int j=0; j<orders.length();j++){
+								mApp.addOrderWithOutNotify(new Order(orders.getJSONObject(j)));
+							}
+						}
+						
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+					// To update list items in People and orders tab
+					updateListViews();
+					
+				}
+			}.start();
+
+		}
+	}
+	/**
+	 * To update list views of people and orders
+	 */
+	protected void updateListViews() {
+		handler.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				// To close progress dialog
+				if(progressDialog!=null){
+					progressDialog.dismiss();
+				}
+				
+				// To update peoples list view
+				if (mPeopleFragment != null) {
+					mPeopleFragment.updatePeopleView();
+					updatePeopleCount();
+				}
+				// To update orders list view
+				if (mBartenderFragment != null) {
+					mBartenderFragment.updateOrdersView();
+					updateOrdersCount();
+				}
+			}
+		});
+		
+		
 	}
 
 	private void initializeFragments() {
@@ -283,7 +370,6 @@ public class MainActivity extends FragmentActivity implements
 
 	}
 
-
 	/******
 	 * 
 	 * 
@@ -363,7 +449,7 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	/*
-	 * Updates the action bar tab with the number of people checked in
+	 * Updates the action bar tab with the number of open orders
 	 */
 
 	void updatePeopleCount() {
@@ -379,7 +465,6 @@ public class MainActivity extends FragmentActivity implements
 				"People (" + mApp.mPeople.size() + ")");
 	}
 
-	
 	/***********
 	 * 
 	 * TODO - Views management
@@ -414,7 +499,6 @@ public class MainActivity extends FragmentActivity implements
 			 R.string.title_inventory, R.string.title_people };
 	
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
 
 
 		public SectionsPagerAdapter(FragmentManager fm) {

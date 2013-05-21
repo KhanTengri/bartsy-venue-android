@@ -15,6 +15,7 @@
  */
 package com.vendsy.bartsy.venue.utils;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 
@@ -35,7 +36,6 @@ public final class Utilities {
 //	public static final String SENDER_ID = "227827031375";
 	public static final String SENDER_ID = "605229245886"; //public server
 	
-
 	/**
 	 * Tag used on log messages.
 	 */
@@ -67,5 +67,22 @@ public final class Utilities {
 		Intent intent = new Intent(DISPLAY_MESSAGE_ACTION);
 		intent.putExtra(EXTRA_MESSAGE, message);
 		context.sendBroadcast(intent);
+	}
+	
+	/**
+	 * To prepare progress dialog
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public static ProgressDialog progressDialog(Context context){
+		ProgressDialog mProgressDialog = new ProgressDialog(context);
+		
+		// To configure the loading dialog
+        mProgressDialog.setMessage("Loading..");
+        mProgressDialog.setIndeterminate(false);
+        mProgressDialog.setCancelable(true);
+        
+        return mProgressDialog;
 	}
 }

@@ -110,6 +110,7 @@ public class WebServices {
 		return response;
 
 	}
+
 	/**
 	 * To download image from the url and save in the model(Object)
 	 * 
@@ -117,7 +118,8 @@ public class WebServices {
 	 * @param model
 	 * @param imageView
 	 */
-	public static void downloadImage(final String fileUrl, final Object model, final ImageView imageView) {
+	public static void downloadImage(final String fileUrl, final Object model,
+			final ImageView imageView) {
 
 		System.out.println("download file");
 		new AsyncTask<String, Void, Bitmap>() {
@@ -160,8 +162,8 @@ public class WebServices {
 			protected void onPostExecute(Bitmap result) {
 				// TODO Auto-generated method stub
 				System.out.println("on post ******************");
-				if(model instanceof Profile){
-					Profile profile = (Profile)model;
+				if (model instanceof Profile) {
+					Profile profile = (Profile) model;
 					profile.setImage(result);
 				}
 				imageView.setImageBitmap(result);
@@ -171,6 +173,7 @@ public class WebServices {
 		}.execute();
 
 	}
+
 	/**
 	 * Service call for the user check in or out
 	 * 
@@ -224,6 +227,7 @@ public class WebServices {
 		String result = "";
 
 		try {
+			// To check network connection available or not
 			boolean status = isNetworkAvailable(context);
 			if (status == true) {
 
@@ -231,6 +235,7 @@ public class WebServices {
 
 				HttpResponse response = httpClient.execute(httpRequest);
 
+				// To read response by using buffer
 				bufferReader = new BufferedReader(new InputStreamReader(
 						response.getEntity().getContent()));
 				String line = "";
@@ -248,6 +253,7 @@ public class WebServices {
 
 		return result;
 	}
+
 	/**
 	 * Service call to change order status
 	 * 
@@ -271,6 +277,35 @@ public class WebServices {
 				}
 			}
 		}.start();
+	}
+
+	/**
+	 * Service call to get lost data locally from server
+	 * 
+	 * @param order
+	 * @param context
+	 */
+	public static JSONObject syncWithServer(final String venueId,
+			final Context context) {
+
+		try {
+			String response;
+			// To get all checked in profiles and open orders data based on the
+			// venue Id
+			JSONObject json = new JSONObject();
+			json.put("venueId", venueId);
+
+			// Sync service call
+			response = postRequest(Constants.URL_SYNC_WITH_SERVER, json,
+					context);
+
+			// Return response in JSON object
+			return new JSONObject(response);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	// alert box

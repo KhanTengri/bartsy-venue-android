@@ -4,6 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,16 +22,20 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.Toast;
 
 import com.vendsy.bartsy.venue.utils.Constants;
+import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
 
 public class VenueRegistrationActivity extends Activity implements
 		OnClickListener {
-
+	// Form elements
 	private EditText locuId, paypal, wifiName, wifiPassword;
 	private RadioGroup typeOfAuthentication, wifiPresent;
 
 	private Handler handler = new Handler();
 	private LinearLayout wifiNameLinear, wifiTypeLinear, wifiPasswordLinear;
+	
+	// Progress dialog
+	private ProgressDialog progressDialog;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -91,7 +96,7 @@ public class VenueRegistrationActivity extends Activity implements
 	 * Invokes this method when the user clicks on the Register Button
 	 */
 	public void registrationAction() {
-
+		
 		int selectedWifiPresent = wifiPresent.getCheckedRadioButtonId();
 
 		// Gets a reference to our "selected" radio button
@@ -133,6 +138,11 @@ public class VenueRegistrationActivity extends Activity implements
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+			
+			// Start progress dialog from here
+			progressDialog = Utilities.progressDialog(this);
+			progressDialog.show();
+			
 			// Call web service in the background
 			new Thread() {
 				@Override
@@ -223,8 +233,13 @@ public class VenueRegistrationActivity extends Activity implements
 				app = (BartsyApplication) getApplication();
 				app.venueProfileID = venueId;
 				app.venueProfileName = venueName;
-
+				
 				editor.commit();
+				
+				// Remove progress dialog
+				if(progressDialog!=null){
+					progressDialog.dismiss();
+				}
 				
 				// To navigate main page and try to close this screen
 				Intent intent = new Intent(
@@ -233,6 +248,7 @@ public class VenueRegistrationActivity extends Activity implements
 				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 				finish();
+				
 			}
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
