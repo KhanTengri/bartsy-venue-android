@@ -42,7 +42,9 @@ public class PeopleSectionFragment extends Fragment implements OnClickListener {
 		mRootView = inflater.inflate(R.layout.users_main, container, false);
 		mPeopleListView = (LinearLayout) mRootView.findViewById(R.id.view_singles);
 		
+		// Make sure the fragment pointed to by the activity is accurate
 		mApp = (BartsyApplication) getActivity().getApplication();
+		((MainActivity) getActivity()).mPeopleFragment = this;		
 
 		updatePeopleView();
         
@@ -76,22 +78,15 @@ public class PeopleSectionFragment extends Fragment implements OnClickListener {
 	}
 	
 	@Override 
-	public void onDestroyView() {
-		super.onDestroyView();
+	public void onDestroy() {
+		super.onDestroy();
 		
-		Log.i("Bartsy", "PeopleSectionFragment.onDestroyView()");
+		Log.i("Bartsy", "PeopleSectionFragment.onDestroy()");
 
 		mRootView = null;
 		mPeopleListView = null;
 		mInflater = null;
 		mContainer = null;
-	}
-	
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		
-		Log.i("Bartsy", "PeopleSectionFragment.onDestroy()");
 
 		// Because the fragment may be destroyed while the activity persists, remove pointer from activity
 		((MainActivity) getActivity()).mPeopleFragment = null;

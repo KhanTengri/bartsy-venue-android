@@ -144,7 +144,7 @@ public class MainActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 
 		// Log function call
-		Log.i(TAG, this.toString() + "onCreate()");
+		Log.i(TAG, "MainActivity.onCreate()");
 
 		// Setup application pointer
 		mApp = (BartsyApplication) getApplication();
@@ -189,16 +189,38 @@ public class MainActivity extends FragmentActivity implements
 					.setText(mSectionsPagerAdapter.getPageTitle(i))
 					.setTabListener(this));
 		}
+		
+		/*
+		 * Now that we're all ready to go, we are ready to accept notifications
+		 * from other components.
+		 */
+		mApp.addObserver(this);
+
 	}
 
 	private void initializeFragments() {
-		// Initialize bartender view
-		if (mBartenderFragment == null) 
+		
+		Log.i(TAG, "MainActivity.initializeFragments()");
+		
+		// Initialize bartender fragment - the fragment may still exist even though the activity has restarted
+		BartenderSectionFragment f = (BartenderSectionFragment) getSupportFragmentManager().findFragmentById(R.string.title_bartender);
+		if ( f == null) {
+			Log.i(TAG, "Bartender fragment not found. Creating one.");
 			mBartenderFragment = new BartenderSectionFragment();
-
-		// Initialize people view
-		if (mPeopleFragment == null) 
+		} else {
+			Log.i(TAG, "Bartender fragment found.");
+			mBartenderFragment = f;
+		}
+		
+		// Initialize people fragment - reuse the fragment if it's already in memory
+		PeopleSectionFragment p = (PeopleSectionFragment) getSupportFragmentManager().findFragmentById(R.string.title_people);
+		if (mPeopleFragment == null) {
+			Log.i(TAG, "People fragment not found. Creating one.");
 			mPeopleFragment = new PeopleSectionFragment();
+		} else {
+			Log.i(TAG, "People fragment found.");
+			mPeopleFragment = p;
+		}
 	}
 
 	@Override
@@ -207,7 +229,7 @@ public class MainActivity extends FragmentActivity implements
 		EasyTracker.getInstance().activityStart(this); // Add this method.
 
 		// Log function call
-		appendStatus(this.toString() + "onCreate()");
+		appendStatus("MainActivity.onStart()");
 
 		/*
 		 * Keep a pointer to the Android Application class around. We use this
@@ -218,19 +240,13 @@ public class MainActivity extends FragmentActivity implements
 
 		mApp.checkin();
 
-		/*
-		 * Now that we're all ready to go, we are ready to accept notifications
-		 * from other components.
-		 */
-		mApp.addObserver(this);
 
 		// This initiates a series of events from the application, handled
 		// by the hander
-		mApp.hostInitChannel();
+//		mApp.hostInitChannel();
 
 		// update the state of the action bar depending on our connection state.
 		updateActionBarStatus();
-		updateOrdersCount();
 
 		// If the tablet hasn't yet been registered started the registration
 		// activity
@@ -256,9 +272,17 @@ public class MainActivity extends FragmentActivity implements
 	public void onStop() {
 		super.onStop();
 		appendStatus("onStop()");
-		mApp = (BartsyApplication) getApplication();
-		mApp.deleteObserver(this);
 	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		Log.i(TAG, "MainActivity().onDestroy()");
+
+		mApp.deleteObserver(this);
+
+	}
+
 
 	/******
 	 * 
@@ -315,6 +339,10 @@ public class MainActivity extends FragmentActivity implements
 							"Invalid venue configuration. Please uninstall then reinstall Bartsy.");
 		else
 			getActionBar().setTitle(mApp.venueProfileName);
+
+		// Update tab titles
+		updateOrdersCount();
+		updatePeopleCount();
 	}
 
 	/*
@@ -322,20 +350,32 @@ public class MainActivity extends FragmentActivity implements
 	 */
 
 	void updateOrdersCount() {
-		// Update tab title with the number of orders - for now hardcode the tab
-		// at the right position
-		getActionBar().getTabAt(0).setText(
+		// find the index of the orders tab
+		int i; 
+		for (i = 0 ; i < mTabs.length ; i++) {
+			if (mTabs[i] == R.string.title_bartender)
+				break;
+		}
+		
+		// update the orders tab title
+		getActionBar().getTabAt(i).setText(
 				"Orders (" + mApp.mOrders.size() + ")");
 	}
 
 	/*
-	 * Updates the action bar tab with the number of open orders
+	 * Updates the action bar tab with the number of people checked in
 	 */
 
 	void updatePeopleCount() {
-		// Update tab title with the number of orders - for now hardcode the tab
-		// at the right position
-		getActionBar().getTabAt(1).setText(
+		// find the index of the people tab
+		int i; 
+		for (i = 0 ; i < mTabs.length ; i++) {
+			if (mTabs[i] == R.string.title_people)
+				break;
+		}
+		
+		// update the people tab title
+		getActionBar().getTabAt(i).setText(
 				"People (" + mApp.mPeople.size() + ")");
 	}
 
@@ -370,10 +410,12 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	MainActivity main_activity = this;
 
+	private static final int mTabs[] = { R.string.title_bartender,
+			 R.string.title_inventory, R.string.title_people };
+	
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-		private int mTabs[] = { R.string.title_bartender,
-				R.string.title_people, R.string.title_inventory };
+
 
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
@@ -523,6 +565,7 @@ public class MainActivity extends FragmentActivity implements
 			case HANDLE_ORDERS_UPDATED_EVENT: 
 				Log.i(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_ORDERS_UPDATED_EVENT");
 				if (mBartenderFragment != null) {
+					Log.i(TAG,"Updating orders view and count...");
 					mBartenderFragment.updateOrdersView();
 					updateOrdersCount();
 				}
@@ -530,6 +573,7 @@ public class MainActivity extends FragmentActivity implements
 			case HANDLE_PEOPLE_UPDATED_EVENT: 
 				Log.i(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_PEOPLE_UPDATED_EVENT");
 				if (mPeopleFragment != null) {
+					Log.i(TAG,"Updating people view and count...");
 					mPeopleFragment.updatePeopleView();
 					updatePeopleCount();
 				}
