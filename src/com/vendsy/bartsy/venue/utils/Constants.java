@@ -45,4 +45,7 @@ public class Constants {
 	public static final int DEVICE_Type = 0;
 	// This is the url for download the facebook picture
 	public static final String FB_PICTURE = "https://graph.facebook.com/";
+	
+	public static final String INGREDIENTS_CSV_FILE = "Ingredients.csv";
+	
 }

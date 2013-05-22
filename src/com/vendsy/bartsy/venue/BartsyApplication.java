@@ -34,6 +34,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.google.android.gcm.GCMRegistrar;
+import com.vendsy.bartsy.venue.db.DatabaseManager;
 import com.vendsy.bartsy.venue.model.AppObservable;
 import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.model.Profile;
@@ -122,7 +123,8 @@ public class BartsyApplication extends Application implements AppObservable {
 		System.out.println("the registration id is:::::" + regId);
 
 		// --------------------------------------------
-
+		// DataBase initialization - First activity should call this method
+		DatabaseManager.getNewInstance(this);
 	}
 
 	/**

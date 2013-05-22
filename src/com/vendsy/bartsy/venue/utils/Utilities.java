@@ -15,6 +15,14 @@
  */
 package com.vendsy.bartsy.venue.utils;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.vendsy.bartsy.venue.db.DatabaseManager;
+import com.vendsy.bartsy.venue.model.Ingredient;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -84,5 +92,36 @@ public final class Utilities {
         mProgressDialog.setCancelable(true);
         
         return mProgressDialog;
+	}
+	
+	/**
+	 * To read ingredients data from CSV file and save in the db
+	 * 
+	 * @param context
+	 */
+	public static void saveIngredientsFromCSVFile(Context context){
+		String data[] = null;
+        // Try to read ingredients data from CSV file 
+        try {
+        	// Initialise the CSVReader object with CSV file by using InputStream
+            CSVReader reader = new CSVReader(new InputStreamReader(context.getAssets().open(Constants.INGREDIENTS_CSV_FILE)));
+            data = reader.readNext();
+            //Loop until the end of the line
+            while(data!=null) {
+                data = reader.readNext();
+                // To ignore empty categories and empty types
+                if(data != null && !data[1].trim().equals("") && !data[2].trim().equals("")) {
+                	// To set the properties for Ingredient model
+                	Ingredient ingredient = new Ingredient();
+                	ingredient.setName(data[0]);
+                	ingredient.setCategory(data[1]);
+                	ingredient.setType(data[2]);
+                	// Here saving in the DB
+                	DatabaseManager.getInstance().saveIngredient(ingredient);
+                } 
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
 }
