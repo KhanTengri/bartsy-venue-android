@@ -6,6 +6,7 @@ import java.util.Date;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -125,6 +126,26 @@ public class Order  {
 			break;
 		}
 	}
+	/**
+	 * To process next negative state for the 0rder
+	 */
+	public void nextNegativeState() {
+		Log.i("Before Change state "," nextNegativeState "+this.status);
+		switch (this.status) {
+		case ORDER_STATUS_NEW:
+			this.status = ORDER_STATUS_REJECTED;
+			break;
+		case ORDER_STATUS_IN_PROGRESS:
+			this.status = ORDER_STATUS_FAILED;
+			break;
+		case ORDER_STATUS_READY:
+			this.status = ORDER_STATUS_INCOMPLETE;
+			break;
+		}
+		Log.i("After Change state "," nextNegativeState "+this.status);
+	}
+	
+	
 	/**
 	 * It will calculates the total price based on price, quantity and tipAmount
 	 * 

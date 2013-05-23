@@ -178,6 +178,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		Log.i("Bartsy", "Click event");
 
 		switch (v.getId()) {
+		// On order positive button pressed
 		case R.id.view_order_button_positive:
 			Order order = (Order) v.getTag();
 			Log.i("Bartsy", "Clicked on order positive button");
@@ -211,6 +212,53 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			((MainActivity) getActivity()).sendOrderStatusChanged(order);
 
 			break;
+			
+			// On order negative button pressed
+		case R.id.view_order_button_negative:
+
+			Log.i("Bartsy", "Clicked on order negative button");
+			Order orderNegative = (Order) v.getTag();
+			Log.i("before status changed ",orderNegative.status+"");
+			// Update the order status locally 
+			orderNegative.nextNegativeState();
+			Log.i("after status changed ",orderNegative.status+"");
+			
+			switch (orderNegative.status) {
+			
+			case Order.ORDER_STATUS_REJECTED:
+				Log.i("Negative button "," Case : Order.ORDER_STATUS_REJECTED");
+				// Trash the order for now 
+				mNewOrdersView.removeView(orderNegative.view);
+				orderNegative.view = null;
+				mApp.mOrders.remove(orderNegative);
+				
+
+				break;
+			case Order.ORDER_STATUS_INCOMPLETE:
+				Log.i("Negative button "," Case : Order.ORDER_STATUS_INCOMPLETE");
+				// Trash the order for now 
+				mCompletedOrdersView.removeView(orderNegative.view);
+				orderNegative.view = null;
+				mApp.mOrders.remove(orderNegative);
+				break;
+			case Order.ORDER_STATUS_FAILED:
+				
+				Log.i("Negative button "," Case : Order.ORDER_STATUS_FAILED");
+				// Trash the order for now 
+				
+				mAcceptedOrdersView.removeView(orderNegative.view);
+				orderNegative.view = null;
+				mApp.mOrders.remove(orderNegative);
+				break;
+				
+			}
+			// Send updated order status to the remote
+			((MainActivity) getActivity())
+					.sendOrderStatusChanged(orderNegative);
+			break;
+
+			
+			
 		}
 	}
 }
