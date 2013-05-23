@@ -23,6 +23,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
@@ -86,7 +89,7 @@ import com.vendsy.bartsy.venue.view.AppObserver;
 public class BartsyApplication extends Application implements AppObservable {
 	private static final String TAG = "Bartsy";
 	public static String PACKAGE_NAME;
-	
+
 	/**
 	 * When created, the application fires an intent to create the AllJoyn
 	 * service. This acts as sort of a combined view/controller in the overall
@@ -178,6 +181,7 @@ public class BartsyApplication extends Application implements AppObservable {
 		mPeople.add(profile);
 		notifyObservers(PEOPLE_UPDATED);
 	}
+
 	/**
 	 * To add profile to the existing checked in people list
 	 * 
@@ -185,35 +189,34 @@ public class BartsyApplication extends Application implements AppObservable {
 	 */
 	public void addPerson(Profile profile) {
 
-//		// Decode the user image and create a new incoming profile
-//		byte[] decodedString = Base64.decode(image, Base64.DEFAULT);
-//		Bitmap img = BitmapFactory.decodeByteArray(decodedString, 0,
-//				decodedString.length);
+		// // Decode the user image and create a new incoming profile
+		// byte[] decodedString = Base64.decode(image, Base64.DEFAULT);
+		// Bitmap img = BitmapFactory.decodeByteArray(decodedString, 0,
+		// decodedString.length);
 		Profile existingPeople = null;
 		for (Profile people : mPeople) {
-			if(profile.userID.equals(people.userID)){
+			if (profile.userID.equals(people.userID)) {
 				existingPeople = people;
 				break;
 			}
 		}
-		if(existingPeople==null){
+		if (existingPeople == null) {
 			mPeople.add(profile);
 			notifyObservers(PEOPLE_UPDATED);
 		}
 	}
 
-	
 	/**
 	 * Called when we have a person check out of a venue
 	 */
 	void removePerson(String profileId) {
 		for (Profile profile : mPeople) {
-			if(profileId.equals(profile.userID)){
+			if (profileId.equals(profile.userID)) {
 				mPeople.remove(profile);
 				break;
 			}
 		}
-		
+
 		notifyObservers(PEOPLE_UPDATED);
 	}
 
@@ -234,8 +237,8 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * checked in this venue
 	 */
 
-	void addOrder(String serverOrderID, String title,
-			String description, String price, String userid) {
+	void addOrder(String serverOrderID, String title, String description,
+			String price, String userid) {
 
 		Log.i(TAG, "New " + title + " for: " + userid);
 
@@ -257,8 +260,7 @@ public class BartsyApplication extends Application implements AppObservable {
 
 		// Create a new order
 		Order order = new Order();
-		order.initialize( 
-				serverOrderID, // server-side order number
+		order.initialize(serverOrderID, // server-side order number
 				title, // Title
 				description, // Description
 				price, // Price
@@ -268,6 +270,7 @@ public class BartsyApplication extends Application implements AppObservable {
 		mOrders.add(order);
 		notifyObservers(ORDERS_UPDATED);
 	}
+
 	/**
 	 * Called from the push notification when the order receives from the user
 	 * 
@@ -289,12 +292,53 @@ public class BartsyApplication extends Application implements AppObservable {
 					+ order.profileId);
 			return;
 		}
-		
+
 		// Add the order to the list of orders
 		mOrders.add(order);
 		notifyObservers(ORDERS_UPDATED);
 	}
-	
+
+	/**
+	 * Remove the orders based on the json array which is getting from the user check out PN
+	 * 
+	 * @param cancelledOrders
+	 */
+	public void removeOrders(JSONArray cancelledOrders) {
+
+		// If cancelled orders count greater than 0
+		if (cancelledOrders.length() > 0) {
+			for (int i = 0; i < cancelledOrders.length(); i++) {
+
+				String orderId = null;
+				try {
+					// To get the cancelled orderId from the jsonArray response
+					orderId = cancelledOrders.getString(i);
+					Log.i(TAG, "Cancelled order number " + orderId);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				if (orderId != null)
+					for (int j = 0; j < mOrders.size(); j++) {
+						// To get the order object from the existing orders list
+						Order order = mOrders.get(j);
+						// If both cancelled order id and existing order id are same
+						if (order.serverID.equalsIgnoreCase(orderId)) {
+							// To remove the order from the existing orders list 
+							mOrders.remove(order);
+							// To terminate the inner for loop
+							break;
+						}
+
+					}
+
+			}
+			// To update orders in orders tab
+			notifyObservers(ORDERS_UPDATED);
+			
+		}
+
+	}
+
 	/**
 	 * Order updated with orderSender profile and add to the orders list
 	 * 
@@ -316,11 +360,10 @@ public class BartsyApplication extends Application implements AppObservable {
 					+ order.profileId);
 			return;
 		}
-		
+
 		// Add the order to the list of orders
 		mOrders.add(order);
 	}
-
 
 	/************************************************************************
 	 * 
