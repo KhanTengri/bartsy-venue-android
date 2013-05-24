@@ -56,8 +56,8 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 	@Override
 	protected void onRegistered(Context context, String registrationId) {
-		System.out.println("senderid :::" + SENDER_ID);
-		System.out.println("in on registered method");
+		Log.i(TAG, "senderid :::" + SENDER_ID);
+		Log.i(TAG, "in on registered method");
 		Log.i(TAG, "Device registered: regId = " + registrationId);
 
 		SharedPreferences settings = getSharedPreferences(REG_ID, 0);
@@ -106,20 +106,35 @@ public class GCMIntentService extends GCMBaseIntentService {
 					// Add user profile to people list
 					app.addPerson(profile);
 					// To display message in PN
-					messageTypeMSG ="User checkIn";
-				} else if (json.getString("messageType").equals("userCheckOut")) {
+					messageTypeMSG = "User checkIn";
+				} else if (json.getString("messageType").equals("orderTimeout")) {
+					JSONArray cancelledOrders = json.has("ordersCancelled") ? json
+							.getJSONArray("ordersCancelled") : null;
+							// When user checkout from venue, it is required to remove  user open orders
+							
+							if (cancelledOrders != null && cancelledOrders.length() > 0) {
+								// For removing the cancelled orders
+								app.removeOrders(cancelledOrders);
+
+							}
+							// To display message in PN
+							messageTypeMSG = "Order time out";
+				}
+
+				else if (json.getString("messageType").equals("userCheckOut")) {
 					// Remove user profile from people list
 					app.removePerson(json.getString("bartsyId"));
 					JSONArray cancelledOrders = json.has("cancelledOrders") ? json
 							.getJSONArray("cancelledOrders") : null;
-					// When user checkout from venue, it is required to remove user open orders
+					// When user checkout from venue, it is required to remove  user open orders
+					
 					if (cancelledOrders != null && cancelledOrders.length() > 0) {
 						// For removing the cancelled orders
 						app.removeOrders(cancelledOrders);
 
 					}
 					// To display message in PN
-					messageTypeMSG ="User check out";
+					messageTypeMSG = "User check out";
 
 				}
 			}

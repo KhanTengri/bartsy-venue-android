@@ -28,7 +28,7 @@ import com.vendsy.bartsy.venue.utils.WebServices;
 public class VenueRegistrationActivity extends Activity implements
 		OnClickListener {
 	// Form elements
-	private EditText locuId, paypal, wifiName, wifiPassword;
+	private EditText locuId, paypal, wifiName, wifiPassword,orderTimeOut;
 	private RadioGroup typeOfAuthentication, wifiPresent;
 
 	private Handler handler = new Handler();
@@ -49,6 +49,7 @@ public class VenueRegistrationActivity extends Activity implements
 		wifiPassword = (EditText) findViewById(R.id.wifiPassword);
 		typeOfAuthentication = (RadioGroup) findViewById(R.id.authentication);
 		wifiPresent = (RadioGroup) findViewById(R.id.wifiPresent);
+		orderTimeOut = (EditText) findViewById(R.id.orderTimeOut);
 
 		wifiNameLinear = (LinearLayout) findViewById(R.id.wifiNameLinear);
 		wifiTypeLinear = (LinearLayout) findViewById(R.id.wifiTypeLinear);
@@ -128,6 +129,7 @@ public class VenueRegistrationActivity extends Activity implements
 								: typeOfAuthentication.getText().toString());
 				postData.put("paypalId", paypal.getText().toString());
 				postData.put("deviceType", "0");
+				postData.put("cancelOrderTime",orderTimeOut.getText().toString());
 
 				if (wifi == null ? false : wifi.getText().toString()
 						.equalsIgnoreCase("Yes"))
