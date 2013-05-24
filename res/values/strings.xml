@@ -5,6 +5,7 @@
     
     <!-- Venue Registration -->
     <string name="paypal_id_label">Paypal ID</string>
+    <string name="order_time_out">Order Timeout</string>
     
     <!--  Config items -->
     <string name="config_shared_preferences_name">bartsy_preferences</string>
