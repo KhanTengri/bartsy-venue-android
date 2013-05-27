@@ -39,6 +39,7 @@ import android.util.Log;
 import com.google.android.gcm.GCMRegistrar;
 import com.vendsy.bartsy.venue.db.DatabaseManager;
 import com.vendsy.bartsy.venue.model.AppObservable;
+import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.model.Profile;
 import com.vendsy.bartsy.venue.service.ConnectivityService;
@@ -128,6 +129,24 @@ public class BartsyApplication extends Application implements AppObservable {
 		// --------------------------------------------
 		// DataBase initialization - First activity should call this method
 		DatabaseManager.getNewInstance(this);
+		
+		List<Category> categories = DatabaseManager.getInstance().getCategories(Category.SPIRITS_TYPE);
+		if(categories==null || categories.size()==0){
+			loadCSVfilesAndSaveInDB();
+		}
+	}
+	// To load csv file in background
+	private void loadCSVfilesAndSaveInDB() {
+		new Thread(){
+			public void run() {
+				// To read data from CSV file and save in the DB 
+				Utilities.saveIngredientsFromCSVFile(BartsyApplication.this);
+				
+				notifyObservers(INVENTORY_UPDATED);
+			}
+		}.start();
+		
+		
 	}
 
 	/**
@@ -364,7 +383,14 @@ public class BartsyApplication extends Application implements AppObservable {
 		// Add the order to the list of orders
 		mOrders.add(order);
 	}
-
+	
+	/**
+	 * Inventory
+	 * 
+	 */
+	
+	public static final String INVENTORY_UPDATED = "INVENTORY_UPDATED";
+	
 	/************************************************************************
 	 * 
 	 * 

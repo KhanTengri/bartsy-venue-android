@@ -13,10 +13,10 @@ public class Ingredient {
 	@DatabaseField
 	private String name;
 	@DatabaseField
-	private String category;
-	@DatabaseField
-	private String type;
+	private int price;
 	
+	@DatabaseField(canBeNull = true, foreign = true, foreignAutoRefresh = true, columnName = "category_id")
+	private Category category;
 	
 	/**
 	 * @return the id
@@ -42,29 +42,31 @@ public class Ingredient {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	/**
+	 * @return the price
+	 */
+	public int getPrice() {
+		return price;
+	}
+	/**
+	 * @param price the price to set
+	 */
+	public void setPrice(int price) {
+		this.price = price;
+	}
 	/**
 	 * @return the category
 	 */
-	public String getCategory() {
+	public Category getCategory() {
 		return category;
 	}
 	/**
 	 * @param category the category to set
 	 */
-	public void setCategory(String category) {
+	public void setCategory(Category category) {
 		this.category = category;
 	}
-	/**
-	 * @return the type
-	 */
-	public String getType() {
-		return type;
-	}
-	/**
-	 * @param type the type to set
-	 */
-	public void setType(String type) {
-		this.type = type;
-	}
+	
 	
 }

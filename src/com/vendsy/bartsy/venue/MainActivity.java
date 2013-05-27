@@ -71,6 +71,7 @@ public class MainActivity extends FragmentActivity implements
 	public static final String TAG = "Bartsy";
 	public BartenderSectionFragment mBartenderFragment = null; 	// make sure the set this to null when fragment is destroyed
 	public PeopleSectionFragment mPeopleFragment = null;		// make sure the set this to null when fragment is destroyed
+	public InventorySectionFragment mInventoryFragment = null;		// make sure the set this to null when fragment is destroyed
 
 	// Progress dialog
 	private ProgressDialog progressDialog;
@@ -108,6 +109,7 @@ public class MainActivity extends FragmentActivity implements
 	private static final int HANDLE_ALLJOYN_ERROR_EVENT = 3;
 	private static final int HANDLE_ORDERS_UPDATED_EVENT = 4;
 	private static final int HANDLE_PEOPLE_UPDATED_EVENT = 5;
+	private static final int HANDLE_INVENTORY_UPDATED_EVENT = 6;
 
 	/**************************************
 	 * 
@@ -281,8 +283,6 @@ public class MainActivity extends FragmentActivity implements
 				}
 			}
 		});
-		
-		
 	}
 
 	private void initializeFragments() {
@@ -307,6 +307,17 @@ public class MainActivity extends FragmentActivity implements
 		} else {
 			Log.i(TAG, "People fragment found.");
 			mPeopleFragment = p;
+		}
+		
+		// Initialize people fragment - reuse the fragment if it's already in memory
+		
+		if (mInventoryFragment == null) {
+			Log.i(TAG, "People fragment not found. Creating one.");
+			mInventoryFragment = new InventorySectionFragment();
+		} else {
+			InventorySectionFragment inventoryFragment = (InventorySectionFragment) getSupportFragmentManager().findFragmentById(R.string.title_inventory);
+			Log.i(TAG, "People fragment found.");
+			mInventoryFragment = inventoryFragment;
 		}
 	}
 
@@ -604,6 +615,10 @@ public class MainActivity extends FragmentActivity implements
 			Message message = mHandler
 					.obtainMessage(HANDLE_PEOPLE_UPDATED_EVENT);
 			mHandler.sendMessage(message);
+		} else if (qualifier.equals(BartsyApplication.INVENTORY_UPDATED)) {
+			Message message = mHandler
+					.obtainMessage(HANDLE_INVENTORY_UPDATED_EVENT);
+			mHandler.sendMessage(message);
 		}
 	}
 
@@ -660,6 +675,13 @@ public class MainActivity extends FragmentActivity implements
 					Log.i(TAG,"Updating people view and count...");
 					mPeopleFragment.updatePeopleView();
 					updatePeopleCount();
+				}
+				break;
+			case HANDLE_INVENTORY_UPDATED_EVENT: 
+				Log.i(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_INVENTORY_UPDATED_EVENT");
+				if (mInventoryFragment != null) {
+					Log.i(TAG,"Updating inventory view...");
+					mInventoryFragment.updateInventoryView();
 				}
 				break;
 			default:

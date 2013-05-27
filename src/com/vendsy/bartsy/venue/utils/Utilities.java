@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.vendsy.bartsy.venue.db.DatabaseManager;
+import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Ingredient;
 
 import android.app.ProgressDialog;
@@ -106,16 +107,32 @@ public final class Utilities {
         	// Initialise the CSVReader object with CSV file by using InputStream
             CSVReader reader = new CSVReader(new InputStreamReader(context.getAssets().open(Constants.INGREDIENTS_CSV_FILE)));
             data = reader.readNext();
+            
+            ArrayList<String> categories = new ArrayList<String>();
+            Category category = null;
+            
             //Loop until the end of the line
             while(data!=null) {
                 data = reader.readNext();
+                
                 // To ignore empty categories and empty types
-                if(data != null && !data[1].trim().equals("") && !data[2].trim().equals("")) {
+                if(data != null && data.length==3 && !data[1].trim().equals("") && !data[2].trim().equals("")) {
                 	// To set the properties for Ingredient model
                 	Ingredient ingredient = new Ingredient();
                 	ingredient.setName(data[0]);
-                	ingredient.setCategory(data[1]);
-                	ingredient.setType(data[2]);
+                	
+                	// To avoid duplicate categories in the list
+                	if(!categories.contains(data[2])){
+                		category = new Category();
+                		category.setName(data[2]);
+                		category.setType(data[1]);
+                		// Here, Category is saving in the  DB
+                    	DatabaseManager.getInstance().saveSection(category);
+                    	
+                		categories.add(data[2]);
+                	}
+                	ingredient.setCategory(category);
+                	
                 	// Here saving in the DB
                 	DatabaseManager.getInstance().saveIngredient(ingredient);
                 } 

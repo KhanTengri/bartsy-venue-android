@@ -8,10 +8,14 @@ import com.j256.ormlite.field.DatabaseField;
 
 public class Category {
 	
+	public static final String SPIRITS_TYPE = "spirit"; 
+	
 	@DatabaseField(generatedId = true) // Auto generated in local db
 	private long id;
 	@DatabaseField
 	private String name;
+	@DatabaseField
+	private String type;
 	
 	/**
 	 * @return the id
@@ -36,6 +40,18 @@ public class Category {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+	/**
+	 * @return the type
+	 */
+	public String getType() {
+		return type;
+	}
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(String type) {
+		this.type = type;
 	}
 	
 	
