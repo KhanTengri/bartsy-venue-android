@@ -1,28 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android1="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scrollView1"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal"
+    android:background="#dddddd"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+		
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:divider="@drawable/div_light_grey"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:showDividers="middle|end"
-        android1:padding="@dimen/activity_vertical_margin" >
+            <Button
+                android:id="@+id/spiritsButton"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:background="@drawable/tab_over"
+                android:text="Spirits"
+                android:textColor="#000000"
+                android:textSize="16dp"
+                android:textStyle="bold" />
 
-        <ExpandableListView
-            android1:id="@+id/expandableListView1"
-            android1:layout_width="match_parent"
-            android1:layout_height="wrap_content" >
-        </ExpandableListView>
-
+            <Button
+                android:id="@+id/mixersButton"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:background="@drawable/tab_bg"
+                android:text="Mixers"
+                android:textColor="#000000"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+            <Button
+                android:id="@+id/mixersButton"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:textColor="#000000"
+                android:background="@drawable/tab_bg"
+                android:text="Cocktails"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+        <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+	        <LinearLayout
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:orientation="horizontal" >
+			         <!-- Navigation left panel -->
+			         <LinearLayout
+			            android:layout_width="180dp"
+			            android:layout_height="wrap_content"
+			            android:orientation="vertical" android:id="@+id/categoryLayout">
+			        </LinearLayout>
+			        
+			         <LinearLayout
+			            android:layout_width="fill_parent"
+			            android:layout_height="wrap_content"
+			            android:orientation="vertical" android:id="@+id/spiritsLayout">
+			        </LinearLayout>
+	         
+			</LinearLayout>
+		</ScrollView>
     </LinearLayout>
-
-</ScrollView>
