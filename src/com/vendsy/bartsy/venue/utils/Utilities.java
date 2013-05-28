@@ -22,6 +22,7 @@ import java.util.List;
 
 import com.vendsy.bartsy.venue.db.DatabaseManager;
 import com.vendsy.bartsy.venue.model.Category;
+import com.vendsy.bartsy.venue.model.Cocktail;
 import com.vendsy.bartsy.venue.model.Ingredient;
 
 import android.app.ProgressDialog;
@@ -108,7 +109,7 @@ public final class Utilities {
             CSVReader reader = new CSVReader(new InputStreamReader(context.getAssets().open(Constants.INGREDIENTS_CSV_FILE)));
             data = reader.readNext();
             
-            ArrayList<String> categories = new ArrayList<String>();
+            ArrayList<Category> categories = new ArrayList<Category>();
             Category category = null;
             
             //Loop until the end of the line
@@ -122,19 +123,84 @@ public final class Utilities {
                 	ingredient.setName(data[0]);
                 	
                 	// To avoid duplicate categories in the list
-                	if(!categories.contains(data[2])){
+                	if(!isCategoryExistInList(categories, data[2], data[1])){
                 		category = new Category();
                 		category.setName(data[2]);
                 		category.setType(data[1]);
                 		// Here, Category is saving in the  DB
                     	DatabaseManager.getInstance().saveSection(category);
                     	
-                		categories.add(data[2]);
+                		categories.add(category);
                 	}
                 	ingredient.setCategory(category);
                 	
                 	// Here saving in the DB
                 	DatabaseManager.getInstance().saveIngredient(ingredient);
+                } 
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+	}
+	
+	/**
+	 * To check category is already exist or not
+	 * 
+	 * @param list
+	 * @param category
+	 * @param type
+	 * @return
+	 */
+	public static boolean isCategoryExistInList(ArrayList<Category> list, String category, String type){
+		for (Category categoryItem : list) {		
+			if(category.equals(categoryItem.getName()) && type.equals(categoryItem.getType())){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * To read Cocktails data from CSV file and save in the db
+	 * 
+	 * @param context
+	 */
+	public static void saveCocktailsFromCSVFile(Context context){
+		String data[] = null;
+        // Try to read ingredients data from CSV file 
+        try {
+        	// Initialize the CSVReader object with CSV file by using InputStream
+            CSVReader reader = new CSVReader(new InputStreamReader(context.getAssets().open(Constants.COCKTAILS_CSV_FILE)));
+            data = reader.readNext();
+            ArrayList<String> categories = new ArrayList<String>();
+            Category category = null;
+            
+            //Loop until the end of the line
+            while(data!=null) {
+                data = reader.readNext();
+                
+                // To ignore empty categories and empty types
+                if(data != null && data.length>=6 && !data[1].trim().equals("") && !data[3].trim().equals("")) {
+                	// To set the properties for Ingredient model
+                	Cocktail cocktail = new Cocktail();
+                	cocktail.setName(data[0]);
+                	cocktail.setIngredients(data[4]);
+                	cocktail.setInstructions(data[5]);
+                	
+                	// To avoid duplicate categories in the list
+                	if(!categories.contains(data[3])){
+                		category = new Category();
+                		category.setName(data[3]);
+                		category.setType(Category.COCKTAILS_TYPE);
+                		// Here, Category is saving in the  DB
+                    	DatabaseManager.getInstance().saveSection(category);
+                    	
+                		categories.add(data[3]);
+                	}
+                	cocktail.setCategory(category);
+                	
+                	// Here saving in the DB
+                	DatabaseManager.getInstance().saveCocktail(cocktail);
                 } 
             }
         } catch (IOException e) {

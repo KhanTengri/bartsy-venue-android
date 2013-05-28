@@ -14,6 +14,7 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import com.vendsy.bartsy.venue.model.Category;
+import com.vendsy.bartsy.venue.model.Cocktail;
 import com.vendsy.bartsy.venue.model.Ingredient;
 
 /**
@@ -33,6 +34,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	private Dao<Ingredient, Integer> ingredientDao = null;
 	// the DAO object we use to access the Category table
 	private Dao<Category, Integer> categoryDao = null;
+	private Dao<Cocktail, Integer> cocktailDao;
 
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -50,7 +52,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			
 			TableUtils.createTable(connectionSource, Category.class);
 			TableUtils.createTable(connectionSource, Ingredient.class);
-
+			TableUtils.createTable(connectionSource, Cocktail.class);
+			
 		} catch (SQLException e) {
 			Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
 			// throw new RuntimeException(e);
@@ -70,7 +73,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			Log.i(DatabaseHelper.class.getName(), "onUpgrade");
 
 			TableUtils.dropTable(connectionSource, Ingredient.class, true);
-
+			TableUtils.dropTable(connectionSource, Cocktail.class, true);
 			TableUtils.dropTable(connectionSource, Category.class, true);
 			// after we drop the old databases, we create the new ones
 			onCreate(db, connectionSource);
@@ -91,6 +94,19 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 		}
 		return ingredientDao;
 	}
+	
+	/**
+	 * Returns the Database Access Object (DAO) for our Cocktail class. It
+	 * will create it or just give the cached value.
+	 */
+	public Dao<Cocktail, Integer> getCocktailDao()
+			throws SQLException {
+		if (cocktailDao == null) {
+			cocktailDao = getDao(Cocktail.class);
+		}
+		return cocktailDao;
+	}
+	
 	/**
 	 * Returns the Database Access Object (DAO) for our Section class. It
 	 * will create it or just give the cached value.

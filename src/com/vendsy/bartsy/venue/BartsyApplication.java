@@ -139,8 +139,11 @@ public class BartsyApplication extends Application implements AppObservable {
 	private void loadCSVfilesAndSaveInDB() {
 		new Thread(){
 			public void run() {
-				// To read data from CSV file and save in the DB 
+				// To read spirits and mixers data from CSV file and save in the DB 
 				Utilities.saveIngredientsFromCSVFile(BartsyApplication.this);
+				
+				// To read cocktails data from CSV file and save in the DB 
+				Utilities.saveCocktailsFromCSVFile(BartsyApplication.this);
 				
 				notifyObservers(INVENTORY_UPDATED);
 			}

@@ -9,6 +9,7 @@ import android.content.Context;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.vendsy.bartsy.venue.model.Category;
+import com.vendsy.bartsy.venue.model.Cocktail;
 import com.vendsy.bartsy.venue.model.Ingredient;
 
 /**
@@ -51,17 +52,31 @@ public class DatabaseManager {
 	}
 	
 	/**
+	 * To save Cocktail data in db
+	 * 
+	 * @param Cocktail
+	 */
+	public void saveCocktail(Cocktail cocktail) {
+		try {
+			dbHelper.getCocktailDao().createOrUpdate(cocktail);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * To get list of categories based on the type
 	 * 
 	 * @param ingredient
 	 */
 	public List<Category> getCategories(String type) {
 		try {
-			QueryBuilder<Category, Integer> surveyQb = dbHelper
+			QueryBuilder<Category, Integer> builder = dbHelper
 					.getSectionDao().queryBuilder();
-			surveyQb.where().eq("type", type);
+			builder.where().eq("type", type);
 			
-			PreparedQuery<Category> query = surveyQb.prepare();
+			PreparedQuery<Category> query = builder.prepare();
 			return dbHelper.getSectionDao().query(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -77,12 +92,32 @@ public class DatabaseManager {
 	 */
 	public List<Ingredient> getIngredients(Category category) {
 		try {
-			QueryBuilder<Ingredient, Integer> surveyQb = dbHelper
+			QueryBuilder<Ingredient, Integer> builder = dbHelper
 					.getIngredientDao().queryBuilder();
-			surveyQb.where().eq("category_id", category.getId());
-			PreparedQuery<Ingredient> query = surveyQb.prepare();
+			builder.where().eq("category_id", category.getId());
+			PreparedQuery<Ingredient> query = builder.prepare();
 			
 			return dbHelper.getIngredientDao().query(query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * To get list of cocktails by category from the db
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public List<Cocktail> getCocktails(Category category) {
+		try {
+			QueryBuilder<Cocktail, Integer> builder = dbHelper
+					.getCocktailDao().queryBuilder();
+			builder.where().eq("category_id", category.getId());
+			PreparedQuery<Cocktail> query = builder.prepare();
+			
+			return dbHelper.getCocktailDao().query(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
