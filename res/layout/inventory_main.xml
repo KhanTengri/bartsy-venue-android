@@ -35,7 +35,7 @@
                 android:textSize="16dp"
                 android:textStyle="bold" />
             <Button
-                android:id="@+id/mixersButton"
+                android:id="@+id/cocktailsButton"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_weight="1"
@@ -45,26 +45,30 @@
                 android:textSize="16dp"
                 android:textStyle="bold" />
         </LinearLayout>
-        <ScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+       
 	        <LinearLayout
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
+	            android:layout_width="match_parent"
+	            android:layout_height="match_parent"
 	            android:orientation="horizontal" >
+             <ScrollView
+        android:layout_width="180dp"
+        android:layout_height="match_parent" >
 			         <!-- Navigation left panel -->
 			         <LinearLayout
 			            android:layout_width="180dp"
 			            android:layout_height="wrap_content"
 			            android:orientation="vertical" android:id="@+id/categoryLayout">
 			        </LinearLayout>
-			        
+			 </ScrollView>
+			  <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
 			         <LinearLayout
 			            android:layout_width="fill_parent"
 			            android:layout_height="wrap_content"
 			            android:orientation="vertical" android:id="@+id/spiritsLayout">
 			        </LinearLayout>
+	         </ScrollView>
 	         
 			</LinearLayout>
-		</ScrollView>
     </LinearLayout>
