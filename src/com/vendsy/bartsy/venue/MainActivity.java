@@ -1,8 +1,6 @@
 package com.vendsy.bartsy.venue;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Locale;
 
@@ -16,13 +14,10 @@ import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -34,15 +29,18 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.analytics.tracking.android.EasyTracker;
-import com.google.android.gcm.GCMRegistrar;
-import com.google.android.gms.plus.model.people.Person;
 import com.vendsy.bartsy.venue.dialog.PeopleDialogFragment;
 import com.vendsy.bartsy.venue.model.AppObservable;
 import com.vendsy.bartsy.venue.model.Order;
@@ -199,6 +197,9 @@ public class MainActivity extends FragmentActivity implements
 					.setTabListener(this));
 		}
 		
+		// To add a spinner to action bar using custom view.
+		addVenueStatusSpinnerToActionBar();
+		
 		/*
 		 * Now that we're all ready to go, we are ready to accept notifications
 		 * from other components.
@@ -257,6 +258,40 @@ public class MainActivity extends FragmentActivity implements
 			}.start();
 
 		}
+	}
+	/**
+	 * This Method is used to add Bar statuses to spinner of action bar
+	 */
+	private void addVenueStatusSpinnerToActionBar() {
+		// To get list of statuses from resources
+		final String[] venueStatusesList=getResources().getStringArray(R.array.barStatuses);
+		// Created spinner object
+		Spinner venueStatusesSpinner = new Spinner(this);
+		// Added venueStatusesSpinner to actionbar by custom view
+		getActionBar().setCustomView(venueStatusesSpinner);
+		// For displaying custom view in action bar
+		getActionBar().setDisplayShowCustomEnabled(true);
+        // On OnItemSelectedListener for spinner
+		venueStatusesSpinner.setOnItemSelectedListener(new OnItemSelectedListener(){
+         @Override
+         public void onNothingSelected(AdapterView<?> arg0) {
+        	 // If no item selected
+            }
+		@Override
+		public void onItemSelected(AdapterView<?> parent, View arg1, int position,
+				long arg3) {
+			((TextView)parent.getChildAt(0)).setTextColor(Color.WHITE);
+			// Selected Item from spinner
+			Toast.makeText(getBaseContext(),"The Venue is in "+venueStatusesList[position]+" state", Toast.LENGTH_LONG).show();
+			
+		}
+        });
+		// Created ArrayAdapter for venuestatuses spinner
+		ArrayAdapter<String> adapterForVenueStatuses=new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1,venueStatusesList);
+		adapterForVenueStatuses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		// Set adapter to the spinner
+		venueStatusesSpinner.setAdapter(adapterForVenueStatuses);		
 	}
 	/**
 	 * To update list views of people and orders
