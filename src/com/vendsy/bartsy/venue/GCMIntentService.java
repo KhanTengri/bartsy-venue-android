@@ -27,7 +27,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -140,7 +139,31 @@ public class GCMIntentService extends GCMBaseIntentService {
 					// To display message in PN
 					messageTypeMSG = "User check out";
 
+				}else if(json.getString("messageType").equals("userTimeout")){
+					
+					
+					JSONArray usersCheckedOut = json.has("usersCheckedOut") ? json
+							.getJSONArray("usersCheckedOut") : null;
+					JSONArray ordersCancelled = json.has("ordersCancelled") ? json
+							.getJSONArray("ordersCancelled") : null;
+					// When userTimeout push notification came, it is required to remove user open orders
+					if (ordersCancelled != null && ordersCancelled.length() > 0) {
+						// For removing the cancelled orders
+						app.removeOrders(ordersCancelled);
+
+					}
+					// When userTimeout push notification came, it is required to user profiles form people list 
+					if (usersCheckedOut != null && usersCheckedOut.length() > 0) {
+						// For removing the time out users
+						if(usersCheckedOut!=null&&usersCheckedOut.length()>0)
+							for(int i=0;i<usersCheckedOut.length();i++)
+								app.removePerson(usersCheckedOut.getString(i));
+
+					}
+					// To display message in PN
+					messageTypeMSG = "User time out";
 				}
+					
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -204,8 +227,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 				notifyMSG = processPushNotification(json);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				e.printStackTrace(); 
 			}
 		}
 
