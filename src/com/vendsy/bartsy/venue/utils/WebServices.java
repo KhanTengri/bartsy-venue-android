@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -16,6 +17,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,8 +34,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.vendsy.bartsy.venue.GCMIntentService;
 import com.vendsy.bartsy.venue.R;
+import com.vendsy.bartsy.venue.model.Category;
+import com.vendsy.bartsy.venue.model.Ingredient;
 import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.model.Profile;
 
@@ -254,6 +257,41 @@ public class WebServices {
 		}
 
 		return result;
+	}
+	
+	/**
+	 * To send ingredients to the server
+	 * 
+	 * @param category
+	 * @param ingredients
+	 * @param venueId
+	 * @param context
+	 * @return response
+	 */
+	public static String saveIngredients(Category category, List<Ingredient> ingredients, String venueId, Context context){
+		
+		try {
+			// Create Json object as a root element
+			JSONObject json = new JSONObject();
+			json.put("venueId", venueId);
+			json.put("type", category.getType());
+			json.put("category", category.getName());
+			
+			// Create JSON Array for ingredients list
+			JSONArray array = new JSONArray();
+			for(Ingredient ingredient: ingredients){
+				array.put(ingredient.toJSON());
+			}
+			json.put("ingredients", array);
+			
+			String response = postRequest(Constants.URL_SAVE_INGREDIENTS, json, context);
+			return response;
+			
+		} catch (JSONException e) {
+		} catch (Exception e) {
+		}
+		
+		return null;
 	}
 
 	/**

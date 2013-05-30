@@ -2,7 +2,7 @@ package com.vendsy.bartsy.venue.utils;
 
 public class Constants {
 
-	//public static final String DOMAIN_NAME = "http://192.168.0.109:8080/";
+//	public static final String DOMAIN_NAME = "http://192.168.0.109:8080/";
 
 	public static final String DOMAIN_NAME = "http://54.235.76.180:8080/";
 	public static final String PROJECT_NAME = "Bartsy/";
@@ -32,6 +32,7 @@ public class Constants {
 	// For saveVenueDetails for bartender
 	public static final String URL_SAVE_VENUEDETAILS = DOMAIN_NAME
 			+ PROJECT_NAME + "venue/saveVenueDetails";
+	
 
 	// For Order status for bartender
 	public static final String URL_UPDATE_ORDER_STATUS = DOMAIN_NAME
@@ -40,10 +41,14 @@ public class Constants {
 	// For data sync with server for bartender
 	public static final String URL_SYNC_WITH_SERVER = DOMAIN_NAME
 			+ PROJECT_NAME + "data/syncBartenderApp";
+	
 	// For heartBeatVenue
-
-	public static final String URL_HEART_BEAT_VENUE = DOMAIN_NAME
-			+ PROJECT_NAME + "venue/heartBeatVenue";
+	public static final String URL_HEART_BEAT_VENUE = DOMAIN_NAME +PROJECT_NAME
+			+ "venue/heartBeatVenue";
+	
+	// To save ingredients
+	public static final String URL_SAVE_INGREDIENTS = DOMAIN_NAME +PROJECT_NAME
+			+ "inventory/saveIngredients";
 
 	// For setVenueStatus
 	public static final String URL_SET_VENUE_STATUS = DOMAIN_NAME

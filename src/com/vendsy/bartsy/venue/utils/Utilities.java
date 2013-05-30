@@ -85,11 +85,11 @@ public final class Utilities {
 	 * @param context
 	 * @return
 	 */
-	public static ProgressDialog progressDialog(Context context){
+	public static ProgressDialog progressDialog(Context context, String message){
 		ProgressDialog mProgressDialog = new ProgressDialog(context);
 		
 		// To configure the loading dialog
-        mProgressDialog.setMessage("Loading..");
+        mProgressDialog.setMessage(message);
         mProgressDialog.setIndeterminate(false);
         mProgressDialog.setCancelable(true);
         

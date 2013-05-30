@@ -213,7 +213,7 @@ public class MainActivity extends FragmentActivity implements
 				
 				@Override
 				public void run() {
-					progressDialog = Utilities.progressDialog(MainActivity.this);
+					progressDialog = Utilities.progressDialog(MainActivity.this,"Loading..");
 					progressDialog.show();
 				}
 			});

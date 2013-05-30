@@ -18,6 +18,8 @@ public class Cocktail {
 	private String instructions;
 	@DatabaseField
 	private int price;
+	@DatabaseField
+	private boolean availability;
 	
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoRefresh = true, columnName = "category_id")
 	private Category category;
@@ -94,6 +96,18 @@ public class Cocktail {
 	 */
 	public void setInstructions(String instructions) {
 		this.instructions = instructions;
+	}
+	/**
+	 * @return the availability
+	 */
+	public boolean isAvailability() {
+		return availability;
+	}
+	/**
+	 * @param availability the availability to set
+	 */
+	public void setAvailability(boolean availability) {
+		this.availability = availability;
 	}
 	
 }

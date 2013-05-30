@@ -1,4 +1,7 @@
 package com.vendsy.bartsy.venue.model;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Ingredient model to save in the DB
  * 
@@ -14,9 +17,28 @@ public class Ingredient {
 	private String name;
 	@DatabaseField
 	private int price;
+	@DatabaseField
+	private boolean availability;
 	
 	@DatabaseField(canBeNull = true, foreign = true, foreignAutoRefresh = true, columnName = "category_id")
 	private Category category;
+	
+	/**
+	 * It will return in the JSON format which is used in the web service call
+	 * 
+	 * @return
+	 */
+	public JSONObject toJSON(){
+		JSONObject json = new JSONObject();
+		try {
+			json.put("ingredientId", String.valueOf(id));
+			json.put("name", name);
+			json.put("price", String.valueOf(price));
+			json.put("available", String.valueOf(availability));
+		} catch (JSONException e) {	}
+		
+		return json;
+	}
 	
 	/**
 	 * @return the id
@@ -66,6 +88,18 @@ public class Ingredient {
 	 */
 	public void setCategory(Category category) {
 		this.category = category;
+	}
+	/**
+	 * @return the availability
+	 */
+	public boolean isAvailability() {
+		return availability;
+	}
+	/**
+	 * @param availability the availability to set
+	 */
+	public void setAvailability(boolean availability) {
+		this.availability = availability;
 	}
 	
 	

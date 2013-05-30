@@ -142,7 +142,7 @@ public class VenueRegistrationActivity extends Activity implements
 			}
 			
 			// Start progress dialog from here
-			progressDialog = Utilities.progressDialog(this);
+			progressDialog = Utilities.progressDialog(this, "Loading..");
 			progressDialog.show();
 			
 			// Call web service in the background

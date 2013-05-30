@@ -110,14 +110,9 @@ public class DatabaseManager {
 	 * @param id
 	 * @return
 	 */
-	public List<Cocktail> getCocktails(Category category) {
+	public List<Cocktail> getCocktails() {
 		try {
-			QueryBuilder<Cocktail, Integer> builder = dbHelper
-					.getCocktailDao().queryBuilder();
-			builder.where().eq("category_id", category.getId());
-			PreparedQuery<Cocktail> query = builder.prepare();
-			
-			return dbHelper.getCocktailDao().query(query);
+			return dbHelper.getCocktailDao().queryForAll();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

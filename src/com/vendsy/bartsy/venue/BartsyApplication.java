@@ -159,8 +159,8 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * 
 	 */
 
-	String venueProfileID = null;
-	String venueProfileName = null;
+	public String venueProfileID = null;
+	public String venueProfileName = null;
 
 	void loadVenueProfile() {
 		SharedPreferences sharedPref = getSharedPreferences(getResources()

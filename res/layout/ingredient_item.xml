@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@drawable/rounded_corner"
     android:layout_margin="5dp">
-   
-   <RelativeLayout
-        android:layout_width="80dp"
-        android:layout_height="80dp" >
     <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_marginRight="3dp"
+        android:layout_gravity="center_vertical"
         android:src="@drawable/champagne_bottle"
         android:scaleType="fitCenter"/>
-   </RelativeLayout>
-   <LinearLayout android:layout_width="180dp"
+   <LinearLayout android:layout_width="wrap_content"
     	android:layout_height="wrap_content" 
     	android:orientation="vertical">
-	    <TextView android:id="@+id/itemText" 
+    	
+	    <TextView android:id="@+id/ingredientItemText" 
 	        android:layout_width="wrap_content" 
 	        android:layout_height="wrap_content"
 	        android:textSize="16dp"
@@ -31,5 +28,58 @@
     		android:layout_height="wrap_content" 
     		android:orientation="vertical">
 	    </LinearLayout>
+	    
+	    <LinearLayout android:layout_width="wrap_content"
+    		android:layout_height="wrap_content">
+    		
+    		<TextView android:layout_width="wrap_content" 
+	        	android:layout_height="wrap_content"
+	        	android:text="Available:"/>
+    	    <ToggleButton android:id="@+id/availableButton"
+	    	    android:textOn="Yes"
+	    	    android:textOff="No"
+	    	    android:text="Available"
+	    	    android:layout_width="wrap_content" 
+		        android:layout_height="wrap_content"/>
+    	    
+    	</LinearLayout>
+    	<!--  
+    	<LinearLayout android:id="@+id/moreInfoLayout" 
+    	    android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:orientation="vertical" android:visibility="gone">
+    	<TextView 
+	        android:layout_width="wrap_content" 
+	        android:layout_height="wrap_content"
+	        android:textSize="15dp"
+	        android:text="Ingredients:"
+	        android:padding="2dp"
+	        android:layout_centerVertical="true"
+	        android:textColor="#000000"/>
+    	<TextView android:id="@+id/ingredientsText" 
+	        android:layout_width="wrap_content" 
+	        android:layout_height="wrap_content"
+	        android:textSize="13dp"
+	        android:padding="2dp"
+	        android:layout_centerVertical="true"
+	        android:textColor="#000000"/>
+    	<TextView 
+	        android:layout_width="wrap_content" 
+	        android:layout_height="wrap_content"
+	        android:textSize="15dp"
+	        android:text="Instructions:"
+	        android:padding="2dp"
+	        android:layout_centerVertical="true"
+	        android:textColor="#000000"/>
+    	<TextView android:id="@+id/instructionsText" 
+	        android:layout_width="wrap_content" 
+	        android:layout_height="wrap_content"
+	        android:textSize="13dp"
+	        android:textStyle="bold" 
+	        android:padding="2dp"
+	        android:layout_centerVertical="true"
+	        android:textColor="#000000"/>
+    	</LinearLayout>
+    	-->
 	</LinearLayout>
 </LinearLayout>
