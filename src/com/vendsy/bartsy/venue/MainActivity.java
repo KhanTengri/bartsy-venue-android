@@ -69,7 +69,7 @@ public class MainActivity extends FragmentActivity implements
 	public static final String TAG = "Bartsy";
 	public BartenderSectionFragment mBartenderFragment = null; 	// make sure the set this to null when fragment is destroyed
 	public PeopleSectionFragment mPeopleFragment = null;		// make sure the set this to null when fragment is destroyed
-	public InventorySectionFragment mInventoryFragment = null;		// make sure the set this to null when fragment is destroyed
+	public InventorySectionFragment mInventoryFragment = null;	// make sure the set this to null when fragment is destroyed
 
 	// Progress dialog
 	private ProgressDialog progressDialog;
@@ -280,11 +280,27 @@ public class MainActivity extends FragmentActivity implements
 		@Override
 		public void onItemSelected(AdapterView<?> parent, View arg1, int position,
 				long arg3) {
+			final int pos = position;
+			// changed the text color black to white
 			((TextView)parent.getChildAt(0)).setTextColor(Color.WHITE);
-			// Selected Item from spinner
+			// For displsying selected venue status
 			Toast.makeText(getBaseContext(),"The Venue is in "+venueStatusesList[position]+" state", Toast.LENGTH_LONG).show();
-			
-		}
+				new Thread()				{
+					public void run() {
+						try {
+							final JSONObject postData = new JSONObject();
+							// added venueId to post object
+							postData.put("venueId", mApp.venueProfileID);
+							// added Selected Item from spinner to post object
+							postData.put("status",venueStatusesList[pos]);
+							// post venue status to the server
+							WebServices.postRequest(Constants.URL_SET_VENUE_STATUS, postData, MainActivity.this);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					};
+				}.start();
+			}
         });
 		// Created ArrayAdapter for venuestatuses spinner
 		ArrayAdapter<String> adapterForVenueStatuses=new ArrayAdapter<String>(this,

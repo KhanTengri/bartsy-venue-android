@@ -39,6 +39,7 @@ import com.vendsy.bartsy.venue.model.Profile;
 
 public class WebServices {
 
+	private static String TAG="WebServices";
 	// checking internet connection
 	public static boolean isNetworkAvailable(Context context) throws Exception {
 
@@ -80,7 +81,7 @@ public class WebServices {
 		HttpPost httppost = new HttpPost(url);
 
 		String data = postData.toString();
-		System.out.println("*** " + data);
+		Log.i(TAG," *** Webservice postRequest " + data);
 		try {
 			boolean status = isNetworkAvailable(context);
 			if (status == true) {
@@ -99,7 +100,7 @@ public class WebServices {
 					response = responseofmain.toString();
 				} catch (Exception e) {
 					Log.e("log_tag", "Error in http connection" + e.toString());
-					System.out.println("::: " + e.getMessage());
+					Log.i("Exception Found","::: " + e.getMessage());
 
 				}
 			}
@@ -107,6 +108,7 @@ public class WebServices {
 			e.printStackTrace();
 
 		}
+		Log.i(TAG, "webservice postrequest method "+response);
 		return response;
 
 	}
@@ -192,7 +194,7 @@ public class WebServices {
 		Resources r = context.getResources();
 		int bartsyId = sharedPref.getInt(r.getString(R.string.bartsyUserId), 0);
 
-		System.out.println("bartsyId ::: " + bartsyId);
+		Log.i(TAG,"bartsyId ::: " + bartsyId);
 		final JSONObject json = new JSONObject();
 		try {
 			json.put("bartsyId", bartsyId);
@@ -205,7 +207,7 @@ public class WebServices {
 		try {
 
 			response = postRequest(url, json, context);
-			System.out.println("response :: " + response);
+			Log.i(TAG,"response :: " + response);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
