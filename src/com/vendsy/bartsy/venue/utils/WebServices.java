@@ -36,6 +36,7 @@ import android.widget.ImageView;
 
 import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.model.Category;
+import com.vendsy.bartsy.venue.model.Cocktail;
 import com.vendsy.bartsy.venue.model.Ingredient;
 import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.model.Profile;
@@ -203,7 +204,6 @@ public class WebServices {
 			json.put("bartsyId", bartsyId);
 			json.put("venueId", venueId);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -213,7 +213,6 @@ public class WebServices {
 			Log.i(TAG,"response :: " + response);
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return response;
@@ -285,6 +284,41 @@ public class WebServices {
 			json.put("ingredients", array);
 			
 			String response = postRequest(Constants.URL_SAVE_INGREDIENTS, json, context);
+			return response;
+			
+		} catch (JSONException e) {
+		} catch (Exception e) {
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * To send cocktails to the server
+	 * 
+	 * @param category
+	 * @param ingredients
+	 * @param venueId
+	 * @param context
+	 * @return response
+	 */
+	public static String saveCocktails(List<Cocktail> cocktails, String venueId, Context context){
+		
+		try {
+			// Create Json object as a root element
+			JSONObject json = new JSONObject();
+			json.put("venueId", venueId);
+			
+			// Create JSON Array for ingredients list
+			JSONArray array = new JSONArray();
+			for(Cocktail cocktail: cocktails){
+				array.put(cocktail.toJSON());
+			}
+			json.put("cocktails", array);
+			
+			// Web service call
+			String response = postRequest(Constants.URL_SAVE_COCKTAILS, json, context);
+			Log.i("SaveCocktails response: ",response);
 			return response;
 			
 		} catch (JSONException e) {

@@ -66,7 +66,23 @@ public class DatabaseManager {
 	}
 	
 	/**
+	 * To save Cocktail data in db
+	 * 
+	 * @param Cocktail
+	 */
+	public void deleteCocktail(Cocktail cocktail) {
+		try {
+			dbHelper.getCocktailDao().delete(cocktail);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * To get list of categories based on the type
+	 * 
+	 * @see Category class contains the different types 
 	 * 
 	 * @param ingredient
 	 */

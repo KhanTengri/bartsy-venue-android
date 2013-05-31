@@ -19,11 +19,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
-import android.widget.CompoundButton;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -31,15 +30,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.google.android.gms.internal.co;
 import com.vendsy.bartsy.venue.BartsyApplication;
-import com.vendsy.bartsy.venue.MainActivity;
 import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.db.DatabaseManager;
+import com.vendsy.bartsy.venue.dialog.InventoryDialogFragment;
 import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Cocktail;
 import com.vendsy.bartsy.venue.model.Ingredient;
-import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
 
@@ -61,6 +58,7 @@ public class InventorySectionFragment extends Fragment {
 	private List<Cocktail> cocktails;
 	private ScrollView categoryScrollView;
 	private Button saveButton;
+	private Button addButton;
 	private Category selectedCategory;
 	private String selectedType;
 	private String venueId;
@@ -69,6 +67,7 @@ public class InventorySectionFragment extends Fragment {
 	private ProgressDialog progressDialog;
 	// Handler 
 	private Handler handler = new Handler();
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -77,16 +76,28 @@ public class InventorySectionFragment extends Fragment {
 		
 		mRootView = inflater.inflate(R.layout.inventory_main, container, false);
 		
+		// Try to get the components from the xml layout
 		itemsLayout = (TableLayout) mRootView.findViewById(R.id.itemsLayout);
 		categoriesList = (LinearLayout) mRootView.findViewById(R.id.categoryLayout);
 		categoryScrollView = (ScrollView) mRootView.findViewById(R.id.categoryScrollView);
 		saveButton = (Button) mRootView.findViewById(R.id.saveButton);
+		addButton = (Button) mRootView.findViewById(R.id.addButton);
 		
 		saveButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				saveAction();
+			}
+		});
+		
+		addButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// Initiate inventory dialog
+				InventoryDialogFragment dialog = new InventoryDialogFragment();
+				dialog.show(getActivity().getSupportFragmentManager(),"Add New");
 			}
 		});
 		
@@ -104,7 +115,9 @@ public class InventorySectionFragment extends Fragment {
 		// Error handling
 		if(selectedType==null) return;
 		
-		progressDialog = Utilities.progressDialog(getActivity(),"Saving..");
+		Log.i(getClass().getName(), "Selected Type: "+selectedType);
+		
+		progressDialog = Utilities.progressDialog(getActivity(),"Uploading..");
 		progressDialog.show();
 		
 		
@@ -123,15 +136,14 @@ public class InventorySectionFragment extends Fragment {
 					response = WebServices.saveIngredients(selectedCategory, ingredients, venueId, getActivity());
 					
 				}else if(selectedType.equals(Category.COCKTAILS_TYPE) && cocktails !=null){
-					// Save cocktail updated information
+					// Save cocktails updated information in the database
 					for (Cocktail cocktail : cocktails) {
 						DatabaseManager.getInstance().saveCocktail(cocktail);
 					}
 					
-					// TODO Cocktail Web service call
-					
+					// Save Cocktail Web service call
+					response = WebServices.saveCocktails(cocktails, venueId, getActivity());
 				}
-				
 				
 				// To call UI thread
 				handler.post(new Runnable() {
@@ -429,6 +441,7 @@ public class InventorySectionFragment extends Fragment {
 	protected void updateCocktailView(){
 		
 		selectedCategory = null;
+		selectedType = Category.COCKTAILS_TYPE;
 		
 		// To get Cocktails from the database
 		cocktails = DatabaseManager.getInstance().getCocktails();

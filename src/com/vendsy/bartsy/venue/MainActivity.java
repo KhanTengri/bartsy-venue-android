@@ -260,19 +260,19 @@ public class MainActivity extends FragmentActivity implements
 		}
 	}
 	/**
-	 * This Method is used to add Bar statuses to spinner of action bar
+	 * This Method is used to add Bar status to spinner of action bar
 	 */
 	private void addVenueStatusSpinnerToActionBar() {
-		// To get list of statuses from resources
-		final String[] venueStatusesList=getResources().getStringArray(R.array.barStatuses);
+		// To get list of status from resources
+		final String[] venueStatusList=getResources().getStringArray(R.array.barStatuses);
 		// Created spinner object
-		Spinner venueStatusesSpinner = new Spinner(this);
-		// Added venueStatusesSpinner to actionbar by custom view
-		getActionBar().setCustomView(venueStatusesSpinner);
+		Spinner venueStatusSpinner = new Spinner(this);
+		// Added venueStatusSpinner to actionbar by custom view
+		getActionBar().setCustomView(venueStatusSpinner);
 		// For displaying custom view in action bar
 		getActionBar().setDisplayShowCustomEnabled(true);
         // On OnItemSelectedListener for spinner
-		venueStatusesSpinner.setOnItemSelectedListener(new OnItemSelectedListener(){
+		venueStatusSpinner.setOnItemSelectedListener(new OnItemSelectedListener(){
          @Override
          public void onNothingSelected(AdapterView<?> arg0) {
         	 // If no item selected
@@ -283,8 +283,12 @@ public class MainActivity extends FragmentActivity implements
 			final int pos = position;
 			// changed the text color black to white
 			((TextView)parent.getChildAt(0)).setTextColor(Color.WHITE);
-			// For displsying selected venue status
-			Toast.makeText(getBaseContext(),"The Venue is in "+venueStatusesList[position]+" state", Toast.LENGTH_LONG).show();
+			// To display selected venue status in toast
+			Toast.makeText(getBaseContext(),"The Venue is in "+venueStatusList[position]+" state", Toast.LENGTH_LONG).show();
+				// if venue profileID not available then we have to skip update Venue Status web service call 
+				if(mApp.venueProfileID==null) return;
+				
+				// Venue Status web service call 
 				new Thread()				{
 					public void run() {
 						try {
@@ -292,7 +296,7 @@ public class MainActivity extends FragmentActivity implements
 							// added venueId to post object
 							postData.put("venueId", mApp.venueProfileID);
 							// added Selected Item from spinner to post object
-							postData.put("status",venueStatusesList[pos]);
+							postData.put("status",venueStatusList[pos]);
 							// post venue status to the server
 							WebServices.postRequest(Constants.URL_SET_VENUE_STATUS, postData, MainActivity.this);
 						} catch (Exception e) {
@@ -304,10 +308,10 @@ public class MainActivity extends FragmentActivity implements
         });
 		// Created ArrayAdapter for venuestatuses spinner
 		ArrayAdapter<String> adapterForVenueStatuses=new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1,venueStatusesList);
+                android.R.layout.simple_list_item_1,venueStatusList);
 		adapterForVenueStatuses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		// Set adapter to the spinner
-		venueStatusesSpinner.setAdapter(adapterForVenueStatuses);		
+		venueStatusSpinner.setAdapter(adapterForVenueStatuses);		
 	}
 	/**
 	 * To update list views of people and orders

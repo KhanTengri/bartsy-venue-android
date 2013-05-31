@@ -1,4 +1,7 @@
 package com.vendsy.bartsy.venue.model;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Cocktails model to save in the DB
  * 
@@ -13,6 +16,12 @@ public class Cocktail {
 	@DatabaseField
 	private String name;
 	@DatabaseField
+	private String category;
+	@DatabaseField
+	private String glassType;
+	@DatabaseField
+	private String alcohol;
+	@DatabaseField
 	private String ingredients;
 	@DatabaseField
 	private String instructions;
@@ -21,8 +30,28 @@ public class Cocktail {
 	@DatabaseField
 	private boolean availability;
 	
-	@DatabaseField(canBeNull = true, foreign = true, foreignAutoRefresh = true, columnName = "category_id")
-	private Category category;
+	
+	/**
+	 * It will return in the JSON format which is used in the web service call
+	 * 
+	 * @return
+	 */
+	public JSONObject toJSON(){
+		JSONObject json = new JSONObject();
+		try {
+			json.put("cocktailId", String.valueOf(id));
+			json.put("available", availability);
+			json.put("name", name);
+			json.put("price", String.valueOf(price));
+			json.put("available", String.valueOf(availability));
+			json.put("category", category);
+			json.put("glass", glassType);
+			json.put("alcohol", alcohol);
+			
+		} catch (JSONException e) {	}
+		
+		return json;
+	}
 	
 	/**
 	 * @return the id
@@ -61,18 +90,7 @@ public class Cocktail {
 	public void setPrice(int price) {
 		this.price = price;
 	}
-	/**
-	 * @return the category
-	 */
-	public Category getCategory() {
-		return category;
-	}
-	/**
-	 * @param category the category to set
-	 */
-	public void setCategory(Category category) {
-		this.category = category;
-	}
+
 	/**
 	 * @return the ingredients
 	 */
@@ -108,6 +126,30 @@ public class Cocktail {
 	 */
 	public void setAvailability(boolean availability) {
 		this.availability = availability;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public String getGlassType() {
+		return glassType;
+	}
+
+	public void setGlassType(String glassType) {
+		this.glassType = glassType;
+	}
+
+	public String getAlcohol() {
+		return alcohol;
+	}
+
+	public void setAlcohol(String alcohol) {
+		this.alcohol = alcohol;
 	}
 	
 }

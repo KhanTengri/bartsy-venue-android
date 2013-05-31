@@ -141,18 +141,17 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 				}else if(json.getString("messageType").equals("userTimeout")){
 					
-					
 					JSONArray usersCheckedOut = json.has("usersCheckedOut") ? json
 							.getJSONArray("usersCheckedOut") : null;
-					JSONArray ordersCancelled = json.has("ordersCancelled") ? json
-							.getJSONArray("ordersCancelled") : null;
-					// When userTimeout push notification came, it is required to remove user open orders
-					if (ordersCancelled != null && ordersCancelled.length() > 0) {
-						// For removing the cancelled orders
-						app.removeOrders(ordersCancelled);
-
-					}
-					// When userTimeout push notification came, it is required to user profiles form people list 
+//					JSONArray ordersCancelled = json.has("ordersCancelled") ? json
+//							.getJSONArray("ordersCancelled") : null;
+//					// When userTimeout push notification came, it is required to remove user open orders
+//					if (ordersCancelled != null && ordersCancelled.length() > 0) {
+//						// For removing the cancelled orders
+//						app.removeOrders(ordersCancelled);
+//					}
+							
+					// When userTimeout push notification received, it is required to remove user profiles form people list 
 					if (usersCheckedOut != null && usersCheckedOut.length() > 0) {
 						// For removing the time out users
 						if(usersCheckedOut!=null&&usersCheckedOut.length()>0)
@@ -261,7 +260,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 	}
 
 	/**
-	 * Issues a notification to inform the user that server has sent a message.
+	 * To generate a notification to inform the user that server has sent a message.
 	 * 
 	 * @param count
 	 * @param count

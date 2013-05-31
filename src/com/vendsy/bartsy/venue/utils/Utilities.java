@@ -105,7 +105,7 @@ public final class Utilities {
 		String data[] = null;
         // Try to read ingredients data from CSV file 
         try {
-        	// Initialise the CSVReader object with CSV file by using InputStream
+        	// Initialize the CSVReader object with CSV file by using InputStream
             CSVReader reader = new CSVReader(new InputStreamReader(context.getAssets().open(Constants.INGREDIENTS_CSV_FILE)));
             data = reader.readNext();
             
@@ -171,9 +171,8 @@ public final class Utilities {
         try {
         	// Initialize the CSVReader object with CSV file by using InputStream
             CSVReader reader = new CSVReader(new InputStreamReader(context.getAssets().open(Constants.COCKTAILS_CSV_FILE)));
+            // To skip excel sheet headings
             data = reader.readNext();
-            ArrayList<String> categories = new ArrayList<String>();
-            Category category = null;
             
             //Loop until the end of the line
             while(data!=null) {
@@ -184,20 +183,13 @@ public final class Utilities {
                 	// To set the properties for Ingredient model
                 	Cocktail cocktail = new Cocktail();
                 	cocktail.setName(data[0]);
+                	// For now it is hard coded for category. 
+                	cocktail.setCategory(Category.COCKTAILS_TYPE);
+                	
+                	cocktail.setAlcohol(data[2]);
+                	cocktail.setGlassType(data[3]);
                 	cocktail.setIngredients(data[4]);
                 	cocktail.setInstructions(data[5]);
-                	
-                	// To avoid duplicate categories in the list
-                	if(!categories.contains(data[3])){
-                		category = new Category();
-                		category.setName(data[3]);
-                		category.setType(Category.COCKTAILS_TYPE);
-                		// Here, Category is saving in the  DB
-                    	DatabaseManager.getInstance().saveSection(category);
-                    	
-                		categories.add(data[3]);
-                	}
-                	cocktail.setCategory(category);
                 	
                 	// Here saving in the DB
                 	DatabaseManager.getInstance().saveCocktail(cocktail);

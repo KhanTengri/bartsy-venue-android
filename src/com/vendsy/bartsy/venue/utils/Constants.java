@@ -49,6 +49,10 @@ public class Constants {
 	// To save ingredients
 	public static final String URL_SAVE_INGREDIENTS = DOMAIN_NAME +PROJECT_NAME
 			+ "inventory/saveIngredients";
+	
+	// To save ingredients
+	public static final String URL_SAVE_COCKTAILS = DOMAIN_NAME +PROJECT_NAME
+				+ "inventory/saveCocktails";
 
 	// For setVenueStatus
 	public static final String URL_SET_VENUE_STATUS = DOMAIN_NAME
