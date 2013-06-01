@@ -35,7 +35,7 @@ public class PeopleSectionFragment extends Fragment implements OnClickListener {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
  
-		Log.i("Bartsy", "PeopleSectionFragment.onCreateView()");
+		Log.v("Bartsy", "PeopleSectionFragment.onCreateView()");
 
 		mInflater = inflater;
 		mContainer = container; 
@@ -57,7 +57,7 @@ public class PeopleSectionFragment extends Fragment implements OnClickListener {
 	
 	public void updatePeopleView () {
 		
-		Log.i("Bartsy", "About to update people list view");
+		Log.v("Bartsy", "About to update people list view");
 
 		if (mPeopleListView == null)
 			return;
@@ -67,10 +67,10 @@ public class PeopleSectionFragment extends Fragment implements OnClickListener {
 
 		// Add any existing people in the layout, one by one
 		
-		Log.i("Bartsy", "mApp.mPeople list size = " + mApp.mPeople.size());
+		Log.v("Bartsy", "mApp.mPeople list size = " + mApp.mPeople.size());
 
 		for (Profile profile : mApp.mPeople) {
-			Log.i("Bartsy", "Adding a user item to the layout");
+			Log.v("Bartsy", "Adding a user item to the layout");
 			profile.view = mInflater.inflate(R.layout.user_item, mContainer, false);
 			profile.updateView(this); // sets up view specifics and sets listener to this
 			mPeopleListView.addView(profile.view);
@@ -81,7 +81,7 @@ public class PeopleSectionFragment extends Fragment implements OnClickListener {
 	public void onDestroy() {
 		super.onDestroy();
 		
-		Log.i("Bartsy", "PeopleSectionFragment.onDestroy()");
+		Log.v("Bartsy", "PeopleSectionFragment.onDestroy()");
 
 		mRootView = null;
 		mPeopleListView = null;

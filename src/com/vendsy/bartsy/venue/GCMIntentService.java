@@ -59,9 +59,9 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 	@Override
 	protected void onRegistered(Context context, String registrationId) {
-		Log.i(TAG, "senderid :::" + SENDER_ID);
-		Log.i(TAG, "in on registered method");
-		Log.i(TAG, "Device registered: regId = " + registrationId);
+		Log.v(TAG, "senderid :::" + SENDER_ID);
+		Log.v(TAG, "in on registered method");
+		Log.v(TAG, "Device registered: regId = " + registrationId);
 
 		SharedPreferences settings = getSharedPreferences(REG_ID, 0);
 		// String uname = settings.getString("user", "").toString();
@@ -73,13 +73,13 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 	@Override
 	protected void onUnregistered(Context context, String registrationId) {
-		Log.i(TAG, "Device unregistered");
+		Log.v(TAG, "Device unregistered");
 		// displayMessage(context, getString(R.string.gcm_unregistered));
 		if (GCMRegistrar.isRegisteredOnServer(getApplicationContext())) {
 			// ServerUtilities.unregister(context, registrationId);
 		} else {
 			// This callback results from the call to unregister made on ServerUtilities when the registration to the server failed.
-			Log.i(TAG, "Ignoring unregister callback");
+			Log.v(TAG, "Ignoring unregister callback");
 		}
 	}
 
@@ -93,7 +93,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 		BartsyApplication app = (BartsyApplication) getApplication();
 		String messageTypeMSG = "";
 		try {
-			Log.i(TAG, "Push notification resposne :: " + json);
+			Log.v(TAG, "Push notification resposne :: " + json);
 			// JSONObject json = new JSONObject(message);
 			if (json.has("messageType")) {
 				// To check push notification message type
@@ -173,13 +173,13 @@ public class GCMIntentService extends GCMBaseIntentService {
 	// HeartBeat web service calling 
 	private void handlingHeartBeat(final BartsyApplication app) {
 
-		Log.i(TAG, "handlingHeartBeat");
+		Log.v(TAG, "handlingHeartBeat");
 		final Context context = getApplicationContext();
 
 		
 		new Thread() {
 		public void run() {
-			Log.i(TAG, "In thread");
+			Log.v(TAG, "In thread");
 			// Checking venue id is null or not
 				if (app.venueProfileID!=null) {
 					try {
@@ -200,7 +200,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 	@Override
 	protected void onMessage(Context context, Intent intent) {
-		Log.i(TAG, "Received message");
+		Log.v(TAG, "Received message");
 		// String message = getString(R.string.gcm_message);
 
 		String message = (String) intent.getExtras().get(
@@ -208,7 +208,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 		String count = (String) intent.getExtras().get("badgeCount");
 		Uri notification = RingtoneManager
 				.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-		Log.i(TAG, "message: " + message);
+		Log.v(TAG, "message: " + message);
 		Ringtone ringtone = RingtoneManager.getRingtone(context, notification);
 		String notifyMSG = "Received..";
 		if (message == null) {
@@ -237,7 +237,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 	// @Override
 	// protected void onDeletedMessages(Context context, int total) {
-	// Log.i(TAG, "Received deleted messages notification");
+	// Log.v(TAG, "Received deleted messages notification");
 	// String message = getString(R.string.gcm_deleted, total);
 	// displayMessage(context, message);
 	// // notifies user
@@ -246,14 +246,14 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 	@Override
 	public void onError(Context context, String errorId) {
-		Log.i(TAG, "Received error: " + errorId);
+		Log.v(TAG, "Received error: " + errorId);
 		// displayMessage(context, getString(R.string.gcm_error, errorId));
 	}
 
 	@Override
 	protected boolean onRecoverableError(Context context, String errorId) {
 		// log message
-		Log.i(TAG, "Received recoverable error: " + errorId);
+		Log.v(TAG, "Received recoverable error: " + errorId);
 		// displayMessage(context, getString(R.string.gcm_recoverable_error,
 		// errorId));
 		return super.onRecoverableError(context, errorId);

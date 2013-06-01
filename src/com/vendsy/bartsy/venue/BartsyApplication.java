@@ -98,7 +98,7 @@ public class BartsyApplication extends Application implements AppObservable {
 	 */
 	@Override
 	public void onCreate() {
-		Log.i(TAG, "onCreate()");
+		Log.v(TAG, "onCreate()");
 		PACKAGE_NAME = getApplicationContext().getPackageName();
 
 		// Start the background connectivity service if running on Alljoyn
@@ -106,7 +106,7 @@ public class BartsyApplication extends Application implements AppObservable {
 			Intent intent = new Intent(this, ConnectivityService.class);
 			mRunningService = startService(intent);
 			if (mRunningService == null) {
-				Log.i(TAG, "onCreate(): failed to startService()");
+				Log.v(TAG, "onCreate(): failed to startService()");
 			}
 		}
 
@@ -191,7 +191,7 @@ public class BartsyApplication extends Application implements AppObservable {
 	void addPerson(String userid, String name, String location, String info,
 			String description, String image // base64 encoded image
 	) {
-		Log.i(TAG, "New user checked in: " + name + " (" + userid + ")");
+		Log.v(TAG, "New user checked in: " + name + " (" + userid + ")");
 
 		// Decode the user image and create a new incoming profile
 		byte[] decodedString = Base64.decode(image, Base64.DEFAULT);
@@ -262,7 +262,7 @@ public class BartsyApplication extends Application implements AppObservable {
 	void addOrder(String serverOrderID, String title, String description,
 			String price, String userid) {
 
-		Log.i(TAG, "New " + title + " for: " + userid);
+		Log.v(TAG, "New " + title + " for: " + userid);
 
 		// Find the person who placed the order in the list of people in this
 		// bar. If not found, don't accept the order
@@ -293,11 +293,13 @@ public class BartsyApplication extends Application implements AppObservable {
 		notifyObservers(ORDERS_UPDATED);
 	}
 
+	
 	/**
 	 * Called from the push notification when the order receives from the user
 	 * 
 	 * @param order
 	 */
+	
 	public void addOrder(Order order) {
 		// Find the person who placed the order in the list of people in this
 		// bar. If not found, don't accept the order
@@ -320,11 +322,13 @@ public class BartsyApplication extends Application implements AppObservable {
 		notifyObservers(ORDERS_UPDATED);
 	}
 
+	
 	/**
 	 * Remove the orders based on the json array which is getting from the user check out PN
 	 * 
 	 * @param cancelledOrders
 	 */
+	
 	public void removeOrders(JSONArray cancelledOrders) {
 
 		// If cancelled orders count greater than 0
@@ -335,7 +339,7 @@ public class BartsyApplication extends Application implements AppObservable {
 				try {
 					// To get the cancelled orderId from the jsonArray response
 					orderId = cancelledOrders.getString(i);
-					Log.i(TAG, "Cancelled order number " + orderId);
+					Log.v(TAG, "Cancelled order number " + orderId);
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -432,13 +436,13 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * through "kill -9". See quit().
 	 */
 	public void checkin() {
-		Log.i(TAG, "checkin()");
+		Log.v(TAG, "checkin()");
 		if (Constants.USE_ALLJOYN && mRunningService == null) {
-			Log.i(TAG, "checkin():  Starting the AllJoynService");
+			Log.v(TAG, "checkin():  Starting the AllJoynService");
 			Intent intent = new Intent(this, ConnectivityService.class);
 			mRunningService = startService(intent);
 			if (mRunningService == null) {
-				Log.i(TAG, "checkin(): failed to startService()");
+				Log.v(TAG, "checkin(): failed to startService()");
 			}
 		}
 	}
@@ -509,10 +513,10 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * name.
 	 */
 	public synchronized void addFoundChannel(String channel) {
-		Log.i(TAG, "addFoundChannel(" + channel + ")");
+		Log.v(TAG, "addFoundChannel(" + channel + ")");
 		removeFoundChannel(channel);
 		mChannels.add(channel);
-		Log.i(TAG, "addFoundChannel(): added " + channel);
+		Log.v(TAG, "addFoundChannel(): added " + channel);
 		notifyObservers(NEW_CHANNEL_FOUND_EVENT);
 
 	}
@@ -533,12 +537,12 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * channel.
 	 */
 	public synchronized void removeFoundChannel(String channel) {
-		Log.i(TAG, "removeFoundChannel(" + channel + ")");
+		Log.v(TAG, "removeFoundChannel(" + channel + ")");
 
 		for (Iterator<String> i = mChannels.iterator(); i.hasNext();) {
 			String string = i.next();
 			if (string.equals(channel)) {
-				Log.i(TAG, "removeFoundChannel(): removed " + channel);
+				Log.v(TAG, "removeFoundChannel(): removed " + channel);
 				i.remove();
 			}
 		}
@@ -551,10 +555,10 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * the list, and we are deeply paranoid, we provide a deep copy.
 	 */
 	public synchronized List<String> getFoundChannels() {
-		Log.i(TAG, "getFoundChannels()");
+		Log.v(TAG, "getFoundChannels()");
 		List<String> clone = new ArrayList<String>(mChannels.size());
 		for (String string : mChannels) {
-			Log.i(TAG, "getFoundChannels(): added " + string);
+			Log.v(TAG, "getFoundChannels(): added " + string);
 			clone.add(new String(string));
 		}
 		return clone;
@@ -958,7 +962,7 @@ public class BartsyApplication extends Application implements AppObservable {
 	 */
 	@Override
 	public synchronized void addObserver(AppObserver obs) {
-		Log.i(TAG, "addObserver(" + obs + ")");
+		Log.v(TAG, "addObserver(" + obs + ")");
 		if (mObservers.indexOf(obs) < 0) {
 			mObservers.add(obs);
 		}
@@ -970,7 +974,7 @@ public class BartsyApplication extends Application implements AppObservable {
 	 */
 	@Override
 	public synchronized void deleteObserver(AppObserver obs) {
-		Log.i(TAG, "deleteObserver(" + obs + ")");
+		Log.v(TAG, "deleteObserver(" + obs + ")");
 		mObservers.remove(obs);
 	}
 
@@ -988,9 +992,9 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * to act or not based on the content of the string.
 	 */
 	private void notifyObservers(Object arg) {
-		Log.i(TAG, "notifyObservers(" + arg + ")");
+		Log.v(TAG, "notifyObservers(" + arg + ")");
 		for (AppObserver obs : mObservers) {
-			Log.i(TAG, "notify observer = " + obs);
+			Log.v(TAG, "notify observer = " + obs);
 			obs.update(this, arg);
 		}
 	}

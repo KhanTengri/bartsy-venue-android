@@ -115,7 +115,7 @@ public class InventorySectionFragment extends Fragment {
 		// Error handling
 		if(selectedType==null) return;
 		
-		Log.i(getClass().getName(), "Selected Type: "+selectedType);
+		Log.v(getClass().getName(), "Selected Type: "+selectedType);
 		
 		progressDialog = Utilities.progressDialog(getActivity(),"Uploading..");
 		progressDialog.show();
@@ -172,7 +172,7 @@ public class InventorySectionFragment extends Fragment {
 	 */
 	public void updateInventoryView() {
 		
-		Log.i("Bartsy", "InventorySectionFragment.updateOrdersView()");
+		Log.v("Bartsy", "InventorySectionFragment.updateOrdersView()");
 		
 		if (mRootView == null) return;
 		// By default Spirits tab is selected, We need to show spirits inventory content
@@ -260,14 +260,14 @@ public class InventorySectionFragment extends Fragment {
 		List<Category> categories = DatabaseManager.getInstance().getCategories(type);
 		if(categories==null) return;
 		
-		Log.i("InventorySectionFragment", "About Categorieslist");
+		Log.v("InventorySectionFragment", "About Categorieslist");
 		
 		// Make sure the list views are all empty
 		categoriesList.removeAllViews();
 		itemsLayout.removeAllViews();
 		categoriesArrowViews.clear();
 		
-		Log.i("InventorySectionFragment", "categories list size = " + categories.size());
+		Log.v("InventorySectionFragment", "categories list size = " + categories.size());
 		
 		// Add categories in the layout, one by one
 		for (Category category : categories) {
@@ -324,7 +324,7 @@ public class InventorySectionFragment extends Fragment {
 		itemsLayout.removeAllViews();
 		
 		// Add Ingredients in the layout, one by onerow
-		Log.i("InventorySectionFragment", "Ingredients list size = " + ingredients.size());
+		Log.v("InventorySectionFragment", "Ingredients list size = " + ingredients.size());
 		int column = 2;
 		TableRow row = null;
 		
@@ -450,7 +450,7 @@ public class InventorySectionFragment extends Fragment {
 		itemsLayout.removeAllViews();
 		
 		// Add Cocktail in the layout, one by one
-		Log.i("InventorySectionFragment", "Cocktail list size = " + cocktails.size());
+		Log.v("InventorySectionFragment", "Cocktail list size = " + cocktails.size());
 		
 		int column = 2;
 		TableRow row = null;

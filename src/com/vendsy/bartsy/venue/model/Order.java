@@ -7,9 +7,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.vendsy.bartsy.venue.R;
@@ -61,11 +64,21 @@ public class Order  {
 	public int status;	
     public Date[] state_transitions = new Date[ORDER_STATUS_COUNT];
 	
+    
+	/**
+	 *  Default constructor
+	 */
+    
+	public Order() {
+
+	}
+
 	
-	/* 
+	/** 
 	 * When an order is initialized the state transition times are undefined except for the 
 	 * first state, which is when the order is received
 	 */
+	
 	public void initialize (String server_id, String title, String description, 
 			String price, String image_resource, Profile order_sender) {
 		this.serverID = server_id;
@@ -76,25 +89,24 @@ public class Order  {
 		this.orderSender = order_sender;
 
 		// Orders starts in the "NEW" status
-		this.status = ORDER_STATUS_NEW;
-		this.state_transitions[this.status] = new Date();
+		status = ORDER_STATUS_NEW;
+		state_transitions[status] = new Date();
 		
 		calculateTotalPrice();
 	}
-	/**
-	 *  Default constructor
-	 */
-	public Order() {
-	}
+	
+	
 	/**
 	 * Constructor to parse all the information from the JSON
 	 * 
 	 * @param json
 	 */
+	
 	public Order(JSONObject json) {
 		
 		try {
 			status = Integer.valueOf(json.getString("orderStatus"));
+			state_transitions[status] = new Date();
 			title = json.getString("itemName");
 			updatedDate = json.getString("orderTime");
 			price = Float.valueOf(json.getString("basePrice"));
@@ -110,45 +122,59 @@ public class Order  {
 		}
 		
 	}
-	/**
-	 * To process next positive state for the 0rder
-	 */
-	public void nextPositiveState() {
-		switch (this.status) {
-		case ORDER_STATUS_NEW:
-			this.status = ORDER_STATUS_IN_PROGRESS;
-			break;
-		case ORDER_STATUS_IN_PROGRESS:
-			this.status = ORDER_STATUS_READY;
-			break;
-		case ORDER_STATUS_READY:
-			this.status = ORDER_STATUS_COMPLETE;
-			break;
-		}
-	}
-	/**
-	 * To process next negative state for the 0rder
-	 */
-	public void nextNegativeState() {
-		Log.i("Before Change state "," nextNegativeState "+this.status);
-		switch (this.status) {
-		case ORDER_STATUS_NEW:
-			this.status = ORDER_STATUS_REJECTED;
-			break;
-		case ORDER_STATUS_IN_PROGRESS:
-			this.status = ORDER_STATUS_FAILED;
-			break;
-		case ORDER_STATUS_READY:
-			this.status = ORDER_STATUS_INCOMPLETE;
-			break;
-		}
-		Log.i("After Change state "," nextNegativeState "+this.status);
-	}
 	
+	
+	/**
+	 * To process next positive state for the order
+	 */
+	
+	public void nextPositiveState() {
+		switch (status) {
+		case ORDER_STATUS_NEW:
+			status = ORDER_STATUS_IN_PROGRESS;
+			break;
+		case ORDER_STATUS_IN_PROGRESS:
+			status = ORDER_STATUS_READY;
+			break;
+		case ORDER_STATUS_READY:
+			status = ORDER_STATUS_COMPLETE;
+			break;
+		default:
+			return;
+		}
+		
+		// Mark the time of the state transition in the timetable
+		state_transitions[status] = new Date();
+	}
+
+	
+	/**
+	 * To process next negative state for the order
+	 */
+	
+	public void nextNegativeState() {
+		Log.i("Before Change state "," nextNegativeState "+status);
+		
+		switch (status) {
+		case ORDER_STATUS_NEW:
+			status = ORDER_STATUS_REJECTED;
+			break;
+		case ORDER_STATUS_IN_PROGRESS:
+			status = ORDER_STATUS_FAILED;
+			break;
+		case ORDER_STATUS_READY:
+			status = ORDER_STATUS_INCOMPLETE;
+			break;
+		}
+		Log.i("After Change state "," nextNegativeState "+status);
+		
+		// Mark the time of the state transition in the timetable
+		state_transitions[status] = new Date();
+	}
+	 
 	
 	/**
 	 * It will calculates the total price based on price, quantity and tipAmount
-	 * 
 	 */
 	public void calculateTotalPrice() {
 		float actualPrice = (price * quantity);
@@ -157,6 +183,8 @@ public class Order  {
 		total = actualPrice + subTotal;
 
 	}
+	
+	
 	/**
 	 * It will returns JSON format to update order status
 	 */
@@ -172,39 +200,40 @@ public class Order  {
 		return orderData;
 	}
 	
+	
+	/**
+	 * Updates the order view. Notice the view holds a pointer to the object being displayed through the "tag" field
+	 */
+	
 	public void updateView () {
 		
 		if (view == null) return;
 
-		((TextView) view.findViewById(R.id.view_order_title)).setText(this.title);
-		((TextView) view.findViewById(R.id.view_order_description)).setText(this.description);
-		if(this.state_transitions[ORDER_STATUS_NEW]!=null){
-			((TextView) view.findViewById(R.id.view_order_time))
-					.setText(DateFormat.getTimeInstance().format(
-							this.state_transitions[ORDER_STATUS_NEW]));
-			((TextView) view.findViewById(R.id.view_order_date)).setText(DateFormat.getDateInstance().format(this.state_transitions[ORDER_STATUS_NEW]));
-		}else{
-			//TODO Need to format updatedDate string value to date and time
-		}
+		((TextView) view.findViewById(R.id.view_order_title)).setText(title);
+		((TextView) view.findViewById(R.id.view_order_description)).setText(description);
+		((TextView) view.findViewById(R.id.view_order_time)).setText(DateFormat.getTimeInstance().format(state_transitions[status]));
+		((TextView) view.findViewById(R.id.view_order_date)).setText(DateFormat.getDateInstance().format(state_transitions[status]));	
+		((TextView) view.findViewById(R.id.view_order_price)).setText("" + (int) price); // use int for now
 		
-		((TextView) view.findViewById(R.id.view_order_price)).setText("" + (int) this.price); // use int for now
-//		((ImageView)view.findViewById(R.id.view_order_image_resource)).setImageResource(this.image_resource);
-		
-		if(this.orderSender!=null){
+		if (orderSender != null ) {
+
 			// Update sender profile section
+			
 			ImageView profileImageView = ((ImageView)view.findViewById(R.id.view_order_profile_picture));
-			if(this.orderSender.image==null){
-				// To download image from the profile URL
-				WebServices.downloadImage(this.orderSender.getProfileImageUrl(), this.orderSender, profileImageView);
-			}else{
-				// To set the saved image to the imageView
-				profileImageView.setImageBitmap(this.orderSender.image);
+			if (orderSender.image==null) {
+				// Download image from the profile URL
+				WebServices.downloadImage(orderSender.getProfileImageUrl(), orderSender, profileImageView);
+			} else {
+				// Set the saved image to the imageView
+				profileImageView.setImageBitmap(orderSender.image);
 			}
-			((TextView) view.findViewById(R.id.view_order_profile_name)).setText(this.orderSender.username);
+			((TextView) view.findViewById(R.id.view_order_profile_name)).setText(orderSender.username);
 		}
 
+		// Update buttons and background
+		
 		String positive="", negative="";
-		switch (this.status) {
+		switch (status) {
 		case ORDER_STATUS_NEW:
 			positive = "ACCEPT";
 			negative = "REJECT";
@@ -221,13 +250,31 @@ public class Order  {
 			view.findViewById(R.id.view_order_header).setBackgroundResource(R.drawable.rounded_corner_green);
 			break;
 		}
-		((TextView) view.findViewById(R.id.view_order_number)).setText(this.serverID);
+		((TextView) view.findViewById(R.id.view_order_number)).setText(serverID);
 		((Button) view.findViewById(R.id.view_order_button_positive)).setText(positive);
 		((Button) view.findViewById(R.id.view_order_button_positive)).setTag(this);
 		((Button) view.findViewById(R.id.view_order_button_negative)).setText(negative);
 		((Button) view.findViewById(R.id.view_order_button_negative)).setTag(this);
+		((Button) view.findViewById(R.id.view_order_button_remove)).setTag(this);
+		
+		// Set a pointer to the object being displayed 
 		view.setTag(this);
 		
 	}
 	
+	
+	public View getMiniView(LayoutInflater inflater, ViewGroup container ) {
+		
+		LinearLayout view = (LinearLayout) inflater.inflate(R.layout.bartender_order_mini, container, false);
+		
+		((TextView) view.findViewById(R.id.view_order_title)).setText(this.title);
+		((TextView) view.findViewById(R.id.view_order_description)).setText(this.description);
+		((TextView) view.findViewById(R.id.view_order_price)).setText(""+ (int) this.price); // use int for now
+
+		// Set a pointer to hte object being displayed
+		view.findViewById(R.id.view_order_button_remove).setTag(this);
+
+		return view;
+	}
+
 }

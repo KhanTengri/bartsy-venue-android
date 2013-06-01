@@ -151,7 +151,7 @@ public class MainActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 
 		// Log function call
-		Log.i(TAG, "MainActivity.onCreate()");
+		Log.v(TAG, "MainActivity.onCreate()");
 
 		// Setup application pointer
 		mApp = (BartsyApplication) getApplication();
@@ -342,36 +342,36 @@ public class MainActivity extends FragmentActivity implements
 
 	private void initializeFragments() {
 		
-		Log.i(TAG, "MainActivity.initializeFragments()");
+		Log.v(TAG, "MainActivity.initializeFragments()");
 		
 		// Initialize bartender fragment - the fragment may still exist even though the activity has restarted
 		BartenderSectionFragment f = (BartenderSectionFragment) getSupportFragmentManager().findFragmentById(R.string.title_bartender);
 		if ( f == null) {
-			Log.i(TAG, "Bartender fragment not found. Creating one.");
+			Log.v(TAG, "Bartender fragment not found. Creating one.");
 			mBartenderFragment = new BartenderSectionFragment();
 		} else {
-			Log.i(TAG, "Bartender fragment found.");
+			Log.v(TAG, "Bartender fragment found.");
 			mBartenderFragment = f;
 		}
 		
 		// Initialize people fragment - reuse the fragment if it's already in memory
 		PeopleSectionFragment p = (PeopleSectionFragment) getSupportFragmentManager().findFragmentById(R.string.title_people);
 		if (mPeopleFragment == null) {
-			Log.i(TAG, "People fragment not found. Creating one.");
+			Log.v(TAG, "People fragment not found. Creating one.");
 			mPeopleFragment = new PeopleSectionFragment();
 		} else {
-			Log.i(TAG, "People fragment found.");
+			Log.v(TAG, "People fragment found.");
 			mPeopleFragment = p;
 		}
 		
 		// Initialize people fragment - reuse the fragment if it's already in memory
 		
 		if (mInventoryFragment == null) {
-			Log.i(TAG, "People fragment not found. Creating one.");
+			Log.v(TAG, "People fragment not found. Creating one.");
 			mInventoryFragment = new InventorySectionFragment();
 		} else {
 			InventorySectionFragment inventoryFragment = (InventorySectionFragment) getSupportFragmentManager().findFragmentById(R.string.title_inventory);
-			Log.i(TAG, "People fragment found.");
+			Log.v(TAG, "People fragment found.");
 			mInventoryFragment = inventoryFragment;
 		}
 	}
@@ -408,7 +408,7 @@ public class MainActivity extends FragmentActivity implements
 				Context.MODE_PRIVATE);
 		String venueId = sharedPref.getString("RegisteredVenueId", null);
 		if (venueId == null) {
-			Log.i(TAG, "Unregistered device. Starting Venue Registration...");
+			Log.v(TAG, "Unregistered device. Starting Venue Registration...");
 			Intent intent = new Intent().setClass(this,
 					VenueRegistrationActivity.class);
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -416,7 +416,7 @@ public class MainActivity extends FragmentActivity implements
 			// finish();
 			return;
 		} else {
-			Log.i(TAG, "Proceeding with startup...");
+			Log.v(TAG, "Proceeding with startup...");
 
 		}
 	}
@@ -430,7 +430,7 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		Log.i(TAG, "MainActivity().onDestroy()");
+		Log.v(TAG, "MainActivity().onDestroy()");
 
 		mApp.deleteObserver(this);
 
@@ -483,7 +483,7 @@ public class MainActivity extends FragmentActivity implements
 
 	private void updateActionBarStatus() {
 
-		Log.i(TAG, "updateChannelState()");
+		Log.v(TAG, "updateChannelState()");
 
 		if (mApp.venueProfileID == null || mApp.venueProfileName == null)
 			getActionBar()
@@ -642,7 +642,7 @@ public class MainActivity extends FragmentActivity implements
 
 	@Override
 	public synchronized void update(AppObservable o, Object arg) {
-		Log.i(TAG, "update(" + arg + ")");
+		Log.v(TAG, "update(" + arg + ")");
 		String qualifier = (String) arg;
 
 		if (qualifier.equals(BartsyApplication.APPLICATION_QUIT_EVENT)) {
@@ -682,17 +682,17 @@ public class MainActivity extends FragmentActivity implements
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case HANDLE_APPLICATION_QUIT_EVENT:
-				Log.i(TAG,
+				Log.v(TAG,
 						"BartsyActivity.mhandler.handleMessage(): HANDLE_APPLICATION_QUIT_EVENT");
 				finish();
 				break;
 			case HANDLE_USE_CHANNEL_STATE_CHANGED_EVENT:
-				Log.i(TAG,
+				Log.v(TAG,
 						"BartsyActivity.mhandler.handleMessage(): HANDLE_USE_CHANNEL_STATE_CHANGED_EVENT");
 				updateActionBarStatus();
 				break;
 			case HANDLE_HISTORY_CHANGED_EVENT: {
-				Log.i(TAG,
+				Log.v(TAG,
 						"BartsyActivity.mhandler.handleMessage(): HANDLE_HISTORY_CHANGED_EVENT");
 
 				String message = mApp.getLastMessage();
@@ -711,31 +711,31 @@ public class MainActivity extends FragmentActivity implements
 				break;
 			}
 			case HANDLE_ALLJOYN_ERROR_EVENT: {
-				Log.i(TAG,
+				Log.v(TAG,
 						"BartsyActivity.mhandler.handleMessage(): HANDLE_ALLJOYN_ERROR_EVENT");
 				alljoynError();
 			}
 				break;
 			case HANDLE_ORDERS_UPDATED_EVENT: 
-				Log.i(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_ORDERS_UPDATED_EVENT");
+				Log.v(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_ORDERS_UPDATED_EVENT");
 				if (mBartenderFragment != null) {
-					Log.i(TAG,"Updating orders view and count...");
+					Log.v(TAG,"Updating orders view and count...");
 					mBartenderFragment.updateOrdersView();
 					updateOrdersCount();
 				}
 				break;
 			case HANDLE_PEOPLE_UPDATED_EVENT: 
-				Log.i(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_PEOPLE_UPDATED_EVENT");
+				Log.v(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_PEOPLE_UPDATED_EVENT");
 				if (mPeopleFragment != null) {
-					Log.i(TAG,"Updating people view and count...");
+					Log.v(TAG,"Updating people view and count...");
 					mPeopleFragment.updatePeopleView();
 					updatePeopleCount();
 				}
 				break;
 			case HANDLE_INVENTORY_UPDATED_EVENT: 
-				Log.i(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_INVENTORY_UPDATED_EVENT");
+				Log.v(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_INVENTORY_UPDATED_EVENT");
 				if (mInventoryFragment != null) {
-					Log.i(TAG,"Updating inventory view...");
+					Log.v(TAG,"Updating inventory view...");
 					mInventoryFragment.updateInventoryView();
 				}
 				break;
