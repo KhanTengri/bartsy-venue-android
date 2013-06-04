@@ -52,6 +52,7 @@ import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
 import com.vendsy.bartsy.venue.view.AppObserver;
 import com.vendsy.bartsy.venue.view.BartenderSectionFragment;
+import com.vendsy.bartsy.venue.view.DrinksSectionFragment;
 import com.vendsy.bartsy.venue.view.InventorySectionFragment;
 import com.vendsy.bartsy.venue.view.PeopleSectionFragment;
 
@@ -70,6 +71,7 @@ public class MainActivity extends FragmentActivity implements
 	public BartenderSectionFragment mBartenderFragment = null; 	// make sure the set this to null when fragment is destroyed
 	public PeopleSectionFragment mPeopleFragment = null;		// make sure the set this to null when fragment is destroyed
 	public InventorySectionFragment mInventoryFragment = null;	// make sure the set this to null when fragment is destroyed
+	public DrinksSectionFragment mDrinksFragment = null;	// make sure the set this to null when fragment is destroyed
 
 	// Progress dialog
 	private ProgressDialog progressDialog;
@@ -364,7 +366,7 @@ public class MainActivity extends FragmentActivity implements
 			mPeopleFragment = p;
 		}
 		
-		// Initialize people fragment - reuse the fragment if it's already in memory
+		// Initialize inventory fragment - reuse the fragment if it's already in memory
 		
 		if (mInventoryFragment == null) {
 			Log.v(TAG, "People fragment not found. Creating one.");
@@ -373,6 +375,17 @@ public class MainActivity extends FragmentActivity implements
 			InventorySectionFragment inventoryFragment = (InventorySectionFragment) getSupportFragmentManager().findFragmentById(R.string.title_inventory);
 			Log.v(TAG, "People fragment found.");
 			mInventoryFragment = inventoryFragment;
+		}
+		
+		// Initialize drinks fragment - reuse the fragment if it's already in memory
+		
+		if (mDrinksFragment == null) {
+			Log.v(TAG, "People fragment not found. Creating one.");
+			mDrinksFragment = new DrinksSectionFragment();
+		} else {
+			DrinksSectionFragment drinksFragment = (DrinksSectionFragment) getSupportFragmentManager().findFragmentById(R.string.title_menu);
+			Log.v(TAG, "People fragment found.");
+			mDrinksFragment = drinksFragment;
 		}
 	}
 
@@ -561,8 +574,7 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	MainActivity main_activity = this;
 
-	private static final int mTabs[] = { R.string.title_bartender,
-			 R.string.title_inventory, R.string.title_people };
+	private static final int mTabs[] = { R.string.title_bartender, R.string.title_people, R.string.title_menu, R.string.title_inventory};
 	
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
@@ -584,6 +596,8 @@ public class MainActivity extends FragmentActivity implements
 										// allows to leave comments for others
 										// on the venue
 				return (mPeopleFragment);
+			case R.string.title_menu:
+				return (mDrinksFragment);
 			default:
 				return null;
 			}

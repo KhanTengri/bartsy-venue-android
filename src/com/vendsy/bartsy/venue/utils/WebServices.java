@@ -117,6 +117,30 @@ public class WebServices {
 
 	}
 
+	
+	/**
+	 * To get list of menu list
+	 * 
+	 * @param context
+	 * @param venueID
+	 */
+	public static String getMenuList(Context context, String venueID) {
+
+		Log.v(TAG, "getting menu for venue: " + venueID);
+
+		String response = null;
+		JSONObject json = new JSONObject();
+		try {
+			json.put("venueId", venueID);
+			response = postRequest(Constants.URL_GET_BAR_LIST, json, context);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		return response;
+	}
+	
 	/**
 	 * To download image from the url and save in the model(Object)
 	 * 
