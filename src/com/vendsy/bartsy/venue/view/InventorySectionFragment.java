@@ -9,7 +9,9 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -96,7 +98,17 @@ public class InventorySectionFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				// Initiate inventory dialog
-				InventoryDialogFragment dialog = new InventoryDialogFragment();
+				InventoryDialogFragment dialog = new InventoryDialogFragment(){
+					@Override
+					protected void saveAction() {
+						super.saveAction();
+						updateRightView();
+						
+					}
+
+				};
+				dialog.setType(selectedType);
+				dialog.setSelectedCategory(selectedCategory);
 				dialog.show(getActivity().getSupportFragmentManager(),"Add New");
 			}
 		});
@@ -106,6 +118,18 @@ public class InventorySectionFragment extends Fragment {
 		venueId = ((BartsyApplication)getActivity().getApplication()).venueProfileID;
 		
         return mRootView;
+	}
+	
+	/**
+	 * To update the layout based on the type
+	 */
+	private void updateRightView() {
+		
+		if(selectedType!=null && !selectedType.equals(Category.COCKTAILS_TYPE)){
+			updateIngredientsView(selectedCategory);
+		}else{
+			updateCocktailView();
+		}
 	}
 	
 	/**
@@ -158,7 +182,7 @@ public class InventorySectionFragment extends Fragment {
 						try {
 							JSONObject json = new JSONObject(response);
 							
-							Toast.makeText(getActivity(), json.getString("errorMessage"), Toast.LENGTH_LONG);
+							Toast.makeText(getActivity(), json.getString("errorMessage"), Toast.LENGTH_LONG).show();
 						} catch (JSONException e) {}
 					}
 				});
@@ -343,8 +367,11 @@ public class InventorySectionFragment extends Fragment {
 //			itemView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.MATCH_PARENT));
 		    TextView itemTextView = (TextView) itemView.findViewById(R.id.ingredientItemText);
 		    itemTextView.setText(ingredient.getName());
+		    
 		    ToggleButton availableButton = (ToggleButton)itemView.findViewById(R.id.availableButton);
 		    availableButton.setChecked(ingredient.isAvailability());
+		    
+		    ImageView deleteImage = (ImageView) itemView.findViewById(R.id.deleteImage);
 		    
 		    final Ingredient ingredientObj = ingredient;
 		    // Add checked changed listener to the toggle button
@@ -352,6 +379,14 @@ public class InventorySectionFragment extends Fragment {
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 					ingredientObj.setAvailability(isChecked);
+				}
+			});
+		    
+		    deleteImage.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					deleteAction(ingredientObj);
 				}
 			});
 		   
@@ -485,6 +520,36 @@ public class InventorySectionFragment extends Fragment {
 		    
 		    row.addView(itemView);
 		}
+	}
+	/**
+	 * To delete custom drink from the database and server as well
+	 * 
+	 * @param ingredient
+	 */
+	private void deleteAction(final Ingredient ingredient){
+		
+		// To Setup confirmation dialog
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setMessage("Are you sure do you want to delete?")
+				.setCancelable(false)
+				.setPositiveButton("Yes",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id){
+								DatabaseManager.getInstance().deleteIngredient(ingredient);
+								updateRightView();
+							}
+						})
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+						return;
+					}
+				});
+		
+		AlertDialog alert = builder.create();
+		alert.show();
 	}
 	
 }

@@ -66,7 +66,20 @@ public class DatabaseManager {
 	}
 	
 	/**
-	 * To save Cocktail data in db
+	 * To delete Ingredient data in db
+	 * 
+	 * @param Ingredient
+	 */
+	public void deleteIngredient(Ingredient ingredient) {
+		try {
+			dbHelper.getIngredientDao().delete(ingredient);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * To delete Cocktail data in db
 	 * 
 	 * @param Cocktail
 	 */
