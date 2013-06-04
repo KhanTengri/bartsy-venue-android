@@ -123,7 +123,8 @@ public final class Utilities {
                 	ingredient.setName(data[0]);
                 	
                 	// To avoid duplicate categories in the list
-                	if(!isCategoryExistInList(categories, data[2], data[1])){
+                	category = getExistingCategoryInList(categories, data[2], data[1]);
+                	if(category==null){
                 		category = new Category();
                 		category.setName(data[2]);
                 		category.setType(data[1]);
@@ -144,20 +145,20 @@ public final class Utilities {
 	}
 	
 	/**
-	 * To check category is already exist or not
+	 * To check category is already exist or not. If it is already exist then it will return the object otherwise it will return null
 	 * 
 	 * @param list
 	 * @param category
 	 * @param type
 	 * @return
 	 */
-	public static boolean isCategoryExistInList(ArrayList<Category> list, String category, String type){
+	public static Category getExistingCategoryInList(ArrayList<Category> list, String category, String type){
 		for (Category categoryItem : list) {		
 			if(category.equals(categoryItem.getName()) && type.equals(categoryItem.getType())){
-				return true;
+				return categoryItem;
 			}
 		}
-		return false;
+		return null;
 	}
 	
 	/**
