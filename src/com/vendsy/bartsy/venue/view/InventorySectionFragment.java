@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.res.Resources.Theme;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -536,8 +537,8 @@ public class InventorySectionFragment extends Fragment {
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int id){
-								DatabaseManager.getInstance().deleteIngredient(ingredient);
-								updateRightView();
+								
+								deleteIngredientFromServer(ingredient);
 							}
 						})
 				.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -550,6 +551,42 @@ public class InventorySectionFragment extends Fragment {
 		
 		AlertDialog alert = builder.create();
 		alert.show();
+	}
+	
+	/**
+	 * To delete ingredient in server by calling web service
+	 * 
+	 * @param ingredient
+	 */
+	protected void deleteIngredientFromServer(final Ingredient ingredient) {
+		// To setup progress dialog and display progress
+		progressDialog = Utilities.progressDialog(getActivity(),"Deleting..");
+		progressDialog.show();
+		
+		// Call web service/sys call in background
+		new Thread(){
+			public void run() {
+				
+				String response = WebServices.deleteIngredients(ingredient, venueId, getActivity());
+				
+				Log.d("InventorySectionFragment", "deleteIngredientFromServer():: Response: "+response);
+				
+				// To access UI thread
+				handler.post(new Runnable() {
+					
+					@Override
+					public void run() {
+						// To stop progress dialog
+						progressDialog.dismiss();
+						// Delete ingredient record in the database 
+						DatabaseManager.getInstance().deleteIngredient(ingredient);
+						// Update UI after ingredient delete
+						updateRightView();
+					}
+				});
+			}
+		}.start();
+		
 	}
 	
 }

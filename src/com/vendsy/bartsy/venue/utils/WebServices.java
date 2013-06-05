@@ -317,6 +317,24 @@ public class WebServices {
 		return null;
 	}
 	
+	public static String deleteIngredients(Ingredient ingredient, String venueId, Context context){
+		
+		try {
+			// Create Json object to post data
+			JSONObject json = new JSONObject();
+			json.put("venueId", venueId);
+			json.put("ingredientId", String.valueOf(ingredient.getId()));
+			
+			String response = postRequest(Constants.URL_DELETE_INGREDIENTS, json, context);
+			return response;
+			
+		} catch (JSONException e) {
+		} catch (Exception e) {
+		}
+		
+		return null;
+	}
+	
 	/**
 	 * To send cocktails to the server
 	 * 
