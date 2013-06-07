@@ -171,9 +171,9 @@ public class Order  {
 			break;
 		}
 		
-		// Log the state change
-
+		// Log the state change and update the order with an error reason
 		Log.i(TAG, "Order " + serverID + " changed status from " + oldStatus + " to " + status + " for reason: "  + errorReason);
+		this.errorReason = errorReason;
 		
 		// Mark the time of the state transition in the timetable
 		state_transitions[status] = new Date();
