@@ -45,6 +45,7 @@ import com.vendsy.bartsy.venue.model.Profile;
 import com.vendsy.bartsy.venue.service.ConnectivityService;
 import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.Utilities;
+import com.vendsy.bartsy.venue.utils.WebServices;
 import com.vendsy.bartsy.venue.view.AppObserver;
 
 /**
@@ -275,8 +276,7 @@ public class BartsyApplication extends Application implements AppObservable {
 			}
 		}
 		if (person == null) {
-			Log.d(TAG, "Error processing command. user not checked in: "
-					+ userid);
+			Log.d(TAG, "Error processing command. user not checked in: "  + userid);
 			return;
 		}
 
@@ -312,8 +312,12 @@ public class BartsyApplication extends Application implements AppObservable {
 			}
 		}
 		if (order.orderSender == null) {
-			Log.d(TAG, "Error processing command. user not checked in: "
-					+ order.profileId);
+			// User placing the order not in the list of user - decline order and send updated order status to the remote
+
+			Log.d(TAG, "Error processing order " + order.serverID + ". User not checked in: " + order.profileId);
+			order.nextNegativeState("User not checked in. Please check out and check back in the venue.");
+			order.view = null;
+			WebServices.orderStatusChanged(order, this);
 			return;
 		}
 

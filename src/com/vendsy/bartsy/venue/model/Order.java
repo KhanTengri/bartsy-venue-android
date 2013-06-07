@@ -20,6 +20,8 @@ import com.vendsy.bartsy.venue.utils.WebServices;
 
 public class Order  {
 
+	static final String TAG = "Order";
+	
 	// Each order has an ID that is unique within a session number
 	public String serverID; 
 	
@@ -62,6 +64,7 @@ public class Order  {
 	
 	// The states are implemented in a status variable and each state transition has an associated time
 	public int status;	
+	private String errorReason = ""; // used to send an error reason for negative order states
     public Date[] state_transitions = new Date[ORDER_STATUS_COUNT];
 	
     
@@ -152,8 +155,9 @@ public class Order  {
 	 * To process next negative state for the order
 	 */
 	
-	public void nextNegativeState() {
-		Log.i("Before Change state "," nextNegativeState "+status);
+	public void nextNegativeState(String errorReason) {
+		
+		int oldStatus = status;
 		
 		switch (status) {
 		case ORDER_STATUS_NEW:
@@ -166,7 +170,10 @@ public class Order  {
 			status = ORDER_STATUS_INCOMPLETE;
 			break;
 		}
-		Log.i("After Change state "," nextNegativeState "+status);
+		
+		// Log the state change
+
+		Log.i(TAG, "Order " + serverID + " changed status from " + oldStatus + " to " + status + " for reason: "  + errorReason);
 		
 		// Mark the time of the state transition in the timetable
 		state_transitions[status] = new Date();
@@ -193,6 +200,7 @@ public class Order  {
 		try {
 			orderData.put("orderId", serverID);
 			orderData.put("orderStatus", status);
+			orderData.put("orderRejectionReason", errorReason);
 			
 		} catch (JSONException e) {
 			e.printStackTrace();

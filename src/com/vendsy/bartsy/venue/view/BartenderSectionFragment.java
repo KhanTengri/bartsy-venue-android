@@ -221,7 +221,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 				Log.v(TAG, "Processing order " + orderItem.serverID);
 				
 				if (orderItem.status == status && orderItem.orderSender.userID.equalsIgnoreCase(userID)) {
-					orderItem.nextNegativeState();	
+					orderItem.nextNegativeState("Order rejected by the bartender");	
 					orderItem.view = null;
 					mApp.mOrders.remove(orderItem);
 					// Send updated order status to the remote
@@ -233,7 +233,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			
 		case R.id.view_order_button_remove:
 			Log.v(TAG, "Clicked on order remove button");
-			order.nextNegativeState();
+			order.nextNegativeState("Individual order rejected by the bartender");
 			order.view = null;
 			mApp.mOrders.remove(order);
 			// Send updated order status to the remote
