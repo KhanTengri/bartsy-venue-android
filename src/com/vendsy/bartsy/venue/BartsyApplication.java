@@ -42,6 +42,7 @@ import com.vendsy.bartsy.venue.model.AppObservable;
 import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.model.Profile;
+import com.vendsy.bartsy.venue.service.ConnectionCheckingService;
 import com.vendsy.bartsy.venue.service.ConnectivityService;
 import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.Utilities;
@@ -101,7 +102,8 @@ public class BartsyApplication extends Application implements AppObservable {
 	public void onCreate() {
 		Log.v(TAG, "onCreate()");
 		PACKAGE_NAME = getApplicationContext().getPackageName();
-
+		// Start background ConnectionCheckingService
+		startService(new Intent(this,ConnectionCheckingService.class));
 		// Start the background connectivity service if running on Alljoyn
 		if (Constants.USE_ALLJOYN) {
 			Intent intent = new Intent(this, ConnectivityService.class);
