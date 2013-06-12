@@ -70,5 +70,6 @@ public class Constants {
 	public static final String INGREDIENTS_CSV_FILE = "Ingredients.csv";
 	// CSV file for spirits and mixers
 	public static final String COCKTAILS_CSV_FILE = "Cocktails.csv";
-
+	// Current ApiVersion number
+	public static final String 	API_VERSION="1";
 }

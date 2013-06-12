@@ -83,7 +83,8 @@ public class WebServices {
 		String response = null;
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpPost httppost = new HttpPost(url);
-
+		// added apiVersion
+		postData.put("apiVersion", Constants.API_VERSION);
 		String data = postData.toString();
 		Log.i(TAG," *** Webservice postRequest " + data);
 		try {
