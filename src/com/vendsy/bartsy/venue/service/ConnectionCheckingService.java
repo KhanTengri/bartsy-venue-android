@@ -70,18 +70,9 @@ public class ConnectionCheckingService extends Service {
 				try {
 					// Get the network status
 					Log.w(TAG, "Network available");
-					boolean network = WebServices .isNetworkAvailable(ConnectionCheckingService.this);
-					if (network) {
-						// This handler to show the UI-related events
-						handler.post(new Runnable() {
-
-							@Override
-							public void run() {
-								Toast.makeText(ConnectionCheckingService.this, "Network available...", Toast.LENGTH_LONG).show();
-							}
-						});
-
-					} else {
+					
+					if (!WebServices .isNetworkAvailable(ConnectionCheckingService.this)) {
+						
 						Log.w(TAG, "Network unavailable");
 						
 						// Attempt recovery by turning wifi off / on
@@ -105,7 +96,7 @@ public class ConnectionCheckingService extends Service {
 
 							@Override
 							public void run() {
-								Toast.makeText(ConnectionCheckingService.this, "Network not available...", Toast.LENGTH_LONG).show();
+								Toast.makeText(ConnectionCheckingService.this, "Network not available. Trying to fix this issue...", Toast.LENGTH_LONG).show();
 							}
 						});
 					}
