@@ -3,7 +3,9 @@ package com.vendsy.bartsy.venue.service;
 import com.vendsy.bartsy.venue.utils.WebServices;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -66,41 +68,51 @@ public class ConnectionCheckingService extends Service {
 		public void run() {
 			while (isRunning) {
 				try {
-					// For get the network status
-					boolean network = WebServices
-							.isNetworkAvailable(ConnectionCheckingService.this);
+					// Get the network status
+					Log.w(TAG, "Network available");
+					boolean network = WebServices .isNetworkAvailable(ConnectionCheckingService.this);
 					if (network) {
 						// This handler to show the UI-related events
 						handler.post(new Runnable() {
 
 							@Override
 							public void run() {
-								Toast.makeText(ConnectionCheckingService.this,
-										"Network available...",
-										Toast.LENGTH_LONG).show();
-
+								Toast.makeText(ConnectionCheckingService.this, "Network available...", Toast.LENGTH_LONG).show();
 							}
 						});
 
 					} else {
-						Log.w("connection checking service",
-								" ******************************** Network is Not There ***********************************");
-						// This handler to show the UI-related events
+						Log.w(TAG, "Network unavailable");
+						
+						// Attempt recovery by turning wifi off / on
+						
+						WifiManager wifiManager = (WifiManager)getSystemService(Context.WIFI_SERVICE);
+
+						if (wifiManager.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
+							 Log.v(TAG, "WiFi enabled - disabling it");
+							 wifiManager.setWifiEnabled(false);
+						} else if (wifiManager.getWifiState() == WifiManager.WIFI_STATE_DISABLED) {
+							 Log.v(TAG, "WiFi disabled - enabling it");
+							 wifiManager.setWifiEnabled(true);
+						} else {
+							 Log.v(TAG, "WiFi status: " + wifiManager.getWifiState());							
+						}
+
+						
+						
+						// Handler to show UI-related events
 						handler.post(new Runnable() {
 
 							@Override
 							public void run() {
-								Toast.makeText(ConnectionCheckingService.this,
-										"Network not available...",
-										Toast.LENGTH_LONG).show();
-
+								Toast.makeText(ConnectionCheckingService.this, "Network not available...", Toast.LENGTH_LONG).show();
 							}
 						});
 					}
 
 				} catch (Exception e) {
 					Log.w("connection checking service",
-							" ******************************** Exception Came ***********************************"
+							" ******************************** Exception ***********************************"
 									+ e.getMessage());
 					e.printStackTrace();
 				}
