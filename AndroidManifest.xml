@@ -68,17 +68,16 @@
         </service>
 
         <activity
-            android:name=".VenueRegistrationActivity"
+            android:name=".VenueProfileActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:screenOrientation="landscape"
+            android:windowSoftInputMode="stateAlwaysHidden" 
             android:theme="@style/AppTheme" >
         </activity>
         <activity
             android:name=".MainActivity"
             android:icon="@drawable/ic_launcher"
             android:label="@string/app_name"
-            android:screenOrientation="landscape"
             android:theme="@style/AppTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -88,8 +87,7 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="SettingsActivity"
-            android:screenOrientation="landscape" >
+            android:label="SettingsActivity" >
         </activity>
 
         <receiver
