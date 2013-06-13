@@ -68,8 +68,6 @@ public class ConnectionCheckingService extends Service {
 		public void run() {
 			while (isRunning) {
 				try {
-					// Get the network status
-					Log.w(TAG, "Network available");
 					
 					if (!WebServices .isNetworkAvailable(ConnectionCheckingService.this)) {
 						

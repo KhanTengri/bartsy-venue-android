@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -25,14 +26,13 @@ import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
 
-public class VenueRegistrationActivity extends Activity implements
-		OnClickListener {
+public class VenueProfileActivity extends Activity implements OnClickListener {
+
+	private static final String TAG = "VenueRegistrationActivity";
+	
 	// Form elements
 	private EditText locuId, paypal, wifiName, wifiPassword,orderTimeOut;
-	private RadioGroup typeOfAuthentication, wifiPresent;
-
 	private Handler handler = new Handler();
-	private LinearLayout wifiNameLinear, wifiTypeLinear, wifiPasswordLinear;
 	
 	// Progress dialog
 	private ProgressDialog progressDialog;
@@ -40,76 +40,67 @@ public class VenueRegistrationActivity extends Activity implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.venue_registration);
+		setContentView(R.layout.venue_profile);
 		
 		// Try to get all form elements from the XML
 		locuId = (EditText) findViewById(R.id.locuId);
 		paypal = (EditText) findViewById(R.id.paypalEdit);
 		wifiName = (EditText) findViewById(R.id.wifiName);
 		wifiPassword = (EditText) findViewById(R.id.wifiPassword);
-		typeOfAuthentication = (RadioGroup) findViewById(R.id.authentication);
-		wifiPresent = (RadioGroup) findViewById(R.id.wifiPresent);
 		orderTimeOut = (EditText) findViewById(R.id.orderTimeOut);
 
-		wifiNameLinear = (LinearLayout) findViewById(R.id.wifiNameLinear);
-		wifiTypeLinear = (LinearLayout) findViewById(R.id.wifiTypeLinear);
-		wifiPasswordLinear = (LinearLayout) findViewById(R.id.wifiPasswordLinear);
-
-		// Setup a listener for the submit button
-		findViewById(R.id.button_venue_registration_submit).setOnClickListener(
-				this);
-		// Setup on check listener for the check box
-		wifiPresent.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-			@Override
-			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				// Invoke this method when the check box selected or unselected
-				RadioButton selectedButton = (RadioButton) findViewById(checkedId);
-				String name = selectedButton.getText().toString();
-				// To hide the wifi information when user selects "no"
-				if (name.equalsIgnoreCase("No")) {
-					wifiNameLinear.setVisibility(View.GONE);
-					wifiTypeLinear.setVisibility(View.GONE);
-					wifiPasswordLinear.setVisibility(View.GONE);
-				} 
-				// Set the wifi information visibility true when user selects "Yes"
-				else
-				{
-					wifiNameLinear.setVisibility(View.VISIBLE);
-					wifiTypeLinear.setVisibility(View.VISIBLE);
-					wifiPasswordLinear.setVisibility(View.VISIBLE);
-				}
-
-			}
-		});
+		// Setup listeners
+		findViewById(R.id.view_registration_button_submit).setOnClickListener(this);
+		findViewById(R.id.view_registration_button_cancel).setOnClickListener(this);
+		findViewById(R.id.view_registration_wifi_checkbox).setOnClickListener(this);
 	}
 
-	@Override
-	public void onClick(View arg0) {
-		// Intent intent = new Intent(this, MainActivity.class);
-
-		// Perform registration - for now assume all will go well
-		registrationAction();
-		Log.d("Bartsy", "Clicked on submit button");
-	}
 	
 	/**
-	 * Invokes this method when the user clicks on the Register Button
+	 * Click listener
 	 */
-	public void registrationAction() {
+	
+	@Override
+	public void onClick(View arg0) {
+
+		switch (arg0.getId()) {
+			
+			case R.id.view_registration_button_submit:
+				Log.d("Bartsy", "Clicked on submit button");
+				
+				// Perform registration - for now assume all will go well
+				processRegistration();
+				break;
+				
+			case R.id.view_registration_button_cancel:
+				finish();
+				break;
+				
+			case R.id.view_registration_wifi_checkbox:
+				
+				if (((CheckBox) findViewById(R.id.view_registration_wifi_checkbox)).isChecked()) {
+					findViewById(R.id.view_registration_wifi).setVisibility(View.VISIBLE);
+				} else {
+					findViewById(R.id.view_registration_wifi).setVisibility(View.GONE);
+				}
+				break;
+		}
+	}
+	
+	
+	/**
+	 * Validates input then sends to server and starts main activity
+	 */
+	
+	public void processRegistration() {
 		
-		int selectedWifiPresent = wifiPresent.getCheckedRadioButtonId();
+		Log.v(TAG, "processRegistration()");
 
-		// Gets a reference to our "selected" radio button
-		RadioButton wifi = (RadioButton) findViewById(selectedWifiPresent);
-
-		int selectedTypeOfAuthentication = typeOfAuthentication
-				.getCheckedRadioButtonId();
+		int selectedTypeOfAuthentication =  ((RadioGroup) findViewById(R.id.typeOfAuthentication)).getCheckedRadioButtonId();
 
 		// Gets a reference to our "selected" radio button
 		RadioButton typeOfAuthentication = (RadioButton) findViewById(selectedTypeOfAuthentication);
-		SharedPreferences settings = getSharedPreferences(
-				GCMIntentService.REG_ID, 0);
+		SharedPreferences settings = getSharedPreferences(GCMIntentService.REG_ID, 0);
 		String deviceToken = settings.getString("RegId", "");
 
 		System.out.println("sumbit");
@@ -131,8 +122,7 @@ public class VenueRegistrationActivity extends Activity implements
 				postData.put("deviceType", "0");
 				postData.put("cancelOrderTime",orderTimeOut.getText().toString());
 
-				if (wifi == null ? false : wifi.getText().toString()
-						.equalsIgnoreCase("Yes"))
+				if (((CheckBox) findViewById(R.id.view_registration_wifi_checkbox)).isChecked())
 					postData.put("wifiPresent", "1");
 				else
 					postData.put("wifiPresent", "0");
@@ -153,7 +143,7 @@ public class VenueRegistrationActivity extends Activity implements
 						// Post venue details to the server
 						final String response = WebServices.postRequest(
 								Constants.URL_SAVE_VENUEDETAILS, postData,
-								VenueRegistrationActivity.this);
+								VenueProfileActivity.this);
 
 						Log.d("Bartsy", "response :: " + response);
 						
@@ -183,7 +173,7 @@ public class VenueRegistrationActivity extends Activity implements
 		// To stop sending details to server if the GCM device token is failed
 		else {
 			WebServices.alertbox("Please try again....",
-					VenueRegistrationActivity.this);
+					VenueProfileActivity.this);
 		}
 	}
 	/**
@@ -245,7 +235,7 @@ public class VenueRegistrationActivity extends Activity implements
 				
 				// To navigate main page and try to close this screen
 				Intent intent = new Intent(
-						VenueRegistrationActivity.this,
+						VenueProfileActivity.this,
 						MainActivity.class);
 				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);

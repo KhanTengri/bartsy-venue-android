@@ -423,7 +423,7 @@ public class MainActivity extends FragmentActivity implements
 		if (venueId == null) {
 			Log.v(TAG, "Unregistered device. Starting Venue Registration...");
 			Intent intent = new Intent().setClass(this,
-					VenueRegistrationActivity.class);
+					VenueProfileActivity.class);
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			this.startActivity(intent);
 			// finish();
@@ -473,7 +473,7 @@ public class MainActivity extends FragmentActivity implements
 
 		case R.id.action_profile:
 			Intent intent = new Intent().setClass(this,
-					VenueRegistrationActivity.class);
+					VenueProfileActivity.class);
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			break;
