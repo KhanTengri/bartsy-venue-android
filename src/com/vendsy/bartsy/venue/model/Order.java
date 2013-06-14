@@ -1,6 +1,7 @@
 package com.vendsy.bartsy.venue.model;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.util.Date;
 
 import org.json.JSONException;
@@ -36,6 +37,7 @@ public class Order  {
 	public float tipAmount;
 	public double total;
 	public String updatedDate;
+	public String createdDate;
 	
 	public String profileId;
 	
@@ -66,7 +68,9 @@ public class Order  {
 	public int status;	
 	private String errorReason = ""; // used to send an error reason for negative order states
     public Date[] state_transitions = new Date[ORDER_STATUS_COUNT];
-	
+    // Decimal Format
+    //public  DecimalFormat df = new DecimalFormat("#.##");
+    DecimalFormat df = new DecimalFormat();
     
 	/**
 	 *  Default constructor
@@ -118,6 +122,8 @@ public class Order  {
 			total = Double.valueOf(json.getString("totalPrice"));
 			profileId = json.getString("bartsyId");
 			description = json.getString("description");
+			if (json.has("dateCreated"))
+			  createdDate = json.getString("dateCreated");
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		} catch (JSONException e) {
@@ -214,14 +220,18 @@ public class Order  {
 	 */
 	
 	public void updateView () {
-		
+		  df.setMaximumFractionDigits(2);
 		if (view == null) return;
 
 		((TextView) view.findViewById(R.id.view_order_title)).setText(title);
 		((TextView) view.findViewById(R.id.view_order_description)).setText(description);
 		((TextView) view.findViewById(R.id.view_order_time)).setText(DateFormat.getTimeInstance().format(state_transitions[status]));
 		((TextView) view.findViewById(R.id.view_order_date)).setText(DateFormat.getDateInstance().format(state_transitions[status]));	
-		((TextView) view.findViewById(R.id.view_order_price)).setText("" + (int) price); // use int for now
+		((TextView) view.findViewById(R.id.view_order_price)).setText("" + price); // use int for now
+		((TextView) view.findViewById(R.id.view_order_price_mini)).setText("$"+ price); // use int for now
+		((TextView) view.findViewById(R.id.view_order_tip_mini)).setText("$"+df.format(total-price)); // use int for now
+		((TextView) view.findViewById(R.id.view_order_total_mini)).setText("$"+df.format(total)); // use int for now
+		
 		
 		if (orderSender != null ) {
 

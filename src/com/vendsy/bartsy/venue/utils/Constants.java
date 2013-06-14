@@ -61,6 +61,10 @@ public class Constants {
 	// For setVenueStatus
 	public static final String URL_SET_VENUE_STATUS = DOMAIN_NAME
 			+ PROJECT_NAME + "venue/setVenueStatus";
+	
+	// For setVenueStatus
+	public static final String URL_GET_PAST_ORDERS = DOMAIN_NAME
+				+ PROJECT_NAME + "order/getPastOrders";
 
 	// Android Device Type
 	public static final int DEVICE_Type = 0;

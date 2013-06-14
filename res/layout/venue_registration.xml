@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:orientation="vertical"
+    android:padding="4dp" >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/activity_vertical_margin" >
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="Venue Registration"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#6CC417"
+                android:textSize="25dp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:text="Locu ID"
+                    android:textColor="#000000" />
+
+                <EditText
+                    android:id="@+id/locuId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="14"
+                    android:text="49be3dcf7e507f6b4775" >
+                </EditText>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/paypal_id_label"
+                    android:textColor="#000000" />
+
+                <EditText
+                    android:id="@+id/paypalEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="14"
+                    android:text="pkamvyss@alum.mit.edu" >
+                </EditText>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/order_time_out"
+                    android:textColor="#000000" />
+
+                <EditText
+                    android:id="@+id/orderTimeOut"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:ems="14"
+                    android:text="15" >
+                </EditText>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:text="Wifi Present"
+                    android:textColor="#000000" />
+
+                <RadioGroup
+                    android:id="@+id/wifiPresent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:checkedButton="@+id/wifiPresentYes"
+                    android:orientation="horizontal" >
+
+                    <RadioButton
+                        android:id="@+id/wifiPresentYes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Yes"
+                        android:textColor="#000000" />
+
+                    <RadioButton
+                        android:id="@+id/wifiPresentNo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No"
+                        android:textColor="#000000" />
+                </RadioGroup>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/wifiNameLinear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:text="Wifi Name"
+                    android:textColor="#000000" />
+
+                <EditText
+                    android:id="@+id/wifiName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="12"
+                    android:text="3HTV6"
+                    android:textSize="14dp" >
+                </EditText>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/wifiPasswordLinear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:text="Wifi Password"
+                    android:textColor="#000000" />
+
+                <EditText
+                    android:id="@+id/wifiPassword"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="14"
+                    android:inputType="textPassword"
+                    android:text="94AB542BEF" >
+                </EditText>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/wifiTypeLinear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:text="Type Of Authentification"
+                    android:textColor="#000000" />
+
+                <RadioGroup
+                    android:id="@+id/authentication"
+                    android:layout_width="wrap_content"
+                    android:checkedButton="@+id/authenticationYes"
+                    
+                    android:layout_height="wrap_content" >
+
+                    <RadioButton
+                         android:id="@+id/authenticationYes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Password"
+                        android:textColor="#000000" />
+
+                    <RadioButton
+                         android:id="@+id/authenticationNo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Passphrase"
+                        android:textColor="#000000" />
+                </RadioGroup>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:orientation="horizontal" >
+
+                <Button
+                    android:id="@+id/button_venue_registration_submit"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:background="#6CC417"
+                    android:text="Submit"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

@@ -34,6 +34,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.vendsy.bartsy.venue.PastOrdersActivity;
 import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Cocktail;
@@ -139,6 +140,32 @@ public class WebServices {
 			e1.printStackTrace();
 		}
 
+		return response;
+	}
+	/**
+	 * To get past orders based on venue profile
+	 * 
+	 * @param context
+	 * @param venueID
+	 * @return
+	 */
+	public static String getPastOrders(Context context, String venueID){
+
+		JSONObject postData = new JSONObject();
+		String response = null;
+		try {
+			postData.put("venueId", venueID);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			response = WebServices.postRequest(
+					Constants.URL_GET_PAST_ORDERS, postData,
+					context);
+		} catch (Exception e) {
+		}
+		
 		return response;
 	}
 	

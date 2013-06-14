@@ -477,6 +477,12 @@ public class MainActivity extends FragmentActivity implements
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			break;
+			
+	    case R.id.action_previous_orders:
+			Intent pastOrderActivity = new Intent().setClass(this, PastOrdersActivity.class);
+			pastOrderActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(pastOrderActivity);
+			break;
 
 		case R.id.action_settings:
 			Intent settingsActivity = new Intent(getBaseContext(),
