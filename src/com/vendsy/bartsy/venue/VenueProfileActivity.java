@@ -200,28 +200,14 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 				// venueName = "Chaya Venice";
 				// venueId = "5a0999dda39f9fe07a44";
 			case 0:
-				// Save the venue id in shared
-				// preferences
-				venueId = venueId == null ? json
-						.getString("venueId")
-						: venueId;
-				venueName = venueName == null ? json
-						.getString("venueName")
-						: venueName;
+				// Save the venue id in shared preferences
+				venueId = venueId == null ? json.getString("venueId") : venueId;
+				venueName = venueName == null ? json.getString("venueName") : venueName;
 				// To save venue details in the shared preference
-				SharedPreferences sharedPref = getSharedPreferences(
-						getResources()
-								.getString(
-										R.string.config_shared_preferences_name),
-						Context.MODE_PRIVATE);
-				SharedPreferences.Editor editor = sharedPref
-						.edit();
-				editor.putString(
-						"RegisteredVenueId",
-						venueId);
-				editor.putString(
-						"RegisteredVenueName",
-						venueName);
+				SharedPreferences sharedPref = getSharedPreferences(getResources().getString(R.string.config_shared_preferences_name), Context.MODE_PRIVATE);
+				SharedPreferences.Editor editor = sharedPref.edit();
+				editor.putString("RegisteredVenueId", venueId);
+				editor.putString("RegisteredVenueName", venueName);
 				app = (BartsyApplication) getApplication();
 				app.venueProfileID = venueId;
 				app.venueProfileName = venueName;
