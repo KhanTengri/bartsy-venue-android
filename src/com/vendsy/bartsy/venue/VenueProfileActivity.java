@@ -154,6 +154,7 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 
 								@Override
 								public void run() {
+									progressDialog.dismiss();
 									try {
 										processVenueResponse(new JSONObject(response));
 									} catch (JSONException e) {
