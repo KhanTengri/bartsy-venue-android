@@ -228,7 +228,6 @@ public class Order  {
 		((TextView) view.findViewById(R.id.view_order_time)).setText(DateFormat.getTimeInstance().format(state_transitions[status]));
 		((TextView) view.findViewById(R.id.view_order_date)).setText(DateFormat.getDateInstance().format(state_transitions[status]));	
 		((TextView) view.findViewById(R.id.view_order_price)).setText("" + price); // use int for now
-		((TextView) view.findViewById(R.id.view_order_price_mini)).setText("$"+ price); // use int for now
 		((TextView) view.findViewById(R.id.view_order_tip_mini)).setText("$"+df.format(total-price)); // use int for now
 		((TextView) view.findViewById(R.id.view_order_total_mini)).setText("$"+df.format(total)); // use int for now
 		
