@@ -66,6 +66,8 @@ public class InventorySectionFragment extends Fragment {
 	private String selectedType;
 	private String venueId;
 	
+	private BartsyApplication mApp;
+	
 	// Progress dialog
 	private ProgressDialog progressDialog;
 	// Handler 
@@ -78,6 +80,9 @@ public class InventorySectionFragment extends Fragment {
 		this.inflater = inflater;
 		
 		mRootView = inflater.inflate(R.layout.inventory_main, container, false);
+		
+		// Set up pointers
+		mApp = (BartsyApplication) getActivity().getApplication();
 		
 		// Try to get the components from the xml layout
 		itemsLayout = (TableLayout) mRootView.findViewById(R.id.itemsLayout);
@@ -115,8 +120,9 @@ public class InventorySectionFragment extends Fragment {
 		});
 		
 		updateInventoryView();
+
 		// To get venue Id from the application global variable
-		venueId = ((BartsyApplication)getActivity().getApplication()).venueProfileID;
+		venueId = mApp.venueProfileID;
 		
         return mRootView;
 	}

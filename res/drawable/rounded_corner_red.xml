@@ -19,5 +19,4 @@
     <solid android:color="#bb5555" />
     <padding android:left="2dp" android:top="2dp"
             android:right="2dp" android:bottom="1dp" />
-    <corners android:radius="3dp" />
 </shape>

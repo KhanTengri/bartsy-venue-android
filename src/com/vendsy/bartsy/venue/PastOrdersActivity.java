@@ -114,7 +114,7 @@ public class PastOrdersActivity extends Activity {
 		dateCreated.setText(order.createdDate);
 		
 		TextView basePrice = (TextView) itemView.findViewById(R.id.basePrice);
-		basePrice.setText(String.valueOf(order.price));
+		basePrice.setText(String.valueOf(order.totalAmount));
 		
 		TextView description = (TextView) itemView.findViewById(R.id.description);
 		description.setText(order.description);

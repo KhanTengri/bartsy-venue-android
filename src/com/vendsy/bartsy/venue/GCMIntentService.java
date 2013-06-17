@@ -200,17 +200,16 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 	@Override
 	protected void onMessage(Context context, Intent intent) {
-		Log.v(TAG, "Received message");
-		// String message = getString(R.string.gcm_message);
 
-		String message = (String) intent.getExtras().get(
-				Utilities.EXTRA_MESSAGE);
+		Log.v(TAG, "Received message");
+
+		String message = (String) intent.getExtras().get(Utilities.EXTRA_MESSAGE);
 		String count = (String) intent.getExtras().get("badgeCount");
-		Uri notification = RingtoneManager
-				.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+		
 		Log.v(TAG, "message: " + message);
-		Ringtone ringtone = RingtoneManager.getRingtone(context, notification);
+		
 		String notifyMSG = "Received..";
+		
 		if (message == null) {
 			message = "";
 		} else {
@@ -218,21 +217,16 @@ public class GCMIntentService extends GCMBaseIntentService {
 				JSONObject json = new JSONObject(message);
 				if (json.has("messageType"))
 
-					if (ringtone != null
-							&& !json.getString("messageType").equalsIgnoreCase(
-									"heartBeat")) {
-						ringtone.play();
-					}
+					if (!json.getString("messageType").equalsIgnoreCase("heartBeat"))
+						generateNotification(context, notifyMSG, count);
 
 				notifyMSG = processPushNotification(json);
 			} catch (JSONException e) {
 				e.printStackTrace(); 
 			}
-		}
 
-		// displayMessage(context, message);
-		// notifies user
-		generateNotification(context, notifyMSG, count);
+
+		}
 	}
 
 	// @Override
@@ -263,10 +257,9 @@ public class GCMIntentService extends GCMBaseIntentService {
 	 * To generate a notification to inform the user that server has sent a message.
 	 * 
 	 * @param count
-	 * @param count
+	 * @param count 
 	 */
-	private static void generateNotification(Context context, String message,
-			String count) {
+	private static void generateNotification(Context context, String message, String count) {
 		int icon = R.drawable.ic_launcher;
 		long when = System.currentTimeMillis();
 		NotificationManager notificationManager = (NotificationManager) context
@@ -288,17 +281,10 @@ public class GCMIntentService extends GCMBaseIntentService {
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		}
-		notificationManager.notify(0, notification);
-
-		notification.defaults = Notification.DEFAULT_ALL;
-		// int count1 = Integer.parseInt(count);
 
 		// // Play default notification sound
-		// notification.defaults |= Notification.DEFAULT_SOUND;
-		//
-		// // Vibrate if vibrate is enabled
-		// notification.defaults |= Notification.DEFAULT_VIBRATE;
-		// notificationManager.notify(0, notification);
+		notification.defaults = Notification.DEFAULT_SOUND;
+		notificationManager.notify(0, notification);
 	}
 
 }

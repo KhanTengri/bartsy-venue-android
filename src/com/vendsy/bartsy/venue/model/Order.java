@@ -31,11 +31,16 @@ public class Order  {
 	public String itemId;
 	
 	// The total price is in the local denomination and is the sum of price * quantity, fee and tax
-	public float price, fee, tax;
 	public int quantity = 1;
 	public int image_resource;
+	
+	// Fees: total = base + tax + fee + tip
+	public float baseAmount;
+	public float feeAmount;
+	public float taxAmount;
 	public float tipAmount;
-	public double total;
+	public float totalAmount;
+	
 	public String updatedDate;
 	public String createdDate;
 	
@@ -70,14 +75,17 @@ public class Order  {
     public Date[] state_transitions = new Date[ORDER_STATUS_COUNT];
     // Decimal Format
     //public  DecimalFormat df = new DecimalFormat("#.##");
+
     DecimalFormat df = new DecimalFormat();
+    
     
 	/**
 	 *  Default constructor
 	 */
     
 	public Order() {
-
+		df.setMaximumFractionDigits(2);
+		df.setMinimumFractionDigits(2);
 	}
 
 	
@@ -91,15 +99,13 @@ public class Order  {
 		this.serverID = server_id;
 		this.title = title;
 		this.description = description;
-		this.price = Float.parseFloat(price);
+//		this.price = Float.parseFloat(price);
 //		this.image_resource = Integer.parseInt(image_resource); 
 		this.orderSender = order_sender;
 
 		// Orders starts in the "NEW" status
 		status = ORDER_STATUS_NEW;
 		state_transitions[status] = new Date();
-		
-		calculateTotalPrice();
 	}
 	
 	
@@ -116,10 +122,14 @@ public class Order  {
 			state_transitions[status] = new Date();
 			title = json.getString("itemName");
 			updatedDate = json.getString("orderTime");
-			price = Float.valueOf(json.getString("basePrice"));
 			serverID = json.getString("orderId");
+
+			
+			baseAmount = Float.valueOf(json.getString("basePrice"));
 			tipAmount = Float.valueOf(json.getString("tipPercentage"));
-			total = Double.valueOf(json.getString("totalPrice"));
+			totalAmount = Float.valueOf(json.getString("totalPrice"));
+			taxAmount = totalAmount - tipAmount - baseAmount;
+			
 			profileId = json.getString("bartsyId");
 			description = json.getString("description");
 			if (json.has("dateCreated"))
@@ -129,6 +139,10 @@ public class Order  {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+
+		// Set our format 
+		df.setMaximumFractionDigits(2);
+		df.setMinimumFractionDigits(2);
 		
 	}
 	
@@ -187,18 +201,6 @@ public class Order  {
 	 
 	
 	/**
-	 * It will calculates the total price based on price, quantity and tipAmount
-	 */
-	public void calculateTotalPrice() {
-		float actualPrice = (price * quantity);
-		float subTotal =  actualPrice * ((tipAmount + 8) / 100);
-		
-		total = actualPrice + subTotal;
-
-	}
-	
-	
-	/**
 	 * It will returns JSON format to update order status
 	 */
 	public JSONObject statusChangedJSON(){
@@ -220,16 +222,21 @@ public class Order  {
 	 */
 	
 	public void updateView () {
-		  df.setMaximumFractionDigits(2);
+
 		if (view == null) return;
 
 		((TextView) view.findViewById(R.id.view_order_title)).setText(title);
 		((TextView) view.findViewById(R.id.view_order_description)).setText(description);
 		((TextView) view.findViewById(R.id.view_order_time)).setText(DateFormat.getTimeInstance().format(state_transitions[status]));
 		((TextView) view.findViewById(R.id.view_order_date)).setText(DateFormat.getDateInstance().format(state_transitions[status]));	
-		((TextView) view.findViewById(R.id.view_order_price)).setText("" + price); // use int for now
-		((TextView) view.findViewById(R.id.view_order_tip_mini)).setText("$"+df.format(total-price)); // use int for now
-		((TextView) view.findViewById(R.id.view_order_total_mini)).setText("$"+df.format(total)); // use int for now
+
+		// Set base price
+		((TextView) view.findViewById(R.id.view_order_price)).setText(df.format(baseAmount));
+		
+		// Set the totals (we'll update again if we have more mini orders...)
+		((TextView) view.findViewById(R.id.view_order_tip_amount)).setText(df.format(tipAmount));
+		((TextView) view.findViewById(R.id.view_order_tax_amount)).setText(df.format(taxAmount));
+		((TextView) view.findViewById(R.id.view_order_total_amount)).setText(df.format(totalAmount)); 
 		
 		
 		if (orderSender != null ) {
@@ -244,7 +251,9 @@ public class Order  {
 				// Set the saved image to the imageView
 				profileImageView.setImageBitmap(orderSender.image);
 			}
-			((TextView) view.findViewById(R.id.view_order_profile_name)).setText(orderSender.username);
+			
+			
+			((TextView) view.findViewById(R.id.view_order_profile_name)).setText(orderSender.getName());
 		}
 
 		// Update buttons and background
@@ -284,9 +293,9 @@ public class Order  {
 		
 		LinearLayout view = (LinearLayout) inflater.inflate(R.layout.bartender_order_mini, container, false);
 		
-		((TextView) view.findViewById(R.id.view_order_title)).setText(this.title);
-		((TextView) view.findViewById(R.id.view_order_description)).setText(this.description);
-		((TextView) view.findViewById(R.id.view_order_price)).setText(""+ (int) this.price); // use int for now
+		((TextView) view.findViewById(R.id.view_order_title)).setText(title);
+		((TextView) view.findViewById(R.id.view_order_description)).setText(description);
+		((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(baseAmount));
 
 		// Set a pointer to hte object being displayed
 		view.findViewById(R.id.view_order_button_remove).setTag(this);
