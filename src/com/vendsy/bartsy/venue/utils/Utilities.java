@@ -118,11 +118,15 @@ public final class Utilities {
                 data = reader.readNext();
                 
                 // To ignore empty categories and empty types
-                if(data != null && data.length==3 && !data[1].trim().equals("") && !data[2].trim().equals("")) {
+                if(data != null && data.length==5 && !data[1].trim().equals("") && !data[2].trim().equals("")) {
                 	// To set the properties for Ingredient model
                 	Ingredient ingredient = new Ingredient();
                 	ingredient.setName(data[0]);
-                	
+                	try {
+						ingredient.setPrice(Integer.parseInt(data[3]));
+					} catch (NumberFormatException e) {
+					}
+                	ingredient.setAvailability((data[4]!=null) && (data[4].equalsIgnoreCase("Yes")));
                 	// To avoid duplicate categories in the list
                 	category = getExistingCategoryInList(categories, data[2], data[1]);
                 	if(category==null){

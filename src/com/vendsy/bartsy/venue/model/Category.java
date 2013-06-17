@@ -8,8 +8,8 @@ import com.j256.ormlite.field.DatabaseField;
 
 public class Category {
 	
-	public static final String SPIRITS_TYPE = "spirit"; 
-	public static final String MIXER_TYPE = "mixer";
+	public static final String SPIRITS_TYPE = "Spirit"; 
+	public static final String MIXER_TYPE = "Mixer";
 	public static final String COCKTAILS_TYPE = "Cocktails";
 			
 	@DatabaseField(generatedId = true) // Auto generated in local db
