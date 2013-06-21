@@ -45,6 +45,7 @@ import com.vendsy.bartsy.venue.dialog.PeopleDialogFragment;
 import com.vendsy.bartsy.venue.model.AppObservable;
 import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.model.Profile;
+import com.vendsy.bartsy.venue.service.ConnectionCheckingService;
 import com.vendsy.bartsy.venue.utils.CommandParser;
 import com.vendsy.bartsy.venue.utils.CommandParser.BartsyCommand;
 import com.vendsy.bartsy.venue.utils.Constants;
@@ -110,7 +111,10 @@ public class MainActivity extends FragmentActivity implements
 	private static final int HANDLE_ORDERS_UPDATED_EVENT = 4;
 	private static final int HANDLE_PEOPLE_UPDATED_EVENT = 5;
 	private static final int HANDLE_INVENTORY_UPDATED_EVENT = 6;
-
+	
+	
+	private static final int HANDLE_ORDER_TIMEOUT_EVENT = 20;
+	
 	/**************************************
 	 * 
 	 * 
@@ -694,6 +698,12 @@ public class MainActivity extends FragmentActivity implements
 			Message message = mHandler
 					.obtainMessage(HANDLE_INVENTORY_UPDATED_EVENT);
 			mHandler.sendMessage(message);
+		} 
+		// To process timeout orders
+		else if(qualifier.equals(ConnectionCheckingService.SERVICE_ORDER_TIMEOUT_EVENT)){
+			Message message = mHandler
+					.obtainMessage(HANDLE_ORDER_TIMEOUT_EVENT);
+			mHandler.sendMessage(message);
 		}
 	}
 
@@ -759,6 +769,15 @@ public class MainActivity extends FragmentActivity implements
 					mInventoryFragment.updateInventoryView();
 				}
 				break;
+				
+			case HANDLE_ORDER_TIMEOUT_EVENT:{
+				Log.v(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_ORDER_TIMEOUT_EVENT");
+				if (mBartenderFragment != null) {
+					Log.v(TAG,"Updating orders timeout...");
+					mBartenderFragment.updateOrderView(mApp.orderTimeOut);
+				}
+				break;
+			}
 			default:
 				break;
 			}

@@ -34,6 +34,8 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 	private EditText locuId, paypal, wifiName, wifiPassword,orderTimeOut;
 	private Handler handler = new Handler();
 	
+	private int orderTimeoutValue;
+	
 	// Progress dialog
 	private ProgressDialog progressDialog;
 
@@ -121,11 +123,13 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 				postData.put("paypalId", paypal.getText().toString());
 				postData.put("deviceType", "0");
 				postData.put("cancelOrderTime",orderTimeOut.getText().toString());
-
+				
 				if (((CheckBox) findViewById(R.id.view_registration_wifi_checkbox)).isChecked())
 					postData.put("wifiPresent", "1");
 				else
 					postData.put("wifiPresent", "0");
+				
+				orderTimeoutValue = Integer.parseInt(orderTimeOut.getText().toString());
 
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -147,22 +151,23 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 
 						Log.d("Bartsy", "response :: " + response);
 						
-						// To check response received from the server or not - Error Handling
-						if (response != null) {
+						
 							// Handler to access UI thread
 							handler.post(new Runnable() {
 
 								@Override
 								public void run() {
 									progressDialog.dismiss();
-									try {
-										processVenueResponse(new JSONObject(response));
-									} catch (JSONException e) {
-										e.printStackTrace();
+									// To check response received from the server or not - Error Handling
+									if (response != null) {
+										try {
+											processVenueResponse(new JSONObject(response));
+										} catch (JSONException e) {
+											e.printStackTrace();
+										}
 									}
 								}
 							});
-						}
 
 					} catch (Exception e) {
 						Log.d("Venue Reg", "Exception :: " + e);
@@ -209,10 +214,12 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 				SharedPreferences.Editor editor = sharedPref.edit();
 				editor.putString("RegisteredVenueId", venueId);
 				editor.putString("RegisteredVenueName", venueName);
+				editor.putInt("RegisteredOrderTimeOut", orderTimeoutValue);
+				
 				app = (BartsyApplication) getApplication();
 				app.venueProfileID = venueId;
 				app.venueProfileName = venueName;
-				
+				app.orderTimeOut = orderTimeoutValue;
 				editor.commit();
 				
 				// Remove progress dialog

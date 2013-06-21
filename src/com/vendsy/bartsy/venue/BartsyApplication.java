@@ -164,6 +164,7 @@ public class BartsyApplication extends Application implements AppObservable {
 
 	public String venueProfileID = null;
 	public String venueProfileName = null;
+	public int orderTimeOut;
 
 	void loadVenueProfile() {
 		SharedPreferences sharedPref = getSharedPreferences(getResources()
@@ -171,6 +172,7 @@ public class BartsyApplication extends Application implements AppObservable {
 				Context.MODE_PRIVATE);
 		venueProfileID = sharedPref.getString("RegisteredVenueId", null);
 		venueProfileName = sharedPref.getString("RegisteredVenueName", null);
+		orderTimeOut = sharedPref.getInt("RegisteredOrderTimeOut", 0);
 	}
 
 	/*****
@@ -997,7 +999,7 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * descriptive string which is then sent to all observers. They can decide
 	 * to act or not based on the content of the string.
 	 */
-	private void notifyObservers(Object arg) {
+	public void notifyObservers(Object arg) {
 		Log.v(TAG, "notifyObservers(" + arg + ")");
 		for (AppObserver obs : mObservers) {
 			Log.v(TAG, "notify observer = " + obs);

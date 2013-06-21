@@ -215,6 +215,25 @@ public class Order  {
 		}
 		return orderData;
 	}
+	/**
+	 * To update timeout value from the local timer
+	 * 
+	 * @param timeOut
+	 */
+	public void updateTimeOut(int timeOut){
+		if (view == null) return;
+		
+		// Calculate duration of timeout value and duration of order updated time
+		long duration  = timeOut - ((System.currentTimeMillis() - (state_transitions[status]).getTime()))/60000;
+		// If the order already expired - duration should not be negative value
+		if(duration<0){
+			((TextView) view.findViewById(R.id.orderOutTime)).setText("Expired");
+		}
+		// To update duration should not be negative value
+		else{
+			((TextView) view.findViewById(R.id.orderOutTime)).setText(String.valueOf(duration)+" min left");
+		}
+	}
 	
 	
 	/**

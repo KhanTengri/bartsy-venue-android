@@ -65,7 +65,16 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		return mRootView;
 
 	}
-
+	/**
+	 * Updates the orders view based on the time out
+	 * 
+	 */
+	public void updateOrderView(int orderTimeout){
+		for (Order order : mApp.mOrders) {
+			order.updateTimeOut(orderTimeout);
+		}
+	}
+	
 	
 	/***
 	 * Updates the orders view

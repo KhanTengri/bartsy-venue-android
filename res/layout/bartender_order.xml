@@ -54,8 +54,9 @@
                                        android:textStyle="bold" />
 
                                    <LinearLayout
-                                       android:layout_width="wrap_content"
-                                       android:layout_height="wrap_content" >
+                                       android:layout_width="match_parent"
+                                       android:layout_height="wrap_content" 
+                                       android:orientation="vertical">
 
                                        <LinearLayout
                                            android:layout_width="fill_parent"
@@ -72,8 +73,17 @@
                                                android:text="Peter Kellis"
                                                android:textAppearance="?android:attr/textAppearanceLargeInverse"
                                                android:textStyle="bold" />
-
                                        </LinearLayout>
+                                       <TextView
+                                               android:id="@+id/orderOutTime"
+                                               android:layout_width="wrap_content"
+                                               android:layout_height="wrap_content"
+                                               android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                               android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                                               android:paddingLeft="@dimen/activity_horizontal_margin"
+							                                               
+                                               android:textAppearance="?android:attr/textAppearanceLargeInverse"
+                                               android:textStyle="bold" />
                                    </LinearLayout>
                                    
                                    

@@ -1,7 +1,5 @@
 package com.vendsy.bartsy.venue.service;
 
-import com.vendsy.bartsy.venue.utils.WebServices;
-
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -11,25 +9,37 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-public class ConnectionCheckingService extends Service {
+import com.vendsy.bartsy.venue.BartsyApplication;
+import com.vendsy.bartsy.venue.model.AppObservable;
+import com.vendsy.bartsy.venue.utils.WebServices;
+import com.vendsy.bartsy.venue.view.AppObserver;
+
+public class ConnectionCheckingService extends Service implements AppObserver {
 
 	private static final String TAG = "ConnectionCheckingService";
+	
+	public static final String SERVICE_ORDER_TIMEOUT_EVENT = "SERVICE_ORDER_TIMEOUT_EVENT";
 
 	private long wait = 12000; // 2 mins
 	// check for thread is running or not
 	private boolean isRunning = false;
-	private Thread thr;
+	private Thread thread;
 	private Handler handler = new Handler();
+
+	private BartsyApplication mApp;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		
+		mApp = (BartsyApplication)getApplication();
+        mApp.addObserver(this);
 
 		Log.i(TAG, "ConnectionCheckingService Service created...");
 		isRunning = true;
 		// Intiate NetworkThread
-		thr = new Thread(new NetworkThread());
-		thr.start();
+		thread = new Thread(new NetworkThread());
+		thread.start();
 	}
 
 	/**
@@ -59,15 +69,20 @@ public class ConnectionCheckingService extends Service {
 
 			if (isRunning) {
 				// create the NetworkThread object in thread
-				thr = new Thread(new NetworkThread());
+				thread = new Thread(new NetworkThread());
 				// start thread
-				thr.start();
+				thread.start();
 			}
 		}
 
 		public void run() {
 			while (isRunning) {
 				try {
+					
+					
+					// To update orders time out
+					mApp.notifyObservers(SERVICE_ORDER_TIMEOUT_EVENT);
+						
 					
 					if (!WebServices .isNetworkAvailable(ConnectionCheckingService.this)) {
 						
@@ -86,7 +101,6 @@ public class ConnectionCheckingService extends Service {
 						} else {
 							 Log.v(TAG, "WiFi status: " + wifiManager.getWifiState());							
 						}
-
 						
 						
 						// Handler to show UI-related events
@@ -94,6 +108,7 @@ public class ConnectionCheckingService extends Service {
 
 							@Override
 							public void run() {
+								
 								Toast.makeText(ConnectionCheckingService.this, "Network not available. Trying to fix this issue...", Toast.LENGTH_LONG).show();
 							}
 						});
@@ -116,6 +131,11 @@ public class ConnectionCheckingService extends Service {
 			}
 		}
 
+	}
+
+	@Override
+	public void update(AppObservable o, Object arg) {
+				
 	}
 
 }
