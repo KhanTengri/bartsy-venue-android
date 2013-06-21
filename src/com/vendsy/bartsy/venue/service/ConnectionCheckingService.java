@@ -23,7 +23,7 @@ public class ConnectionCheckingService extends Service implements AppObserver {
 	
 	public static final String SERVICE_ORDER_TIMEOUT_EVENT = "SERVICE_ORDER_TIMEOUT_EVENT";
 
-	private long wait = 12000; // 2 mins
+	private long wait = 60000; // 1 mins
 	// check for thread is running or not
 	private boolean isRunning = false;
 	private Thread thread;
@@ -91,8 +91,6 @@ public class ConnectionCheckingService extends Service implements AppObserver {
 						
 						Log.w(TAG, "Network unavailable");
 						
-						heartBeatSysCall();
-						
 						// Attempt recovery by turning wifi off / on
 						
 						WifiManager wifiManager = (WifiManager)getSystemService(Context.WIFI_SERVICE);
@@ -117,6 +115,10 @@ public class ConnectionCheckingService extends Service implements AppObserver {
 								Toast.makeText(ConnectionCheckingService.this, "Network not available. Trying to fix this issue...", Toast.LENGTH_LONG).show();
 							}
 						});
+					}
+					// Network is available
+					else{
+						heartBeatSysCall();
 					}
 
 				} catch (Exception e) {

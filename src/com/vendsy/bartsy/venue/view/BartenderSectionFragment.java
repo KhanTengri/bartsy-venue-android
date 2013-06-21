@@ -112,6 +112,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			// Update the view's main layout 
 			order.view = mInflater.inflate(R.layout.bartender_order, mContainer, false);
 			order.updateView();
+			order.updateTimeOut(mApp.orderTimeOut);
 			
 			switch (order.status) {
 			case Order.ORDER_STATUS_NEW:
