@@ -1,5 +1,7 @@
 package com.vendsy.bartsy.venue.service;
 
+import org.json.JSONObject;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +13,7 @@ import android.widget.Toast;
 
 import com.vendsy.bartsy.venue.BartsyApplication;
 import com.vendsy.bartsy.venue.model.AppObservable;
+import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.WebServices;
 import com.vendsy.bartsy.venue.view.AppObserver;
 
@@ -88,6 +91,8 @@ public class ConnectionCheckingService extends Service implements AppObserver {
 						
 						Log.w(TAG, "Network unavailable");
 						
+						heartBeatSysCall();
+						
 						// Attempt recovery by turning wifi off / on
 						
 						WifiManager wifiManager = (WifiManager)getSystemService(Context.WIFI_SERVICE);
@@ -136,6 +141,31 @@ public class ConnectionCheckingService extends Service implements AppObserver {
 	@Override
 	public void update(AppObservable o, Object arg) {
 				
+	}
+	
+	// HeartBeat web service calling 
+	private void heartBeatSysCall() {
+
+			Log.v(TAG, "handlingHeartBeat");
+			
+			new Thread() {
+				public void run() {
+					Log.v(TAG, "In thread");
+					// Checking venue id is null or not
+						if (mApp.venueProfileID!=null) {
+							try {
+								// Created jsonobject
+								JSONObject postData = new JSONObject();
+								postData.put("venueId", mApp.venueProfileID);
+								// Heart beat Webservice calling
+								WebServices.postRequest(Constants.URL_HEART_BEAT_VENUE,	postData, getApplicationContext());
+	
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+				}
+			}.start();
 	}
 
 }

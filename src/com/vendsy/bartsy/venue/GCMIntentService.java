@@ -97,10 +97,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 			// JSONObject json = new JSONObject(message);
 			if (json.has("messageType")) {
 				// To check push notification message type
-				if (json.getString("messageType").equalsIgnoreCase("heartBeat")) {
-					// Handling heart beat webservice
-					handlingHeartBeat(app);
-				} else if (json.getString("messageType").equals("placeOrder")) {
+				if (json.getString("messageType").equals("placeOrder")) {
 					Order order = new Order(json);
 					// Add order to order list
 					app.addOrder(order);
@@ -170,33 +167,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 		return messageTypeMSG;
 	}
 
-	// HeartBeat web service calling 
-	private void handlingHeartBeat(final BartsyApplication app) {
-
-		Log.v(TAG, "handlingHeartBeat");
-		final Context context = getApplicationContext();
-
-		
-		new Thread() {
-		public void run() {
-			Log.v(TAG, "In thread");
-			// Checking venue id is null or not
-				if (app.venueProfileID!=null) {
-					try {
-						// Created jsonobject
-						JSONObject postData = new JSONObject();
-						postData.put("venueId", app.venueProfileID);
-						// Heart beat Webservice calling
-						WebServices.postRequest(Constants.URL_HEART_BEAT_VENUE,
-								postData, context);
-
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-		};
-		}.start();
-	}
+	
 
 	@Override
 	protected void onMessage(Context context, Intent intent) {
