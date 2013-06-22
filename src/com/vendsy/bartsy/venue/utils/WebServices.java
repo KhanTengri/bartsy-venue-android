@@ -78,8 +78,7 @@ public class WebServices {
 	 * @return
 	 * @throws Exception
 	 */
-	public static String postRequest(String url, JSONObject postData,
-			Context context) throws Exception {
+	public static String postRequest(String url, JSONObject postData, Context context) throws Exception {
 
 		String response = null;
 		HttpClient httpclient = new DefaultHttpClient();
@@ -87,7 +86,9 @@ public class WebServices {
 		// added apiVersion
 		postData.put("apiVersion", Constants.API_VERSION);
 		String data = postData.toString();
-		Log.i(TAG," *** Webservice postRequest " + data);
+		
+		Log.i(TAG,"===> postRequest("+ url  + ", " + data + ")");
+		
 		try {
 			boolean status = isNetworkAvailable(context);
 			if (status == true) {
@@ -114,7 +115,7 @@ public class WebServices {
 			e.printStackTrace();
 
 		}
-		Log.i(TAG, "webservice postrequest method "+response);
+		Log.i(TAG, "<=== postRequest response: "+response);
 		return response;
 
 	}
@@ -275,7 +276,9 @@ public class WebServices {
 	 * get() method.
 	 */
 	public static String getRequest(String url, Context context) {
-		System.out.println("web service calling ");
+		
+		Log.i(TAG,"===> getRequest("+ url + ")");
+
 		BufferedReader bufferReader = null;
 		StringBuffer stringBuffer = new StringBuffer("");
 		HttpClient httpClient = new DefaultHttpClient();
@@ -306,6 +309,9 @@ public class WebServices {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		
+		Log.i(TAG,"<=== getRequest response: "+ result);
 
 		return result;
 	}
