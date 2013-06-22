@@ -264,39 +264,6 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * checked in this venue
 	 */
 
-	void addOrder(String serverOrderID, String title, String description,
-			String price, String userid) {
-
-		Log.v(TAG, "New " + title + " for: " + userid);
-
-		// Find the person who placed the order in the list of people in this
-		// bar. If not found, don't accept the order
-		Profile person = null;
-		for (Profile p : mPeople) {
-			if (p.userID.equalsIgnoreCase(userid)) {
-				// User found
-				person = p;
-				break;
-			}
-		}
-		if (person == null) {
-			Log.d(TAG, "Error processing command. user not checked in: "  + userid);
-			return;
-		}
-
-		// Create a new order
-		Order order = new Order();
-		order.initialize(serverOrderID, // server-side order number
-				title, // Title
-				description, // Description
-				price, // Price
-				"", // Image resource
-				person); // Order sender ID
-
-		mOrders.add(order);
-		notifyObservers(ORDERS_UPDATED);
-	}
-
 	
 	/**
 	 * Called from the push notification when the order receives from the user

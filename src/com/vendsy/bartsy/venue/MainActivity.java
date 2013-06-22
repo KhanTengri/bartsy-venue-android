@@ -46,8 +46,6 @@ import com.vendsy.bartsy.venue.model.AppObservable;
 import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.model.Profile;
 import com.vendsy.bartsy.venue.service.ConnectionCheckingService;
-import com.vendsy.bartsy.venue.utils.CommandParser;
-import com.vendsy.bartsy.venue.utils.CommandParser.BartsyCommand;
 import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
@@ -670,39 +668,30 @@ public class MainActivity extends FragmentActivity implements
 		String qualifier = (String) arg;
 
 		if (qualifier.equals(BartsyApplication.APPLICATION_QUIT_EVENT)) {
-			Message message = mHandler
-					.obtainMessage(HANDLE_APPLICATION_QUIT_EVENT);
+			Message message = mHandler.obtainMessage(HANDLE_APPLICATION_QUIT_EVENT);
 			mHandler.sendMessage(message);
 		} else if (qualifier.equals(BartsyApplication.HISTORY_CHANGED_EVENT)) {
-			Message message = mHandler
-					.obtainMessage(HANDLE_HISTORY_CHANGED_EVENT);
+			Message message = mHandler.obtainMessage(HANDLE_HISTORY_CHANGED_EVENT);
 			mHandler.sendMessage(message);
-		} else if (qualifier
-				.equals(BartsyApplication.USE_CHANNEL_STATE_CHANGED_EVENT)) {
-			Message message = mHandler
-					.obtainMessage(HANDLE_USE_CHANNEL_STATE_CHANGED_EVENT);
+		} else if (qualifier.equals(BartsyApplication.USE_CHANNEL_STATE_CHANGED_EVENT)) {
+			Message message = mHandler.obtainMessage(HANDLE_USE_CHANNEL_STATE_CHANGED_EVENT);
 			mHandler.sendMessage(message);
 		} else if (qualifier.equals(BartsyApplication.ALLJOYN_ERROR_EVENT)) {
-			Message message = mHandler
-					.obtainMessage(HANDLE_ALLJOYN_ERROR_EVENT);
+			Message message = mHandler.obtainMessage(HANDLE_ALLJOYN_ERROR_EVENT);
 			mHandler.sendMessage(message);
 		} else if (qualifier.equals(BartsyApplication.ORDERS_UPDATED)) {
-			Message message = mHandler
-					.obtainMessage(HANDLE_ORDERS_UPDATED_EVENT);
+			Message message = mHandler.obtainMessage(HANDLE_ORDERS_UPDATED_EVENT);
 			mHandler.sendMessage(message);
 		} else if (qualifier.equals(BartsyApplication.PEOPLE_UPDATED)) {
-			Message message = mHandler
-					.obtainMessage(HANDLE_PEOPLE_UPDATED_EVENT);
+			Message message = mHandler.obtainMessage(HANDLE_PEOPLE_UPDATED_EVENT);
 			mHandler.sendMessage(message);
 		} else if (qualifier.equals(BartsyApplication.INVENTORY_UPDATED)) {
-			Message message = mHandler
-					.obtainMessage(HANDLE_INVENTORY_UPDATED_EVENT);
+			Message message = mHandler.obtainMessage(HANDLE_INVENTORY_UPDATED_EVENT);
 			mHandler.sendMessage(message);
 		} 
 		// To process timeout orders
 		else if(qualifier.equals(ConnectionCheckingService.SERVICE_ORDER_TIMEOUT_EVENT)){
-			Message message = mHandler
-					.obtainMessage(HANDLE_ORDER_TIMEOUT_EVENT);
+			Message message = mHandler.obtainMessage(HANDLE_ORDER_TIMEOUT_EVENT);
 			mHandler.sendMessage(message);
 		}
 	}
@@ -712,39 +701,21 @@ public class MainActivity extends FragmentActivity implements
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case HANDLE_APPLICATION_QUIT_EVENT:
-				Log.v(TAG,
-						"BartsyActivity.mhandler.handleMessage(): HANDLE_APPLICATION_QUIT_EVENT");
+				Log.v(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_APPLICATION_QUIT_EVENT");
 				finish();
 				break;
 			case HANDLE_USE_CHANNEL_STATE_CHANGED_EVENT:
-				Log.v(TAG,
-						"BartsyActivity.mhandler.handleMessage(): HANDLE_USE_CHANNEL_STATE_CHANGED_EVENT");
+				Log.v(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_USE_CHANNEL_STATE_CHANGED_EVENT");
 				updateActionBarStatus();
 				break;
-			case HANDLE_HISTORY_CHANGED_EVENT: {
-				Log.v(TAG,
-						"BartsyActivity.mhandler.handleMessage(): HANDLE_HISTORY_CHANGED_EVENT");
-
+			case HANDLE_HISTORY_CHANGED_EVENT: 
+				Log.v(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_HISTORY_CHANGED_EVENT");
 				String message = mApp.getLastMessage();
-
-				// The history could be empty because this event is sent even on
-				// a channel init
-				if (message == null)
-					break;
-
-				BartsyCommand command = parseMessage(message);
-				if (command != null) {
-					processCommand(command);
-				} else {
-					Log.d(TAG, "Invalid command received");
-				}
+				Log.v(TAG, message);
 				break;
-			}
-			case HANDLE_ALLJOYN_ERROR_EVENT: {
-				Log.v(TAG,
-						"BartsyActivity.mhandler.handleMessage(): HANDLE_ALLJOYN_ERROR_EVENT");
+			case HANDLE_ALLJOYN_ERROR_EVENT: 
+				Log.v(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_ALLJOYN_ERROR_EVENT");
 				alljoynError();
-			}
 				break;
 			case HANDLE_ORDERS_UPDATED_EVENT: 
 				Log.v(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_ORDERS_UPDATED_EVENT");
@@ -769,103 +740,27 @@ public class MainActivity extends FragmentActivity implements
 					mInventoryFragment.updateInventoryView();
 				}
 				break;
-				
-			case HANDLE_ORDER_TIMEOUT_EVENT:{
+			case HANDLE_ORDER_TIMEOUT_EVENT:
 				Log.v(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_ORDER_TIMEOUT_EVENT");
 				if (mBartenderFragment != null) {
 					Log.v(TAG,"Updating orders timeout...");
 					mBartenderFragment.updateOrderView(mApp.orderTimeOut);
 				}
 				break;
-			}
 			default:
 				break;
 			}
 		}
 	};
-	private Order order;
+	
 
 	private void alljoynError() {
-		if (mApp.getErrorModule() == BartsyApplication.Module.GENERAL
-				|| mApp.getErrorModule() == BartsyApplication.Module.USE) {
+		if (mApp.getErrorModule() == BartsyApplication.Module.GENERAL || mApp.getErrorModule() == BartsyApplication.Module.USE) {
 			appendStatus("AllJoyn ERROR!!!!!!");
 			// showDialog(DIALOG_ALLJOYN_ERROR_ID);
 		}
 	}
 
-	public BartsyCommand parseMessage(String readMessage) {
-		appendStatus("Message received: " + readMessage);
-
-		// parse the command
-		BartsyCommand command = null;
-		ByteArrayInputStream stream = new ByteArrayInputStream(
-				readMessage.getBytes());
-		CommandParser commandParser = new CommandParser();
-
-		try {
-			command = commandParser.parse(stream);
-		} catch (XmlPullParserException e) {
-			// Auto-generated catch block
-			e.printStackTrace();
-			appendStatus("Invalid command format received");
-			return null;
-		} catch (IOException e) {
-			// Auto-generated catch block
-			e.printStackTrace();
-			appendStatus("Parser IO exception");
-			return null;
-		} finally {
-			// Makes sure that the InputStream is closed after the app is
-			// finished using it.
-			if (stream != null) {
-				try {
-					stream.close();
-				} catch (IOException e) {
-					// Auto-generated catch block
-					e.printStackTrace();
-					appendStatus("Stream close IO exception");
-					return null;
-				}
-			}
-		}
-
-		// check to make sure there was a
-		if (command == null) {
-			appendStatus("Parser succeeded but command is null");
-			return null;
-		}
-
-		// Return successfully processed command
-		return command;
-	}
-
-	void processCommand(BartsyCommand command) {
-		if (command.opcode.equalsIgnoreCase("order")) {
-			appendStatus("Opcode: " + command.opcode + "");
-			processCommandOrder(command);
-		} else if (command.opcode.equalsIgnoreCase("profile")) {
-			processProfile(command);
-		} else
-			appendStatus("Unknown command: " + command.opcode);
-	}
-
-	/******
-	 * 
-	 * 
-	 * TODO - Receive drink order
-	 * 
-	 */
-
-	void processCommandOrder(BartsyCommand command) {
-
-		mApp.addOrder(
-				command.arguments.get(0), // client order number
-				command.arguments.get(2), // Title
-				command.arguments.get(3), // Description
-				command.arguments.get(4), // Price)
-				command.arguments.get(6)  // userid
-				);
-	}
 
 	/*
 	 * 
@@ -873,32 +768,16 @@ public class MainActivity extends FragmentActivity implements
 	 */
 
 	public void sendOrderStatusChanged(Order order) {
-		// Expects the order status and the server ID to be already set on this
-		// end
+		// Expects the order status and the server ID to be already set on this end
 		appendStatus("Sending order response for order: " + order.serverID);
 
-		if (Constants.USE_ALLJOYN) {
-
-			mApp.newLocalUserMessage("<command><opcode>order_status_changed</opcode>"
-					+ "<argument>" + order.status + "</argument>" + // arg(0) -
-																	// status is
-																	// already
-																	// updated
-																	// on
-																	// this end
-					"<argument>" + order.serverID + "</argument>" + // arg(1)
-					"<argument>" + order.serverID + "</argument>" + // arg(2)
-					"<argument>" + order.orderSender.userID + "</argument>" + // arg(3)
-					"</command>");
-		} else {
-			WebServices.orderStatusChanged(order, this);
-		}
+		WebServices.orderStatusChanged(order, this);
 
 		// Update tab title with the number of open orders
 		updateOrdersCount();
-
 	}
 
+	
 	/*
 	 * 
 	 * TODO - User interaction commands
@@ -932,18 +811,4 @@ public class MainActivity extends FragmentActivity implements
 		appendStatus("Sent message");
 	}
 
-	/*
-	 * 
-	 * TODO - Profile commands
-	 */
-
-	void processProfile(BartsyCommand command) {
-		appendStatus("Process command: " + command.opcode);
-		mApp.addPerson(command.arguments.get(0), 
-				command.arguments.get(1), 
-				command.arguments.get(2), 
-				command.arguments.get(3), 
-				command.arguments.get(4), 
-				command.arguments.get(5));
-	}
 }
