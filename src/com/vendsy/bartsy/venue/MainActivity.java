@@ -110,9 +110,6 @@ public class MainActivity extends FragmentActivity implements
 	private static final int HANDLE_PEOPLE_UPDATED_EVENT = 5;
 	private static final int HANDLE_INVENTORY_UPDATED_EVENT = 6;
 	
-	
-	private static final int HANDLE_ORDER_TIMEOUT_EVENT = 20;
-	
 	/**************************************
 	 * 
 	 * 
@@ -211,7 +208,7 @@ public class MainActivity extends FragmentActivity implements
 		mApp.addObserver(this);
 		
 
-		if (!Constants.USE_ALLJOYN && (mApp.mOrders.size()==0 || mApp.mPeople.size()==0) ) {
+		if (!Constants.USE_ALLJOYN && (mApp.getOrderCount()==0 || mApp.mPeople.size()==0) ) {
 			// Start progress dialog from here
 			handler.post(new Runnable() {
 				
@@ -244,7 +241,7 @@ public class MainActivity extends FragmentActivity implements
 							}
 						}
 						// To parse orders from JSON object
-						if(json.has("orders") && mApp.mOrders.size()==0){
+						if(json.has("orders") && mApp.getOrderCount()==0){
 							JSONArray orders = json.getJSONArray("orders");
 							
 							for(int j=0; j<orders.length();j++){
@@ -532,7 +529,7 @@ public class MainActivity extends FragmentActivity implements
 		
 		// update the orders tab title
 		getActionBar().getTabAt(i).setText(
-				"Orders (" + mApp.mOrders.size() + ")");
+				"Orders (" + mApp.getOrderCount() + ")");
 	}
 
 	/*
@@ -689,13 +686,9 @@ public class MainActivity extends FragmentActivity implements
 			Message message = mHandler.obtainMessage(HANDLE_INVENTORY_UPDATED_EVENT);
 			mHandler.sendMessage(message);
 		} 
-		// To process timeout orders
-		else if(qualifier.equals(ConnectionCheckingService.SERVICE_ORDER_TIMEOUT_EVENT)){
-			Message message = mHandler.obtainMessage(HANDLE_ORDER_TIMEOUT_EVENT);
-			mHandler.sendMessage(message);
-		}
 	}
 
+	
 	private Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -738,13 +731,6 @@ public class MainActivity extends FragmentActivity implements
 				if (mInventoryFragment != null) {
 					Log.v(TAG,"Updating inventory view...");
 					mInventoryFragment.updateInventoryView();
-				}
-				break;
-			case HANDLE_ORDER_TIMEOUT_EVENT:
-				Log.v(TAG, "BartsyActivity.mhandler.handleMessage(): HANDLE_ORDER_TIMEOUT_EVENT");
-				if (mBartenderFragment != null) {
-					Log.v(TAG,"Updating orders timeout...");
-					mBartenderFragment.updateOrderView(mApp.orderTimeOut);
 				}
 				break;
 			default:

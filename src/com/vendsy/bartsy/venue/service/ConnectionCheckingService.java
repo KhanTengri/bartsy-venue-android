@@ -21,9 +21,6 @@ public class ConnectionCheckingService extends Service implements AppObserver {
 
 	private static final String TAG = "ConnectionCheckingService";
 	
-	public static final String SERVICE_ORDER_TIMEOUT_EVENT = "SERVICE_ORDER_TIMEOUT_EVENT";
-
-	private long wait = 60000; // 1 mins
 	// check for thread is running or not
 	private boolean isRunning = false;
 	private Thread thread;
@@ -36,7 +33,6 @@ public class ConnectionCheckingService extends Service implements AppObserver {
 		super.onCreate();
 		
 		mApp = (BartsyApplication)getApplication();
-        mApp.addObserver(this);
 
 		Log.i(TAG, "ConnectionCheckingService Service created...");
 		isRunning = true;
@@ -83,10 +79,12 @@ public class ConnectionCheckingService extends Service implements AppObserver {
 				try {
 					
 					
-					// To update orders time out
-					mApp.notifyObservers(SERVICE_ORDER_TIMEOUT_EVENT);
+					// refresh the UI to update the timers in the order
+					mApp.updateOrderTimers();
 						
 					
+					// Handle WIFI failures
+						
 					if (!WebServices .isNetworkAvailable(ConnectionCheckingService.this)) {
 						
 						Log.w(TAG, "Network unavailable");
@@ -112,7 +110,7 @@ public class ConnectionCheckingService extends Service implements AppObserver {
 							@Override
 							public void run() {
 								
-								Toast.makeText(ConnectionCheckingService.this, "Network not available. Trying to fix this issue...", Toast.LENGTH_LONG).show();
+								Toast.makeText(ConnectionCheckingService.this, "Network not available. Trying to fix this issue... If you need to work with the WIFI please manually kill the Bartsy Venue app in the tablet's preferences.", Toast.LENGTH_LONG).show();
 							}
 						});
 					}
@@ -129,7 +127,7 @@ public class ConnectionCheckingService extends Service implements AppObserver {
 				}
 				try {
 					// Thread in sleep
-					Thread.sleep(wait);
+					Thread.sleep(Constants.monitorFrequency);
 				} catch (InterruptedException e) {
 
 					e.printStackTrace();

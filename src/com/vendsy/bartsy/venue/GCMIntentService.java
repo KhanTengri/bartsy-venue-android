@@ -93,7 +93,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 		BartsyApplication app = (BartsyApplication) getApplication();
 		String messageTypeMSG = "";
 		try {
-			Log.v(TAG, "Push notification resposne :: " + json);
+
 			// JSONObject json = new JSONObject(message);
 			if (json.has("messageType")) {
 				// To check push notification message type
@@ -110,12 +110,13 @@ public class GCMIntentService extends GCMBaseIntentService {
 					// To display message in PN
 					messageTypeMSG = "User checkIn";
 				} else if (json.getString("messageType").equals("orderTimeout")) {
-					JSONArray cancelledOrders = json.has("ordersCancelled") ? json
-							.getJSONArray("ordersCancelled") : null;
+					
+					JSONArray expiredOrders = json.has("ordersCancelled") ? json.getJSONArray("ordersCancelled") : null;
+					
 					// When user checkout from venue, it is required to remove user open orders
-					if (cancelledOrders != null && cancelledOrders.length() > 0) {
+					if (expiredOrders != null && expiredOrders.length() > 0) {
 						// For removing the cancelled orders
-						app.removeOrders(cancelledOrders);
+						app.expireOrders(expiredOrders);
 
 					}
 					// To display message in PN
@@ -130,7 +131,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 					// When user checkout from venue, it is required to remove user open orders
 					if (cancelledOrders != null && cancelledOrders.length() > 0) {
 						// For removing the cancelled orders
-						app.removeOrders(cancelledOrders);
+						app.expireOrders(cancelledOrders);
 
 					}
 					// To display message in PN
@@ -172,31 +173,28 @@ public class GCMIntentService extends GCMBaseIntentService {
 	@Override
 	protected void onMessage(Context context, Intent intent) {
 
-		Log.v(TAG, "Received message");
+//		Log.v(TAG, "Received message");
 
 		String message = (String) intent.getExtras().get(Utilities.EXTRA_MESSAGE);
 		String count = (String) intent.getExtras().get("badgeCount");
 		
-		Log.v(TAG, "message: " + message);
+//		Log.v(TAG, "message: " + message);
 		
+		Log.i(TAG, "<=== pushNotification(" + message + ")");
+
 		String notifyMSG = "Received..";
 		
-		if (message == null) {
-			message = "";
-		} else {
+		if (message != null) {
 			try {
 				JSONObject json = new JSONObject(message);
-				if (json.has("messageType"))
-
+				if (json.has("messageType")) {
 					if (!json.getString("messageType").equalsIgnoreCase("heartBeat"))
 						generateNotification(context, notifyMSG, count);
-
+				}
 				notifyMSG = processPushNotification(json);
 			} catch (JSONException e) {
 				e.printStackTrace(); 
 			}
-
-
 		}
 	}
 

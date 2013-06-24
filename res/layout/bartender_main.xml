@@ -19,7 +19,10 @@
             android:id="@+id/view_order_header"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/activity_vertical_margin"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
             android:background="@drawable/rounded_corner_dark" >
 
             <TextView
@@ -74,7 +77,10 @@
             android:id="@+id/LinearLayout01"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/activity_vertical_margin"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
             android:background="@drawable/rounded_corner_dark" >
 
             <TextView
@@ -127,7 +133,10 @@
             android:id="@+id/LinearLayout04"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/activity_vertical_margin"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
             android:background="@drawable/rounded_corner_dark" >
 
             <TextView

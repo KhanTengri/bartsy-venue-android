@@ -102,8 +102,10 @@ public class BartsyApplication extends Application implements AppObservable {
 	public void onCreate() {
 		Log.v(TAG, "onCreate()");
 		PACKAGE_NAME = getApplicationContext().getPackageName();
+		
 		// Start background ConnectionCheckingService
 		startService(new Intent(this,ConnectionCheckingService.class));
+		
 		// Start the background connectivity service if running on Alljoyn
 		if (Constants.USE_ALLJOYN) {
 			Intent intent = new Intent(this, ConnectivityService.class);
@@ -164,7 +166,6 @@ public class BartsyApplication extends Application implements AppObservable {
 
 	public String venueProfileID = null;
 	public String venueProfileName = null;
-	public int orderTimeOut;
 
 	void loadVenueProfile() {
 		SharedPreferences sharedPref = getSharedPreferences(getResources()
@@ -172,7 +173,6 @@ public class BartsyApplication extends Application implements AppObservable {
 				Context.MODE_PRIVATE);
 		venueProfileID = sharedPref.getString("RegisteredVenueId", null);
 		venueProfileName = sharedPref.getString("RegisteredVenueName", null);
-		orderTimeOut = sharedPref.getInt("RegisteredOrderTimeOut", 0);
 	}
 
 	/*****
@@ -271,7 +271,7 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * @param order
 	 */
 	
-	public void addOrder(Order order) {
+	public synchronized void addOrder(Order order) {
 		// Find the person who placed the order in the list of people in this
 		// bar. If not found, don't accept the order
 		order.orderSender = null;
@@ -301,43 +301,39 @@ public class BartsyApplication extends Application implements AppObservable {
 	/**
 	 * Remove the orders based on the json array which is getting from the user check out PN
 	 * 
-	 * @param cancelledOrders
+	 * @param expiredOrders
 	 */
 	
-	public void removeOrders(JSONArray cancelledOrders) {
+	public synchronized void expireOrders(JSONArray expiredOrders) {
 
+		Log.v(TAG, "expireOrders()");
+		
 		// If cancelled orders count greater than 0
-		if (cancelledOrders.length() > 0) {
-			for (int i = 0; i < cancelledOrders.length(); i++) {
+		for (int i = 0; i < expiredOrders.length(); i++) {
 
-				String orderId = null;
-				try {
-					// To get the cancelled orderId from the jsonArray response
-					orderId = cancelledOrders.getString(i);
-					Log.v(TAG, "Cancelled order number " + orderId);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				if (orderId != null)
-					for (int j = 0; j < mOrders.size(); j++) {
-						// To get the order object from the existing orders list
-						Order order = mOrders.get(j);
-						// If both cancelled order id and existing order id are same
-						if (order.serverID.equalsIgnoreCase(orderId)) {
-							// To remove the order from the existing orders list 
-							mOrders.remove(order);
-							// To terminate the inner for loop
-							break;
-						}
+			String orderId = null;
+			try {
+				// To get the cancelled orderId from the jsonArray response
+				orderId = expiredOrders.getString(i);
+				Log.v(TAG, "Expired  order number " + orderId);
 
+				for (int j = 0; j < mOrders.size(); j++) {
+					// To get the order object from the existing orders list
+					Order order = mOrders.get(j);
+
+					// Matching order - flag it as expired
+					if (order.serverID.equalsIgnoreCase(orderId)) {
+						order.setCancelledState();
+						break;
 					}
-
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
 			}
-			// To update orders in orders tab
-			notifyObservers(ORDERS_UPDATED);
-			
 		}
 
+		// Notify views to display the updated order list
+		notifyObservers(ORDERS_UPDATED);
 	}
 
 	/**
@@ -345,7 +341,7 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * 
 	 * @param order
 	 */
-	public void addOrderWithOutNotify(Order order) {
+	public synchronized void addOrderWithOutNotify(Order order) {
 		// Find the person who placed the order in the list of people in this
 		// bar. If not found, don't accept the order
 		order.orderSender = null;
@@ -365,6 +361,43 @@ public class BartsyApplication extends Application implements AppObservable {
 		// Add the order to the list of orders
 		mOrders.add(order);
 	}
+	
+	
+	/**
+	 * 
+	 * This handles a local order timeout. This scenario should be rare and only if WIFI is long irreparably. This in itself is pretty 
+	 * catastrophic, but regardless, we don't want orders to stick around forever in the local display so some time after the server timeout
+	 * (the additional time is indicated by the Constants.timeoutDelay value) we expire the orders locally 
+	 * 
+	 */
+	
+	public synchronized void updateOrderTimers() {
+
+		for (Order order : mOrders) {
+
+			// The additional timeout when we check for local timeouts gives the server the opportunity to always time out an order first. This 
+			long duration  = Constants.timoutDelay + order.timeOut - ((System.currentTimeMillis() - (order.state_transitions[order.status]).getTime()))/60000;
+			
+			if (duration <= 0) {
+				// Order time out - set it to that state and update UI
+				order.setCancelledState();
+			}
+		}
+		
+		notifyObservers(ORDERS_UPDATED);
+	}
+	
+	public synchronized void removeOrder(Order order) {
+		// Add the order to the list of orders
+		mOrders.remove(order);
+		notifyObservers(ORDERS_UPDATED);
+	}
+
+	public int getOrderCount() {
+		return mOrders.size();
+	}
+
+	
 	
 	/**
 	 * Inventory

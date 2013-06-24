@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+
+    <ToggleButton
+        android:id="@+id/ToggleButton04"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:textOff="Venues"
+        android:textOn="Venues" />
+
+    <ToggleButton
+        android:id="@+id/ToggleButton02"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:textOff="Rewards"
+        android:textOn="Rewards" />
+
+    <ToggleButton
+        android:id="@+id/ToggleButton01"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:textOff="Mssgs"
+        android:textOn="Mssgs" />
+
+    <ToggleButton
+        android:id="@+id/ToggleButton03"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:textOff="Profile"
+        android:textOn="Profile" />
+
+</LinearLayout>

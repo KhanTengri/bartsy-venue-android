@@ -2,20 +2,22 @@
            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                android:layout_width="fill_parent"
                android:layout_height="wrap_content"
-               android:orientation="vertical" >
+               android:orientation="vertical"
+               android:padding="4dp" >
 
                <LinearLayout
                    android:layout_width="match_parent"
-                   android:layout_height="wrap_content" >
+                   android:layout_height="wrap_content"
+                   android:background="@drawable/rounded_corner_dark"
+                   android:padding="2dp" >
 
                    <LinearLayout
                        android:id="@+id/view_order_background"
                        android:layout_width="fill_parent"
                        android:layout_height="wrap_content"
-                       android:layout_margin="@dimen/activity_vertical_margin"
                        android:background="@drawable/rounded_corner"
                        android:orientation="vertical"
-                       android:padding="4dp" >
+                       android:padding="2dp" >
 
                        <LinearLayout
                            android:id="@+id/view_order_mini"
@@ -39,6 +41,7 @@
                                <LinearLayout
                                    android:layout_width="fill_parent"
                                    android:layout_height="wrap_content"
+                                   android:layout_gravity="center_vertical"
                                    android:orientation="vertical" >
 
                                    <TextView
@@ -53,98 +56,116 @@
                                        android:textSize="48sp"
                                        android:textStyle="bold" />
 
-                                   <LinearLayout
-                                       android:layout_width="match_parent"
-                                       android:layout_height="wrap_content" 
-                                       android:orientation="vertical">
-
-                                       <LinearLayout
-                                           android:layout_width="fill_parent"
-                                           android:layout_height="wrap_content"
-                                           android:orientation="horizontal" >
-
-                                           <TextView
-                                               android:id="@+id/view_order_profile_name"
-                                               android:layout_width="wrap_content"
-                                               android:layout_height="wrap_content"
-                                               android:layout_marginBottom="@dimen/activity_vertical_margin"
-                                               android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                                               android:paddingLeft="@dimen/activity_horizontal_margin"
-                                               android:text="Peter Kellis"
-                                               android:textAppearance="?android:attr/textAppearanceLargeInverse"
-                                               android:textStyle="bold" />
-                                       </LinearLayout>
-                                       <TextView
-                                               android:id="@+id/orderOutTime"
-                                               android:layout_width="wrap_content"
-                                               android:layout_height="wrap_content"
-                                               android:layout_marginBottom="@dimen/activity_vertical_margin"
-                                               android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                                               android:paddingLeft="@dimen/activity_horizontal_margin"
-							                                               
-                                               android:textAppearance="?android:attr/textAppearanceLargeInverse"
-                                               android:textStyle="bold" />
-                                   </LinearLayout>
+                                   <TextView
+                                       android:id="@+id/view_order_profile_name"
+                                       android:layout_width="wrap_content"
+                                       android:layout_height="wrap_content"
+                                       android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                                       android:paddingLeft="@dimen/activity_horizontal_margin"
+                                       android:text="Peter Kellis"
+                                       android:textAppearance="?android:attr/textAppearanceMediumInverse"
+                                       android:textStyle="bold" />
                                    
                                    
                                </LinearLayout>
                            </LinearLayout>
 
                            <LinearLayout
-                               android:layout_width="wrap_content"
+                               android:layout_width="fill_parent"
                                android:layout_height="wrap_content"
                                android:padding="4dp" >
 
                                <TextView
-                                   android:id="@+id/textView2"
+                                   android:id="@+id/TextView04"
                                    android:layout_width="wrap_content"
                                    android:layout_height="wrap_content"
-                                   android:layout_gravity="center_vertical"
-                                   android:text="Placed at: "
-                                   android:textAppearance="?android:attr/textAppearanceSmall"
-                                   android:textSize="14sp" />
-
-                               <TextView
-                                   android:id="@+id/view_order_time"
-                                   android:layout_width="wrap_content"
-                                   android:layout_height="wrap_content"
-                                   android:layout_gravity="center_vertical"
-                                   android:text="9:22 PM"
-                                   android:textColor="#995555"
-                                   android:textSize="14sp"
+                                   android:text="Placed "
+                                   android:textAppearance="?android:attr/textAppearanceMedium"
                                    android:textStyle="bold" />
 
                                <TextView
-                                   android:id="@+id/textView1"
+                                   android:id="@+id/view_order_timer"
                                    android:layout_width="wrap_content"
                                    android:layout_height="wrap_content"
-                                   android:layout_gravity="center_vertical"
-                                   android:text=" on "
-                                   android:textAppearance="?android:attr/textAppearanceSmall"
-                                   android:textSize="14sp" />
+                                   android:text="3 min"
+                                   android:textAppearance="?android:attr/textAppearanceMedium"
+                                   android:textStyle="bold" />
 
                                <TextView
-                                   android:id="@+id/view_order_date"
+                                   android:id="@+id/TextView08"
                                    android:layout_width="wrap_content"
                                    android:layout_height="wrap_content"
-                                   android:layout_gravity="center_vertical"
+                                   android:text=" ago. "
+                                   android:textAppearance="?android:attr/textAppearanceMedium"
+                                   android:textStyle="bold" />
+
+                               <TextView
+                                   android:id="@+id/TextView09"
+                                   android:layout_width="0dp"
+                                   android:layout_height="wrap_content"
                                    android:layout_weight="2"
-                                   android:text="Apr 11, 2013"
-                                   android:textAppearance="?android:attr/textAppearanceSmall"
-                                   android:textSize="14sp" />
+                                   android:textAppearance="?android:attr/textAppearanceMedium"
+                                   android:textStyle="bold" />
+
+                               <TextView
+                                   android:id="@+id/TextView07"
+                                   android:layout_width="wrap_content"
+                                   android:layout_height="wrap_content"
+                                   android:text="Expires in "
+                                   android:textAppearance="?android:attr/textAppearanceMedium"
+                                   android:textStyle="bold" />
+
+                               <TextView
+                                   android:id="@+id/view_order_timeout"
+                                   android:layout_width="wrap_content"
+                                   android:layout_height="wrap_content"
+                                   android:text="3 min"
+                                   android:textAppearance="?android:attr/textAppearanceMedium"
+                                   android:textStyle="bold" />
+                           </LinearLayout>
+
+                           <LinearLayout
+                               android:id="@+id/view_order_expired"
+                               style="?android:attr/buttonBarStyle"
+                               android:layout_width="match_parent"
+                               android:layout_height="wrap_content"
+                               android:layout_gravity="center_horizontal"
+                               android:background="@drawable/rounded_corner_red"
+                               android:orientation="vertical"
+                               android:visibility="gone" >
+
+                               <TextView
+                                   android:id="@+id/view_order_state_description"
+                                   android:layout_width="fill_parent"
+                                   android:layout_height="fill_parent"
+                                   android:layout_marginTop="@dimen/activity_vertical_margin"
+                                   android:gravity="center"
+                                   android:text="ORDER EXPIRED"
+                                   android:textAppearance="?android:attr/textAppearanceMedium"
+                                   android:textColor="#ffffff"
+                                   android:textStyle="bold" />
+
+                               <Button
+                                   android:id="@+id/view_order_button_expired"
+                                   style="?android:attr/buttonStyle"
+                                   android:layout_width="fill_parent"
+                                   android:layout_height="wrap_content"
+                                   android:text="Save to failed orders"
+                                   android:textStyle="bold" />
+
                            </LinearLayout>
 
                            <LinearLayout
                                android:id="@+id/view_order_mini"
                                android:layout_width="match_parent"
                                android:layout_height="wrap_content"
-                               android:background="@drawable/rounded_corner"
                                android:orientation="vertical" >
 
                                <LinearLayout
                                    android:layout_width="match_parent"
-                                   android:orientation="horizontal"
-                                   android:layout_height="wrap_content" >
+                                   android:layout_height="wrap_content"
+                                   android:layout_gravity="center_vertical"
+                                   android:orientation="horizontal" >
 
                                    <Button
                                        android:id="@+id/view_order_button_remove"
@@ -157,7 +178,7 @@
 
                                    <LinearLayout
                                        android:layout_width="0dp"
-                                       android:layout_height="fill_parent"
+                                       android:layout_height="wrap_content"
                                        android:layout_gravity="center_vertical"
                                        android:layout_weight="2"
                                        android:orientation="vertical"
@@ -189,7 +210,6 @@
                                        android:text="$"
                                        android:textAppearance="?android:attr/textAppearanceMediumInverse"
                                        android:textColor="#995555"
-                                       android:textSize="16sp"
                                        android:textStyle="bold" />
 
                                    <TextView
@@ -201,7 +221,6 @@
                                        android:text="12"
                                        android:textAppearance="?android:attr/textAppearanceMediumInverse"
                                        android:textColor="#995555"
-                                       android:textSize="18sp"
                                        android:textStyle="bold" />
 
                                </LinearLayout>
@@ -209,6 +228,15 @@
                            </LinearLayout>
 
                        </LinearLayout>
+
+                       <FrameLayout
+                           android:layout_width="match_parent"
+                           android:layout_height="2dp"
+                           android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                           android:layout_marginRight="@dimen/activity_horizontal_margin"
+                           android:background="@drawable/rounded_corner" >
+
+                       </FrameLayout>
 
                        <LinearLayout
                            android:layout_width="fill_parent"
@@ -317,6 +345,7 @@
                        </LinearLayout>
 
                        <LinearLayout
+                           android:id="@+id/view_order_actions"
                            android:layout_width="match_parent"
                            android:layout_height="fill_parent"
                            android:gravity="center_vertical" >

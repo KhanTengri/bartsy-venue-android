@@ -49,12 +49,19 @@ public class Order  {
 	// Each order contains the sender and the recipient (another single in the bar or a friend to pick the order up)
 	public Profile orderSender;
 	public Profile orderReceiver;
+	public String senderId;
+	public String receiverId;
 	
 	// The view displaying this order or null. The view is the display of the order in a list. 
 	// The list could be either on the client or the server and it looks different in both cases
 	// but the code manages the differences. 
 	public View view = null;
 	
+	// The states are implemented in a status variable and each state transition has an associated time
+	public int status;	
+	public int last_status;	// the previous status of this order (needed for timeouts in particular)
+	public int timeOut;			// time in minutes this order has before it times out (from the last updated state)
+
 	// Order states
 	// (received) -> NEW -> (accepted) -> IN_PROGRESS -> (completed) -> READY   -> (picked_up) -> COMPLETE    -> (timed out, error, etc) -> CANCELLED
 	//                      (rejected) -> REJECTED       (failed)    -> FAILED     (forgotten) -> INCOMPLETE  
@@ -66,11 +73,12 @@ public class Order  {
 	public static final int ORDER_STATUS_FAILED	 		= 4;
 	public static final int ORDER_STATUS_COMPLETE	 	= 5;
 	public static final int ORDER_STATUS_INCOMPLETE	 	= 6;
-	public static final int ORDER_STATUS_CANCELLED	 	= 7;
+	public static final int ORDER_STATUS_EXPIRED	 	= 7;
 	public static final int ORDER_STATUS_COUNT			= 8;
 	
-	// The states are implemented in a status variable and each state transition has an associated time
-	public int status;	
+	
+	
+	
 	private String errorReason = ""; // used to send an error reason for negative order states
     public Date[] state_transitions = new Date[ORDER_STATUS_COUNT];
     // Decimal Format
@@ -89,25 +97,7 @@ public class Order  {
 	}
 
 	
-	/** 
-	 * When an order is initialized the state transition times are undefined except for the 
-	 * first state, which is when the order is received
-	 */
-	
-	public void initialize (String server_id, String title, String description, 
-			String price, String image_resource, Profile order_sender) {
-		this.serverID = server_id;
-		this.title = title;
-		this.description = description;
-//		this.price = Float.parseFloat(price);
-//		this.image_resource = Integer.parseInt(image_resource); 
-		this.orderSender = order_sender;
 
-		// Orders starts in the "NEW" status
-		status = ORDER_STATUS_NEW;
-		state_transitions[status] = new Date();
-	}
-	
 	
 	/**
 	 * Constructor to parse all the information from the JSON
@@ -121,7 +111,6 @@ public class Order  {
 			status = Integer.valueOf(json.getString("orderStatus"));
 			state_transitions[status] = new Date();
 			title = json.getString("itemName");
-			updatedDate = json.getString("orderTime");
 			serverID = json.getString("orderId");
 
 			
@@ -130,10 +119,21 @@ public class Order  {
 			totalAmount = Float.valueOf(json.getString("totalPrice"));
 			taxAmount = totalAmount - tipAmount - baseAmount;
 			
-			profileId = json.getString("bartsyId");
-			description = json.getString("description");
+			if (json.has("bartsyId"))
+				profileId = json.getString("bartsyId");
+			if (json.has("description"))
+				description = json.getString("description");
+			
+			if (json.has("orderTimeout"))
+				timeOut = json.getInt("orderTimeout");
+			if (json.has("orderTime"))
+				updatedDate = json.getString("orderTime");
 			if (json.has("dateCreated"))
 			  createdDate = json.getString("dateCreated");
+			
+			if (json.has("orderStatus"))
+				status = Integer.parseInt(json.getString("orderStatus"));
+			
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		} catch (JSONException e) {
@@ -154,12 +154,15 @@ public class Order  {
 	public void nextPositiveState() {
 		switch (status) {
 		case ORDER_STATUS_NEW:
+			last_status = status;
 			status = ORDER_STATUS_IN_PROGRESS;
 			break;
 		case ORDER_STATUS_IN_PROGRESS:
+			last_status = status;
 			status = ORDER_STATUS_READY;
 			break;
 		case ORDER_STATUS_READY:
+			last_status = status;
 			status = ORDER_STATUS_COMPLETE;
 			break;
 		default:
@@ -167,6 +170,17 @@ public class Order  {
 		}
 		
 		// Mark the time of the state transition in the timetable
+		state_transitions[status] = new Date();
+	}
+
+	public void setCancelledState() {
+		
+		// Don't change orders that have already this status because their last_status would get lost
+		if (status == ORDER_STATUS_EXPIRED) 
+			return;
+		
+		last_status = status;
+		status = ORDER_STATUS_EXPIRED;
 		state_transitions[status] = new Date();
 	}
 
@@ -181,12 +195,15 @@ public class Order  {
 		
 		switch (status) {
 		case ORDER_STATUS_NEW:
+			last_status = status;
 			status = ORDER_STATUS_REJECTED;
 			break;
 		case ORDER_STATUS_IN_PROGRESS:
+			last_status = status;
 			status = ORDER_STATUS_FAILED;
 			break;
 		case ORDER_STATUS_READY:
+			last_status = status;
 			status = ORDER_STATUS_INCOMPLETE;
 			break;
 		}
@@ -215,25 +232,6 @@ public class Order  {
 		}
 		return orderData;
 	}
-	/**
-	 * To update timeout value from the local timer
-	 * 
-	 * @param timeOut
-	 */
-	public void updateTimeOut(int timeOut){
-		if (view == null) return;
-		
-		// Calculate duration of timeout value and duration of order updated time
-		long duration  = timeOut - ((System.currentTimeMillis() - (state_transitions[status]).getTime()))/60000;
-		// If the order already expired - duration should not be negative value
-		if(duration<0){
-			((TextView) view.findViewById(R.id.orderOutTime)).setText("Expired");
-		}
-		// To update duration should not be negative value
-		else{
-			((TextView) view.findViewById(R.id.orderOutTime)).setText(String.valueOf(duration)+" min left");
-		}
-	}
 	
 	
 	/**
@@ -244,10 +242,13 @@ public class Order  {
 
 		if (view == null) return;
 
+		// Set main order parameters
+		((TextView) view.findViewById(R.id.view_order_number)).setText(serverID);
 		((TextView) view.findViewById(R.id.view_order_title)).setText(title);
-		((TextView) view.findViewById(R.id.view_order_description)).setText(description);
-		((TextView) view.findViewById(R.id.view_order_time)).setText(DateFormat.getTimeInstance().format(state_transitions[status]));
-		((TextView) view.findViewById(R.id.view_order_date)).setText(DateFormat.getDateInstance().format(state_transitions[status]));	
+		if (description != null && !description.equalsIgnoreCase(""))
+			((TextView) view.findViewById(R.id.view_order_description)).setText(description);
+		else
+			view.findViewById(R.id.view_order_description).setVisibility(View.GONE);
 
 		// Set base price
 		((TextView) view.findViewById(R.id.view_order_price)).setText(df.format(baseAmount));
@@ -256,7 +257,6 @@ public class Order  {
 		((TextView) view.findViewById(R.id.view_order_tip_amount)).setText(df.format(tipAmount));
 		((TextView) view.findViewById(R.id.view_order_tax_amount)).setText(df.format(taxAmount));
 		((TextView) view.findViewById(R.id.view_order_total_amount)).setText(df.format(totalAmount)); 
-		
 		
 		if (orderSender != null ) {
 
@@ -282,25 +282,69 @@ public class Order  {
 		case ORDER_STATUS_NEW:
 			positive = "ACCEPT";
 			negative = "REJECT";
-			view.findViewById(R.id.view_order_header).setBackgroundResource(R.drawable.rounded_corner_red);
 			break;
 		case ORDER_STATUS_IN_PROGRESS:
 			positive = "COMPLETED";
 			negative = "FAILED";
-			view.findViewById(R.id.view_order_header).setBackgroundResource(R.drawable.rounded_corner_orange);
 			break;
 		case ORDER_STATUS_READY:
 			positive = "PICKED UP";
 			negative = "NO SHOW";
-			view.findViewById(R.id.view_order_header).setBackgroundResource(R.drawable.rounded_corner_green);
 			break;
 		}
-		((TextView) view.findViewById(R.id.view_order_number)).setText(serverID);
-		((Button) view.findViewById(R.id.view_order_button_positive)).setText(positive);
-		((Button) view.findViewById(R.id.view_order_button_positive)).setTag(this);
-		((Button) view.findViewById(R.id.view_order_button_negative)).setText(negative);
-		((Button) view.findViewById(R.id.view_order_button_negative)).setTag(this);
-		((Button) view.findViewById(R.id.view_order_button_remove)).setTag(this);
+		
+		// Compute timers
+		long timeout_ms	 = timeOut * 60000;
+		long elapsed_ms;
+		if (state_transitions[last_status] != null)
+			elapsed_ms = System.currentTimeMillis() - (state_transitions[last_status]).getTime();
+		else
+			// For now don't bother resetting timers in the case we just uninstalled and reinstalled the app
+			elapsed_ms = 0;
+		long left_ms     = timeout_ms - elapsed_ms;
+		long elapsed_min = elapsed_ms / 60000;
+		long left_min    = left_ms / 60000;
+		
+		// Set the background color of the order depending on how much time has elapsed as a percent of the timeout gree->orange->red
+		if (elapsed_ms <= timeout_ms / 3.0)
+			view.findViewById(R.id.view_order_header).setBackgroundResource(android.R.color.holo_green_dark);
+		else if (elapsed_ms <=  timeout_ms * 2.0 / 3.0)
+			view.findViewById(R.id.view_order_header).setBackgroundResource(android.R.color.holo_orange_dark);
+		else
+			view.findViewById(R.id.view_order_header).setBackgroundResource(android.R.color.holo_red_dark);
+
+
+		// Handle timeout views
+		if (status == ORDER_STATUS_EXPIRED) {
+			// Change the order display to hide the normal action buttons and to show the timeout acknowledgement
+			view.findViewById(R.id.view_order_actions).setVisibility(View.GONE);
+			view.findViewById(R.id.view_order_expired).setVisibility(View.VISIBLE);
+
+			// Update timer since last state
+			((TextView) view.findViewById(R.id.view_order_timer)).setText(String.valueOf(elapsed_min)+" min");
+
+			// Update timeout counter to always be expired even if there is some left (due to clock inconsistencies between local and server)
+			((TextView) view.findViewById(R.id.view_order_timeout)).setText("0 min");
+			
+			// Set tag to self for clicks
+			view.findViewById(R.id.view_order_button_expired).setTag(this);
+		} else {
+
+			// Update timer since last state
+			((TextView) view.findViewById(R.id.view_order_timer)).setText(String.valueOf(elapsed_min)+" min");
+
+			// Update timout counter		
+			if (left_min > 0) 
+				((TextView) view.findViewById(R.id.view_order_timeout)).setText(String.valueOf(left_min)+" min");
+			else
+				((TextView) view.findViewById(R.id.view_order_timeout)).setText("0 min");
+
+			((Button) view.findViewById(R.id.view_order_button_positive)).setText(positive);
+			((Button) view.findViewById(R.id.view_order_button_positive)).setTag(this);
+			((Button) view.findViewById(R.id.view_order_button_negative)).setText(negative);
+			((Button) view.findViewById(R.id.view_order_button_negative)).setTag(this);
+			((Button) view.findViewById(R.id.view_order_button_remove)).setTag(this);
+		}
 		
 		// Set a pointer to the object being displayed 
 		view.setTag(this);

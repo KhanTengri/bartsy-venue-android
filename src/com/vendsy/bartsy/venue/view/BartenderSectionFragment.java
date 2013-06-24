@@ -65,30 +65,18 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		return mRootView;
 
 	}
-	/**
-	 * Updates the orders view based on the time out
-	 * 
-	 */
-	public void updateOrderView(int orderTimeout){
-		for (Order order : mApp.mOrders) {
-			order.updateTimeOut(orderTimeout);
-		}
-	}
 	
 	
 	/***
 	 * Updates the orders view
 	 */
 	
-	public void updateOrdersView() {
+	public synchronized void updateOrdersView() {
 		
 		Log.v(TAG, "updateOrdersView()");
-
 		
 		if (mRootView == null) return;
 		
-		Log.v("Bartsy", "About update orders list view");
-
 		mNewOrdersView = (LinearLayout) mRootView.findViewById(R.id.view_new_order_list);
 		mAcceptedOrdersView = (LinearLayout) mRootView.findViewById(R.id.view_accepted_order_list);
 		mCompletedOrdersView = (LinearLayout) mRootView.findViewById(R.id.view_completed_order_list);
@@ -104,15 +92,15 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		
 		// Add any existing orders in the layout, one by one
 		
-		Log.v("Bartsy", "mApp.mOrders list size = " + mApp.mOrders.size());
+		Log.v("Bartsy", "mApp.mOrders list size = " + mApp.getOrderCount());
 
 		for (Order order : mApp.mOrders) {
-			Log.v("Bartsy", "Adding an item to the layout");
+			
+			Log.v("Bartsy", "Adding order " + order.serverID + " with status " + order.status + " to the layout");
 			
 			// Update the view's main layout 
 			order.view = mInflater.inflate(R.layout.bartender_order, mContainer, false);
 			order.updateView();
-			order.updateTimeOut(mApp.orderTimeOut);
 			
 			switch (order.status) {
 			case Order.ORDER_STATUS_NEW:
@@ -127,6 +115,20 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 				// add order to the bottom of the completed orders list view 
 				insertOrderInLayout(order, mCompletedOrdersView);
 				break;
+			case Order.ORDER_STATUS_EXPIRED:
+				// add cancelled order in the right layout based on its last state
+				switch (order.last_status) {
+				case Order.ORDER_STATUS_NEW:
+					insertOrderInLayout(order, mNewOrdersView);
+					break;
+				case Order.ORDER_STATUS_IN_PROGRESS:
+					insertOrderInLayout(order, mAcceptedOrdersView);
+					break;
+				case Order.ORDER_STATUS_READY:
+					insertOrderInLayout(order, mCompletedOrdersView);
+					break;
+				}
+				break;
 			}
 		}
 	}
@@ -140,23 +142,29 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		
 		boolean inserted = false;
 
-		// Try to insert the order in a previous order from the same user
+		// Never bundle expired orders
+		if (order.status != Order.ORDER_STATUS_EXPIRED) {
 		
-		for (int i=0 ; i < layout.getChildCount() ; i++) {
-			
-			View view = layout.getChildAt(i);
-			Order layoutOrder = (Order) view.getTag();
-			
-			if (layoutOrder.orderSender.userID.equalsIgnoreCase(order.orderSender.userID)) {
-				// Found an existing order from the same user. Insert a mini-view of the order
+			// Try to insert the order in a previous order from the same user
+
+			for (int i=0 ; i < layout.getChildCount() ; i++) {
 				
-				LinearLayout miniLayout = (LinearLayout) view.findViewById(R.id.view_order_mini);
-				View miniView = order.getMiniView(mInflater, mContainer);
-				miniView.findViewById(R.id.view_order_button_remove).setOnClickListener(this);
-				miniLayout.addView(miniView);
-				return;
+				View view = layout.getChildAt(i);
+				Order layoutOrder = (Order) view.getTag();
+				
+				if (layoutOrder.status != Order.ORDER_STATUS_EXPIRED && // Don't insert in expired orders
+						layoutOrder.orderSender.userID.equalsIgnoreCase(order.orderSender.userID)) {
+					// Found an existing order from the same user. Insert a mini-view of the order
+					
+					LinearLayout miniLayout = (LinearLayout) view.findViewById(R.id.view_order_mini);
+					View miniView = order.getMiniView(mInflater, mContainer);
+					miniView.findViewById(R.id.view_order_button_remove).setOnClickListener(this);
+					miniLayout.addView(miniView);
+					return;
+				}
 			}
 		}
+		
 		
 		// No previous order was found, insert the order at the top level
 		
@@ -165,6 +173,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		order.view.findViewById(R.id.view_order_button_negative).setOnClickListener(this);
 		order.view.findViewById(R.id.view_order_button_remove).setOnClickListener(this);
 		order.view.findViewById(R.id.view_order_button_remove).setOnClickListener(this);
+		order.view.findViewById(R.id.view_order_button_expired).setOnClickListener(this);
 	}
 	
 
@@ -178,7 +187,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 	 */
 	
 	@Override
-	public void onClick(View v) {
+	public synchronized void onClick(View v) {
 
 		Log.v(TAG, "onClick()");
 
@@ -211,7 +220,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 					if (orderItem.status == Order.ORDER_STATUS_COMPLETE) {
 						Log.v(TAG, "Removing child with status COMPLETE");
 						orderItem.view = null;
-						mApp.mOrders.remove(orderItem);
+						mApp.removeOrder(orderItem);
 					}
 					// Send updated order status to the remote
 					((MainActivity) getActivity()).sendOrderStatusChanged(orderItem);
@@ -233,7 +242,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 				if (orderItem.status == status && orderItem.orderSender.userID.equalsIgnoreCase(userID)) {
 					orderItem.nextNegativeState("Order rejected by the bartender");	
 					orderItem.view = null;
-					mApp.mOrders.remove(orderItem);
+					mApp.removeOrder(orderItem);
 					// Send updated order status to the remote
 					((MainActivity) getActivity()).sendOrderStatusChanged(orderItem);
 				}
@@ -245,11 +254,17 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			Log.v(TAG, "Clicked on order remove button");
 			order.nextNegativeState("Individual order rejected by the bartender");
 			order.view = null;
-			mApp.mOrders.remove(order);
+			mApp.removeOrder(order);
 			// Send updated order status to the remote
 			((MainActivity) getActivity()).sendOrderStatusChanged(order);
 			break;
-			
+
+		case R.id.view_order_button_expired:
+			Log.v(TAG, "Clicked on order expired button");
+			order.view = null;
+			mApp.removeOrder(order);
+			break;
+
 		default:
 			break;
 		}

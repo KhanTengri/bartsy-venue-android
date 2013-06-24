@@ -34,8 +34,6 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 	private EditText locuId, paypal, wifiName, wifiPassword,orderTimeOut;
 	private Handler handler = new Handler();
 	
-	private int orderTimeoutValue;
-	
 	// Progress dialog
 	private ProgressDialog progressDialog;
 
@@ -129,8 +127,6 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 				else
 					postData.put("wifiPresent", "0");
 				
-				orderTimeoutValue = Integer.parseInt(orderTimeOut.getText().toString());
-
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -214,12 +210,10 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 				SharedPreferences.Editor editor = sharedPref.edit();
 				editor.putString("RegisteredVenueId", venueId);
 				editor.putString("RegisteredVenueName", venueName);
-				editor.putInt("RegisteredOrderTimeOut", orderTimeoutValue);
 				
 				app = (BartsyApplication) getApplication();
 				app.venueProfileID = venueId;
 				app.venueProfileName = venueName;
-				app.orderTimeOut = orderTimeoutValue;
 				editor.commit();
 				
 				// Remove progress dialog
