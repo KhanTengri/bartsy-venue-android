@@ -52,7 +52,6 @@
 	        android:text="$"
 	        android:textAppearance="?android:attr/textAppearanceMediumInverse"
 	        android:textColor="#995555"
-	        android:textSize="16sp"
 	        android:textStyle="bold" />
 	
 	    <TextView
@@ -64,7 +63,6 @@
 	        android:text="12"
 	        android:textAppearance="?android:attr/textAppearanceMediumInverse"
 	        android:textColor="#995555"
-	        android:textSize="16sp"
 	        android:textStyle="bold" />
 	
 	</LinearLayout>

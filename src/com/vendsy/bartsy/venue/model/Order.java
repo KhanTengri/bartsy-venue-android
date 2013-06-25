@@ -76,13 +76,8 @@ public class Order  {
 	public static final int ORDER_STATUS_EXPIRED	 	= 7;
 	public static final int ORDER_STATUS_COUNT			= 8;
 	
-	
-	
-	
 	private String errorReason = ""; // used to send an error reason for negative order states
     public Date[] state_transitions = new Date[ORDER_STATUS_COUNT];
-    // Decimal Format
-    //public  DecimalFormat df = new DecimalFormat("#.##");
 
     DecimalFormat df = new DecimalFormat();
     
@@ -251,7 +246,7 @@ public class Order  {
 			view.findViewById(R.id.view_order_description).setVisibility(View.GONE);
 
 		// Set base price
-		((TextView) view.findViewById(R.id.view_order_price)).setText(df.format(baseAmount));
+		((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(baseAmount));
 		
 		// Set the totals (we'll update again if we have more mini orders...)
 		((TextView) view.findViewById(R.id.view_order_tip_amount)).setText(df.format(tipAmount));
@@ -305,7 +300,7 @@ public class Order  {
 		long elapsed_min = elapsed_ms / 60000;
 		long left_min    = left_ms / 60000;
 		
-		// Set the background color of the order depending on how much time has elapsed as a percent of the timeout gree->orange->red
+		// Set the background color of the order depending on how much time has elapsed as a percent of the timeout green->orange->red
 		if (elapsed_ms <= timeout_ms / 3.0)
 			view.findViewById(R.id.view_order_header).setBackgroundResource(android.R.color.holo_green_dark);
 		else if (elapsed_ms <=  timeout_ms * 2.0 / 3.0)
@@ -316,7 +311,7 @@ public class Order  {
 
 		// Handle timeout views
 		if (status == ORDER_STATUS_EXPIRED) {
-			// Change the order display to hide the normal action buttons and to show the timeout acknowledgement
+			// Change the order display to hide the normal action buttons and to show the timeout acknowledgment
 			view.findViewById(R.id.view_order_actions).setVisibility(View.GONE);
 			view.findViewById(R.id.view_order_expired).setVisibility(View.VISIBLE);
 
@@ -328,6 +323,11 @@ public class Order  {
 			
 			// Set tag to self for clicks
 			view.findViewById(R.id.view_order_button_expired).setTag(this);
+
+			// Hide order item rejection button
+			((Button) view.findViewById(R.id.view_order_button_remove)).setVisibility(View.GONE);
+
+		
 		} else {
 
 			// Update timer since last state

@@ -10,6 +10,8 @@ import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.BartsyApplication;
 import com.vendsy.bartsy.venue.MainActivity;
 import com.vendsy.bartsy.venue.model.Order;
+import com.vendsy.bartsy.venue.utils.Constants;
+import com.vendsy.bartsy.venue.utils.Utilities;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 /**
  * @author peterkellis
@@ -61,6 +64,16 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		
 		// Update the view
 		updateOrdersView();
+		
+		// Check and set development environment display
+		if (Constants.DOMAIN_NAME.equalsIgnoreCase("http://54.235.76.180:8080/") && 
+				Utilities.SENDER_ID.equalsIgnoreCase("605229245886")) 
+			((TextView) mRootView.findViewById(R.id.view_main_deployment_environment)).setText("Server: DEV");
+		else if (Constants.DOMAIN_NAME.equalsIgnoreCase("http://app.bartsy.vendsy.com/") && 
+				Utilities.SENDER_ID.equalsIgnoreCase("560663323691")) 
+			((TextView) mRootView.findViewById(R.id.view_main_deployment_environment)).setText("Server: PROD");
+		else 
+			((TextView) mRootView.findViewById(R.id.view_main_deployment_environment)).setText("** INCONSISTENT DEPLOYMENT **");
 		
 		return mRootView;
 
