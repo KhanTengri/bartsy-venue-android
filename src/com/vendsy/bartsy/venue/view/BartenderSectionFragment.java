@@ -84,7 +84,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 	 * Updates the orders view
 	 */
 	
-	public synchronized void updateOrdersView() {
+	synchronized public void updateOrdersView() {
 		
 		Log.v(TAG, "updateOrdersView()");
 		
@@ -128,7 +128,8 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 				// add order to the bottom of the completed orders list view 
 				insertOrderInLayout(order, mCompletedOrdersView);
 				break;
-			case Order.ORDER_STATUS_EXPIRED:
+			case Order.ORDER_STATUS_CANCELLED:
+			case Order.ORDER_STATUS_TIMEOUT:
 				// add cancelled order in the right layout based on its last state
 				switch (order.last_status) {
 				case Order.ORDER_STATUS_NEW:
@@ -153,10 +154,8 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 	
 	void insertOrderInLayout(Order order, LinearLayout layout) {
 		
-		boolean inserted = false;
-
-		// Never bundle expired orders
-		if (order.status != Order.ORDER_STATUS_EXPIRED) {
+		// Never bundle expired or cancelled orders 
+		if (order.status != Order.ORDER_STATUS_CANCELLED && order.status != Order.ORDER_STATUS_TIMEOUT) {
 		
 			// Try to insert the order in a previous order from the same user
 
@@ -165,7 +164,8 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 				View view = layout.getChildAt(i);
 				Order layoutOrder = (Order) view.getTag();
 				
-				if (layoutOrder.status != Order.ORDER_STATUS_EXPIRED && // Don't insert in expired orders
+				if (layoutOrder.status != Order.ORDER_STATUS_CANCELLED && // Don't insert in expired orders
+						layoutOrder.status != Order.ORDER_STATUS_TIMEOUT &&
 						layoutOrder.orderSender.userID.equalsIgnoreCase(order.orderSender.userID)) {
 					// Found an existing order from the same user. Insert a mini-view of the order
 					

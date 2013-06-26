@@ -193,7 +193,7 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * Called when we have a new person check in a venue
 	 */
 
-	void addPerson(String userid, String name, String location, String info,
+	synchronized void addPerson(String userid, String name, String location, String info,
 			String description, String image // base64 encoded image
 	) {
 		Log.v(TAG, "New user checked in: " + name + " (" + userid + ")");
@@ -214,7 +214,7 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * 
 	 * @param profile
 	 */
-	public void addPerson(Profile profile) {
+	synchronized public void addPerson(Profile profile) {
 
 		// // Decode the user image and create a new incoming profile
 		// byte[] decodedString = Base64.decode(image, Base64.DEFAULT);
@@ -236,16 +236,48 @@ public class BartsyApplication extends Application implements AppObservable {
 	/**
 	 * Called when we have a person check out of a venue
 	 */
-	void removePerson(String profileId) {
+	synchronized String removePerson(String profileId, boolean rebuildUI) {
+		
+		Log.v(TAG, "removePerson(" + profileId + ")");
+		String response = null;
+		
 		for (Profile profile : mPeople) {
 			if (profileId.equals(profile.userID)) {
+				String message =  "(" + profile.getName() + ", " + profileId + ")";
+				Log.v(TAG, "Removing " + message + " from the person list");
 				mPeople.remove(profile);
+				if (response == null) response = message; else response += ", " + message;
 				break;
 			}
 		}
 
-		notifyObservers(PEOPLE_UPDATED);
+		if (rebuildUI) notifyObservers(PEOPLE_UPDATED);
+
+		return response;
 	}
+	
+	synchronized String removePeople (JSONArray usersCheckedOut) {
+		String notificationMessage = "";
+		for(int i = 0 ; i < usersCheckedOut.length() ; i++) {
+			String userId;
+			try {
+				userId = usersCheckedOut.getString(i);
+			} catch (JSONException e) {
+				e.printStackTrace();
+				return null;
+			}
+			String removeMessage = removePerson(userId, false);
+			if (removeMessage == null)
+				notificationMessage += "<" + userId + ", not found> ";
+			else
+				notificationMessage += userId + " ";
+		}
+		
+		notifyObservers(PEOPLE_UPDATED);
+
+		return notificationMessage;
+	}
+	
 
 	/**********
 	 * 
@@ -304,9 +336,9 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * @param expiredOrders
 	 */
 	
-	public synchronized void expireOrders(JSONArray expiredOrders) {
+	public synchronized String cancelOrders(JSONArray expiredOrders, String cancelReason) {
 
-		Log.v(TAG, "expireOrders()");
+		Log.v(TAG, "expireOrders(" + expiredOrders +", " + cancelReason + ")");
 		
 		// If cancelled orders count greater than 0
 		for (int i = 0; i < expiredOrders.length(); i++) {
@@ -315,7 +347,7 @@ public class BartsyApplication extends Application implements AppObservable {
 			try {
 				// To get the cancelled orderId from the jsonArray response
 				orderId = expiredOrders.getString(i);
-				Log.v(TAG, "Expired  order number " + orderId);
+				Log.v(TAG, "Trying to find order " + orderId);
 
 				for (int j = 0; j < mOrders.size(); j++) {
 					// To get the order object from the existing orders list
@@ -323,17 +355,20 @@ public class BartsyApplication extends Application implements AppObservable {
 
 					// Matching order - flag it as expired
 					if (order.serverID.equalsIgnoreCase(orderId)) {
-						order.setCancelledState();
+						order.setCancelledState(cancelReason);
 						break;
 					}
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();
+				return null;
 			}
 		}
 
 		// Notify views to display the updated order list
 		notifyObservers(ORDERS_UPDATED);
+		
+		return expiredOrders.toString();
 	}
 
 	/**
@@ -380,7 +415,7 @@ public class BartsyApplication extends Application implements AppObservable {
 			
 			if (duration <= 0) {
 				// Order time out - set it to that state and update UI
-				order.setCancelledState();
+				order.setTimeoutState();
 			}
 		}
 		

@@ -73,8 +73,9 @@ public class Order  {
 	public static final int ORDER_STATUS_FAILED	 		= 4;
 	public static final int ORDER_STATUS_COMPLETE	 	= 5;
 	public static final int ORDER_STATUS_INCOMPLETE	 	= 6;
-	public static final int ORDER_STATUS_EXPIRED	 	= 7;
-	public static final int ORDER_STATUS_COUNT			= 8;
+	public static final int ORDER_STATUS_CANCELLED	 	= 7;
+	public static final int ORDER_STATUS_TIMEOUT 		= 8;
+	public static final int ORDER_STATUS_COUNT 			= 9;
 	
 	private String errorReason = ""; // used to send an error reason for negative order states
     public Date[] state_transitions = new Date[ORDER_STATUS_COUNT];
@@ -147,6 +148,9 @@ public class Order  {
 	 */
 	
 	public void nextPositiveState() {
+		
+		Log.v(TAG, "setNextPositiveState()");
+
 		switch (status) {
 		case ORDER_STATUS_NEW:
 			last_status = status;
@@ -161,24 +165,54 @@ public class Order  {
 			status = ORDER_STATUS_COMPLETE;
 			break;
 		default:
+			Log.v(TAG, "Order " + serverID + " status not changed to next positive because the status was " + status);
 			return;
 		}
 		
 		// Mark the time of the state transition in the timetable
 		state_transitions[status] = new Date();
+		
+		Log.v(TAG, "Order " + this.serverID + " moved from state" + last_status + " to state " + status);
 	}
 
-	public void setCancelledState() {
+	public void setCancelledState(String cancelReason) {
+		
+		Log.v(TAG, "setCancelledState()");
 		
 		// Don't change orders that have already this status because their last_status would get lost
-		if (status == ORDER_STATUS_EXPIRED) 
+		if (status == ORDER_STATUS_CANCELLED) {
+			Log.v(TAG, "Order " + this.serverID + " was already cancelled");
 			return;
+		}
 		
 		last_status = status;
-		status = ORDER_STATUS_EXPIRED;
+		status = ORDER_STATUS_CANCELLED;
 		state_transitions[status] = new Date();
+		errorReason = cancelReason;
+
+		Log.v(TAG, "Order " + this.serverID + " moved from state" + last_status + " to cancelled state " + status + " with reason " + cancelReason);
 	}
 
+	public void setTimeoutState() {
+		
+		Log.v(TAG, "setTimeoutState()");
+
+		// Don't change orders that have already this status because their last_status would get lost
+		if (status == ORDER_STATUS_TIMEOUT ||
+				status == ORDER_STATUS_REJECTED ||
+				status == ORDER_STATUS_FAILED ||
+				status == ORDER_STATUS_INCOMPLETE) {
+			Log.v(TAG, "Order " + this.serverID + " not changed to timeout state because their state was " + status);
+			return;
+		}
+		
+		last_status = status;
+		status = ORDER_STATUS_CANCELLED;
+		state_transitions[status] = new Date();
+		errorReason = "Communication with the server seems compromised. Please check with your Bartsy rep immediately!";
+
+		Log.v(TAG, "Order " + this.serverID + " moved from state" + last_status + " to timeout state " + status);
+	}
 	
 	/**
 	 * To process next negative state for the order
@@ -186,6 +220,8 @@ public class Order  {
 	
 	public void nextNegativeState(String errorReason) {
 		
+		Log.v(TAG, "setNegativeState()");
+
 		int oldStatus = status;
 		
 		switch (status) {
@@ -201,10 +237,13 @@ public class Order  {
 			last_status = status;
 			status = ORDER_STATUS_INCOMPLETE;
 			break;
+		default:
+			Log.v(TAG, "Order " + serverID + " status not changed to negative with reason " + errorReason + " because the status was " + status);
+			return;
 		}
 		
 		// Log the state change and update the order with an error reason
-		Log.i(TAG, "Order " + serverID + " changed status from " + oldStatus + " to " + status + " for reason: "  + errorReason);
+		Log.v(TAG, "Order " + serverID + " changed status from " + oldStatus + " to " + status + " for reason: "  + errorReason);
 		this.errorReason = errorReason;
 		
 		// Mark the time of the state transition in the timetable
@@ -310,10 +349,13 @@ public class Order  {
 
 
 		// Handle timeout views
-		if (status == ORDER_STATUS_EXPIRED) {
+		if (status == ORDER_STATUS_CANCELLED || status == ORDER_STATUS_TIMEOUT) {
 			// Change the order display to hide the normal action buttons and to show the timeout acknowledgment
 			view.findViewById(R.id.view_order_actions).setVisibility(View.GONE);
 			view.findViewById(R.id.view_order_expired).setVisibility(View.VISIBLE);
+			
+			// Set text based on reason
+			((TextView) view.findViewById(R.id.view_order_state_description)).setText(errorReason);
 
 			// Update timer since last state
 			((TextView) view.findViewById(R.id.view_order_timer)).setText(String.valueOf(elapsed_min)+" min");

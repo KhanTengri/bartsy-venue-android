@@ -55,7 +55,7 @@ public class PeopleSectionFragment extends Fragment implements OnClickListener {
 	 * Updates the people view from scratch
 	 */
 	
-	public void updatePeopleView () {
+	synchronized public void updatePeopleView () {
 		
 		Log.v("Bartsy", "About to update people list view");
 

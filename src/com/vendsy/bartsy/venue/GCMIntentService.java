@@ -90,82 +90,97 @@ public class GCMIntentService extends GCMBaseIntentService {
 	 * @return
 	 */
 	private String processPushNotification(JSONObject json) {
+		
 		BartsyApplication app = (BartsyApplication) getApplication();
-		String messageTypeMSG = "";
+		
+		String notificationMessage = null;
 		try {
 
 			// JSONObject json = new JSONObject(message);
 			if (json.has("messageType")) {
-				// To check push notification message type
+
 				if (json.getString("messageType").equals("placeOrder")) {
-					Order order = new Order(json);
+
+					// <=== placeOrder - **** new order placed ****
+					
 					// Add order to order list
+					Order order = new Order(json);
 					app.addOrder(order);
-					// To display message in PN
-					messageTypeMSG = "User placed an Order";
+					notificationMessage = "New order: " + order.title + " for " + order.receiverId + " from " + order.senderId;
+					
 				} else if (json.getString("messageType").equals("userCheckIn")) {
+					
+					// <=== userCheckIn - **** check the user in ****
+					
 					Profile profile = new Profile(json);
-					// Add user profile to people list
 					app.addPerson(profile);
-					// To display message in PN
-					messageTypeMSG = "User checkIn";
+					notificationMessage = "User check in: " + profile.getName() + " ( " + profile.userID + ")";
+
 				} else if (json.getString("messageType").equals("orderTimeout")) {
+					
+					// <=== orderTimeout - **** Change the state and leave it in the order list until user acknowledges the time out ****
 					
 					JSONArray expiredOrders = json.has("ordersCancelled") ? json.getJSONArray("ordersCancelled") : null;
 					
 					// When user checkout from venue, it is required to remove user open orders
 					if (expiredOrders != null && expiredOrders.length() > 0) {
 						// For removing the cancelled orders
-						app.expireOrders(expiredOrders);
-
+						notificationMessage = app.cancelOrders(expiredOrders, "This order took too long and it timed out. Please accept orders promptly.");
 					}
-					// To display message in PN
-					messageTypeMSG = "Order time out";
+
+					// Make sure we successfully removed some orders and set up notification message accordingly
+					if (notificationMessage == null) {
+						notificationMessage = "System error: Received a timeout, but no orders were attached";
+						Log.e(TAG, notificationMessage);
+					}
 				}
 
 				else if (json.getString("messageType").equals("userCheckOut")) {
-					// Remove user profile from people list
-					app.removePerson(json.getString("bartsyId"));
-					JSONArray cancelledOrders = json.has("cancelledOrders") ? json
-							.getJSONArray("cancelledOrders") : null;
-					// When user checkout from venue, it is required to remove user open orders
-					if (cancelledOrders != null && cancelledOrders.length() > 0) {
-						// For removing the cancelled orders
-						app.expireOrders(cancelledOrders);
-
-					}
-					// To display message in PN
-					messageTypeMSG = "User check out";
-
-				}else if(json.getString("messageType").equals("userTimeout")){
 					
-					JSONArray usersCheckedOut = json.has("usersCheckedOut") ? json
-							.getJSONArray("usersCheckedOut") : null;
-//					JSONArray ordersCancelled = json.has("ordersCancelled") ? json
-//							.getJSONArray("ordersCancelled") : null;
-//					// When userTimeout push notification came, it is required to remove user open orders
-//					if (ordersCancelled != null && ordersCancelled.length() > 0) {
-//						// For removing the cancelled orders
-//						app.removeOrders(ordersCancelled);
-//					}
-							
-					// When userTimeout push notification received, it is required to remove user profiles form people list 
-					if (usersCheckedOut != null && usersCheckedOut.length() > 0) {
-						// For removing the time out users
-						if(usersCheckedOut!=null&&usersCheckedOut.length()>0)
-							for(int i=0;i<usersCheckedOut.length();i++)
-								app.removePerson(usersCheckedOut.getString(i));
+					// <=== userCheckOut - **** Remove user profile from people list. Notice that we keep a pointer to the profile from any open orders for display purposes. ****
 
+					// Remove the person
+					notificationMessage = app.removePerson(json.getString("bartsyId"), true);
+
+							
+					// Flag the orders as cancelled
+					JSONArray cancelledOrders = json.has("cancelledOrders") ? json.getJSONArray("cancelledOrders") : null;
+					if (cancelledOrders != null && cancelledOrders.length() > 0) {
+						String orderMessage = app.cancelOrders(cancelledOrders, "User checked out and the order was charged. You can recycle it.");
+
+						if (notificationMessage == null) notificationMessage = ""; else notificationMessage += "\n";
+						notificationMessage += "Orders cancelled: " + orderMessage;
 					}
-					// To display message in PN
-					messageTypeMSG = "User time out";
+
+					// Make sure we successfully removed some orders and set up notification message accordingly
+					if (notificationMessage == null) {
+						notificationMessage = "System error: User check out received with no attached user!";
+						Log.e(TAG, notificationMessage);
+					}
+
+				}else if(json.getString("messageType").equals("userTimeout")) {
+					
+					// <=== userTimeout - **** Check out time-out users (this means their connection is not working).  ****
+
+					JSONArray usersCheckedOut = json.has("usersCheckedOut") ? json.getJSONArray("usersCheckedOut") : null;
+							
+					// When userTimeout push notification received, it is required to remove user profiles from people list 
+					if(usersCheckedOut != null && usersCheckedOut.length() > 0) {
+						notificationMessage = "Removing users: ";
+						String removeMessage = app.removePeople(usersCheckedOut);
+						if (removeMessage == null)
+							notificationMessage = "System error: Trying to remove peole failed for user: " + usersCheckedOut;
+						else
+							notificationMessage = "Removed users: " + removeMessage;					
+					}
 				}
 					
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		return messageTypeMSG;
+		
+		return notificationMessage;
 	}
 
 	
@@ -173,25 +188,20 @@ public class GCMIntentService extends GCMBaseIntentService {
 	@Override
 	protected void onMessage(Context context, Intent intent) {
 
-//		Log.v(TAG, "Received message");
-
 		String message = (String) intent.getExtras().get(Utilities.EXTRA_MESSAGE);
 		String count = (String) intent.getExtras().get("badgeCount");
 		
-//		Log.v(TAG, "message: " + message);
-		
 		Log.i(TAG, "<=== pushNotification(" + message + ")");
 
-		String notifyMSG = "Received..";
-		
+		// Process the notification and if successful post a user-level notification
 		if (message != null) {
 			try {
 				JSONObject json = new JSONObject(message);
-				if (json.has("messageType")) {
-					if (!json.getString("messageType").equalsIgnoreCase("heartBeat"))
-						generateNotification(context, notifyMSG, count);
+				String notifyMSG = processPushNotification(json);
+				if (notifyMSG != null) {
+					generateNotification(context, notifyMSG, count);
+					Log.v(TAG, "<=== pushNotification result: " + notifyMSG);
 				}
-				notifyMSG = processPushNotification(json);
 			} catch (JSONException e) {
 				e.printStackTrace(); 
 			}
