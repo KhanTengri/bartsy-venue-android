@@ -175,13 +175,11 @@ public class Profile {
 
 	public void updateView(OnClickListener listener) {
 
-		((TextView) view.findViewById(R.id.view_user_list_name))
-				.setText(this.name);
+		((TextView) view.findViewById(R.id.view_user_list_name)).setText(this.name);
 
 		// Update the profile image - if the image doesn't exist locally, get it from the server
-		ImageView profileImageView = (ImageView) view
-				.findViewById(R.id.view_user_list_image_resource);
-		if (image == null){
+		ImageView profileImageView = (ImageView) view.findViewById(R.id.view_user_list_image_resource);
+		if (image == null) {
 			WebServices.downloadImage(this.profileImageUrl, this, profileImageView);
 		} else {
 			profileImageView.setImageBitmap(image);
