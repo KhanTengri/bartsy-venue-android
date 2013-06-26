@@ -30,6 +30,9 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 
 	private static final String TAG = "VenueRegistrationActivity";
 	
+	// Pointers
+	BartsyApplication mApp;
+	
 	// Form elements
 	private EditText locuId, paypal, wifiName, wifiPassword,orderTimeOut;
 	private Handler handler = new Handler();
@@ -41,6 +44,9 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.venue_profile);
+		
+		// Set up pointers
+		mApp = (BartsyApplication) getApplication();
 		
 		// Try to get all form elements from the XML
 		locuId = (EditText) findViewById(R.id.locuId);
@@ -209,12 +215,15 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 				SharedPreferences sharedPref = getSharedPreferences(getResources().getString(R.string.config_shared_preferences_name), Context.MODE_PRIVATE);
 				SharedPreferences.Editor editor = sharedPref.edit();
 				editor.putString("RegisteredVenueId", venueId);
-				editor.putString("RegisteredVenueName", venueName);
-				
-				app = (BartsyApplication) getApplication();
-				app.venueProfileID = venueId;
-				app.venueProfileName = venueName;
+				editor.putString("RegisteredVenueName", venueName);				
 				editor.commit();
+				
+				// Start a new venue
+				mApp.venueProfileID = venueId;
+				mApp.venueProfileName = venueName;
+				mApp.mOrders.clear();
+				mApp.mPeople.clear();
+				
 				
 				// Remove progress dialog
 				if(progressDialog!=null){
