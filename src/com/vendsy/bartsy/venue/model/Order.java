@@ -2,7 +2,11 @@ package com.vendsy.bartsy.venue.model;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.vendsy.bartsy.venue.R;
+import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
 
 public class Order  {
@@ -104,8 +109,6 @@ public class Order  {
 	public Order(JSONObject json) {
 		
 		try {
-			status = Integer.valueOf(json.getString("orderStatus"));
-			state_transitions[status] = new Date();
 			title = json.getString("itemName");
 			serverID = json.getString("orderId");
 
@@ -122,13 +125,55 @@ public class Order  {
 			
 			if (json.has("orderTimeout"))
 				timeOut = json.getInt("orderTimeout");
-			if (json.has("orderTime"))
-				updatedDate = json.getString("orderTime");
-			if (json.has("dateCreated"))
-			  createdDate = json.getString("dateCreated");
-			
+
+			// Setup the order status if it exists or set it to NEW_ORDER if it doesn't
 			if (json.has("orderStatus"))
 				status = Integer.parseInt(json.getString("orderStatus"));
+			else 
+				status = ORDER_STATUS_NEW;
+			
+			// Used only by the getPastOrders syscall
+			if (json.has("dateCreated")) 
+				createdDate = json.getString("dateCreated");
+				
+			// Setup created date (time the order was placed)
+			if (json.has("orderTime")) {
+				// User server provided creation date in the following format: 27 Jun 2013 12:03:04 GMT
+				createdDate = json.getString("orderTime");
+				state_transitions[ORDER_STATUS_NEW] = parseWeirdDate(createdDate);
+			} else {
+				// If no created date use current date for the creation state
+				state_transitions[ORDER_STATUS_NEW] = new Date();
+			}
+
+			// Setup last updated date (time the order was updated last)  *** MAKE SURE to have updated status before getting here ***
+			if (json.has("updateTime")) {
+				// User server provided creation date in the following format: 27 Jun 2013 12:03:04 GMT
+				state_transitions[status] = parseWeirdDate(json.getString("updateTime"));
+			} else {
+				// If no created date use current date for the update time
+				state_transitions[status] = new Date();
+			}
+			
+			// For now, since we are not receiving the last status time, set it to the update time to avoid expiring the order locally before the server had a chance. 
+			// The bartender may not be warned with enough notice and the order may expire prematurely
+			if (status == ORDER_STATUS_READY) {
+				// HACK for now - need to add value is syscalls
+				state_transitions[ORDER_STATUS_IN_PROGRESS] = state_transitions[status];
+			}
+			
+			// Set up last status based on current status
+			switch (status) {
+			case ORDER_STATUS_NEW:
+				last_status = status;
+				break;
+			case ORDER_STATUS_IN_PROGRESS:
+				last_status = ORDER_STATUS_READY;
+				break;
+			case ORDER_STATUS_READY:
+				last_status = ORDER_STATUS_IN_PROGRESS;
+				break;
+			}
 			
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
@@ -140,6 +185,13 @@ public class Order  {
 		df.setMaximumFractionDigits(2);
 		df.setMinimumFractionDigits(2);
 		
+	}
+		
+	Date parseWeirdDate(String date) {
+		Date d = Utilities.getLocalDateFromGTMString(createdDate, "dd MMM yyyy HH:mm:ss 'GMT'");
+		if (d == null)
+			d = Utilities.getLocalDateFromGTMString(createdDate, "d MMM yyyy HH:mm:ss 'GMT'");
+		return d;
 	}
 	
 	
@@ -326,13 +378,8 @@ public class Order  {
 		}
 		
 		// Compute timers
-		double timeout_ms	 = timeOut * 60000;
-		double elapsed_ms;
-		if (state_transitions[last_status] != null)
-			elapsed_ms = System.currentTimeMillis() - (state_transitions[last_status]).getTime();
-		else
-			// For now don't bother resetting timers in the case we just uninstalled and reinstalled the app
-			elapsed_ms = 0;
+		double timeout_ms	= timeOut * 60000;
+		double elapsed_ms	= System.currentTimeMillis() - (state_transitions[ORDER_STATUS_NEW]).getTime();
 		double left_ms     = timeout_ms - elapsed_ms;
 		double elapsed_min = elapsed_ms / (double) 60000;
 		double left_min    = Math.ceil(left_ms / (double) 60000);
@@ -346,6 +393,10 @@ public class Order  {
 			view.findViewById(R.id.view_order_header).setBackgroundResource(android.R.color.holo_red_dark);
 
 
+		// Update timer since the order was placed
+		((TextView) view.findViewById(R.id.view_order_timer)).setText(String.valueOf((int)elapsed_min)+" min");
+
+		
 		// Handle timeout views
 		if (status == ORDER_STATUS_CANCELLED || status == ORDER_STATUS_TIMEOUT) {
 			// Change the order display to hide the normal action buttons and to show the timeout acknowledgment
@@ -354,9 +405,6 @@ public class Order  {
 			
 			// Set text based on reason
 			((TextView) view.findViewById(R.id.view_order_state_description)).setText(errorReason);
-
-			// Update timer since last state
-			((TextView) view.findViewById(R.id.view_order_timer)).setText(String.valueOf((int)elapsed_min)+" min");
 
 			// Update timeout counter to always be expired even if there is some left (due to clock inconsistencies between local and server)
 			((TextView) view.findViewById(R.id.view_order_timeout)).setText("Expired");
@@ -370,14 +418,13 @@ public class Order  {
 		
 		} else {
 
-			// Update timer since last state
-			((TextView) view.findViewById(R.id.view_order_timer)).setText(String.valueOf((int)elapsed_min)+" min");
-
 			// Update timout counter		
 			if (left_min > 0) 
 				((TextView) view.findViewById(R.id.view_order_timeout)).setText("Expires in < " + String.valueOf((int)left_min)+" min");
 			else
-				((TextView) view.findViewById(R.id.view_order_timeout)).setText("Expired");
+				((TextView) view.findViewById(R.id.view_order_timeout)).setText("About to expire");
+
+			// Set up buttons
 			((Button) view.findViewById(R.id.view_order_button_positive)).setTag(this);
 			((Button) view.findViewById(R.id.view_order_button_negative)).setText(negative);
 			((Button) view.findViewById(R.id.view_order_button_negative)).setTag(this);

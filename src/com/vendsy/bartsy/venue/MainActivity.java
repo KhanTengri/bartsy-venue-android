@@ -244,8 +244,17 @@ public class MainActivity extends FragmentActivity implements
 						if(json.has("orders") && mApp.getOrderCount()==0){
 							JSONArray orders = json.getJSONArray("orders");
 							
+							
 							for(int j=0; j<orders.length();j++){
-								mApp.addOrderWithOutNotify(new Order(orders.getJSONObject(j)));
+								Order order = new Order(orders.getJSONObject(j));
+								
+								// Set the order timeout value
+								if (json.has("orderTimeout"))
+									order.timeOut = json.getInt("orderTimeout");
+								
+								mApp.addOrderWithOutNotify(order);
+								// Set the order time
+
 							}
 						}
 						

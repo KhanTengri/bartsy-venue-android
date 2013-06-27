@@ -416,8 +416,14 @@ public class BartsyApplication extends Application implements AppObservable {
 			long duration  = Constants.timoutDelay + order.timeOut - ((System.currentTimeMillis() - (order.state_transitions[order.status]).getTime()))/60000;
 			
 			if (duration <= 0) {
+
+				Log.v(TAG, "Order " + order.serverID + " timed out. Status " + order.status + " (" + order.state_transitions[order.status] + 
+						"), last_status: " + order.last_status + " (" + order.state_transitions[order.last_status] + 
+						"), placed (" + order.state_transitions[Order.ORDER_STATUS_NEW] + ")");
+
 				// Order time out - set it to that state (this won't have an effect if already in that state as the called function guarantees that)
 				order.setTimeoutState();
+				
 			}
 		}
 		
