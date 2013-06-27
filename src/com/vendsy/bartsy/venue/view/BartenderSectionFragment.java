@@ -109,7 +109,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 
 		for (Order order : mApp.mOrders) {
 			
-			Log.v("Bartsy", "Adding order " + order.serverID + " with status " + order.status + " to the layout");
+			Log.v("Bartsy", "Adding order " + order.serverID + " with status " + order.status + " and last status " + order.last_status + " to the layout");
 			
 			// Update the view's main layout 
 			order.view = mInflater.inflate(R.layout.bartender_order, mContainer, false);
@@ -141,6 +141,11 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 				case Order.ORDER_STATUS_READY:
 					insertOrderInLayout(order, mCompletedOrdersView);
 					break;
+				default:
+					// We should not have gotten there. Show the order regardless but warn the user...
+					order.errorReason = "This order is cancelled, but in the wrong state. Please let the Bartsy team know.";
+					insertOrderInLayout(order, mCompletedOrdersView);
+					
 				}
 				break;
 			}

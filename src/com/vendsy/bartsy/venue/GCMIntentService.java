@@ -146,7 +146,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 					// Flag the orders as cancelled
 					JSONArray cancelledOrders = json.has("cancelledOrders") ? json.getJSONArray("cancelledOrders") : null;
 					if (cancelledOrders != null && cancelledOrders.length() > 0) {
-						String orderMessage = app.cancelOrders(cancelledOrders, "User checked out and the order was charged. You can recycle it.");
+						String orderMessage = app.cancelOrders(cancelledOrders, "User checked out and the order was charged.You may dispose of it or wait.");
 
 						if (notificationMessage == null) notificationMessage = ""; else notificationMessage += "\n";
 						notificationMessage += "Orders cancelled: " + orderMessage;

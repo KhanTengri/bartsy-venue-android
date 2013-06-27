@@ -408,13 +408,15 @@ public class BartsyApplication extends Application implements AppObservable {
 	
 	public synchronized void updateOrderTimers() {
 
+		Log.v(TAG, "updateOrderTimers()");
+		
 		for (Order order : mOrders) {
 
 			// The additional timeout when we check for local timeouts gives the server the opportunity to always time out an order first. This 
 			long duration  = Constants.timoutDelay + order.timeOut - ((System.currentTimeMillis() - (order.state_transitions[order.status]).getTime()))/60000;
 			
 			if (duration <= 0) {
-				// Order time out - set it to that state and update UI
+				// Order time out - set it to that state (this won't have an effect if already in that state as the called function guarantees that)
 				order.setTimeoutState();
 			}
 		}

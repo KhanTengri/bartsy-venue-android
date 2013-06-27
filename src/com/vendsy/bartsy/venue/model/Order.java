@@ -77,7 +77,7 @@ public class Order  {
 	public static final int ORDER_STATUS_TIMEOUT 		= 8;
 	public static final int ORDER_STATUS_COUNT 			= 9;
 	
-	private String errorReason = ""; // used to send an error reason for negative order states
+	public String errorReason = ""; // used to send an error reason for negative order states
     public Date[] state_transitions = new Date[ORDER_STATUS_COUNT];
 
     DecimalFormat df = new DecimalFormat();
@@ -180,8 +180,8 @@ public class Order  {
 		Log.v(TAG, "setCancelledState()");
 		
 		// Don't change orders that have already this status because their last_status would get lost
-		if (status == ORDER_STATUS_CANCELLED) {
-			Log.v(TAG, "Order " + this.serverID + " was already cancelled");
+		if (status == ORDER_STATUS_CANCELLED || status == ORDER_STATUS_TIMEOUT) {
+			Log.v(TAG, "Order " + this.serverID + " was already cancelled or timed out (last status: " + last_status + ")");
 			return;
 		}
 		
@@ -190,7 +190,7 @@ public class Order  {
 		state_transitions[status] = new Date();
 		errorReason = cancelReason;
 
-		Log.v(TAG, "Order " + this.serverID + " moved from state" + last_status + " to cancelled state " + status + " with reason " + cancelReason);
+		Log.v(TAG, "Order " + this.serverID + " moved from status" + last_status + " to cancelled status " + status + " with reason " + cancelReason);
 	}
 
 	public void setTimeoutState() {
@@ -202,16 +202,16 @@ public class Order  {
 				status == ORDER_STATUS_REJECTED ||
 				status == ORDER_STATUS_FAILED ||
 				status == ORDER_STATUS_INCOMPLETE) {
-			Log.v(TAG, "Order " + this.serverID + " not changed to timeout state because their state was " + status);
+			Log.v(TAG, "Order " + this.serverID + "with last status " + last_status + " not changed to timeout status because the status was " + status + " with reason " + errorReason);
 			return;
 		}
 		
 		last_status = status;
-		status = ORDER_STATUS_CANCELLED;
+		status = ORDER_STATUS_TIMEOUT;
 		state_transitions[status] = new Date();
 		errorReason = "Communication with the server seems compromised. Please check with your Bartsy rep immediately!";
 
-		Log.v(TAG, "Order " + this.serverID + " moved from state" + last_status + " to timeout state " + status);
+		Log.v(TAG, "Order " + this.serverID + " moved from state " + last_status + " to timeout state " + status);
 	}
 	
 	/**
