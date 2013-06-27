@@ -17,17 +17,22 @@ package com.vendsy.bartsy.venue.utils;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 
 import com.vendsy.bartsy.venue.db.DatabaseManager;
 import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Cocktail;
 import com.vendsy.bartsy.venue.model.Ingredient;
-
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
 
 /**
  * Helper class providing methods and constants common to other classes in the
@@ -43,9 +48,9 @@ public final class Utilities {
 	/**
 	 * Google API project id registered to use GCM.
 	 */
-//	public static final String SENDER_ID = "227827031375";
+	public static final String SENDER_ID = "227827031375";
 //	public static final String SENDER_ID = "605229245886"; // dev 
-	public static final String SENDER_ID = "560663323691"; // prod
+//	public static final String SENDER_ID = "560663323691"; // prod
 	
 	
 	/**
@@ -206,4 +211,35 @@ public final class Utilities {
             e.printStackTrace();
         }
 	}
+	
+	public static Date getLocalTime(String mDate) {
+		Date date = new Date();
+	    try {
+		     String md = mDate.replace("T", " ");
+		     md.replace("Z", "");
+		     SimpleDateFormat utcFormat1 = new SimpleDateFormat(
+		       "yyyy-MM-dd HH:mm:ss", new Locale("en", "US"));
+		     utcFormat1.setTimeZone(TimeZone.getDefault());
+		     Date dt1 = utcFormat1.parse(md);
+		     Format formatter;
+	
+		     TimeZone tz = TimeZone.getDefault();
+	
+		     long msFromEpochGmt = dt1.getTime();
+		     int offsetFromUTC = tz.getOffset(msFromEpochGmt);
+	
+		     Calendar gmtCal = Calendar.getInstance();
+		     gmtCal.setTime(dt1);
+		     gmtCal.add(Calendar.MILLISECOND, offsetFromUTC);
+	
+		     date = gmtCal.getTime();
+	
+	//	      formatter = new SimpleDateFormat("dd/MM/yyyy", new Locale(
+	//	        "en", "US"));
+	//	      pattern = formatter.format(df);
+	    } catch (Exception e) {
+	    }
+
+	    return date;
+	 }
 }
