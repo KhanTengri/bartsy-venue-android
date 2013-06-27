@@ -103,6 +103,12 @@ public class InventorySectionFragment extends Fragment {
 			
 			@Override
 			public void onClick(View v) {
+				// Make sure that category selected before.
+				if(selectedCategory==null){
+					Toast.makeText(getActivity(), "Please select any category", Toast.LENGTH_LONG).show();
+					return;
+				}
+				
 				// Initiate inventory dialog
 				InventoryDialogFragment dialog = new InventoryDialogFragment(){
 					@Override
@@ -131,7 +137,7 @@ public class InventorySectionFragment extends Fragment {
 	 * To update the layout based on the type
 	 */
 	private void updateRightView() {
-		
+				
 		if(selectedType!=null && !selectedType.equals(Category.COCKTAILS_TYPE)){
 			updateIngredientsView(selectedCategory);
 		}else{
