@@ -108,18 +108,10 @@
                                    android:textStyle="bold" />
 
                                <TextView
-                                   android:id="@+id/TextView07"
-                                   android:layout_width="wrap_content"
-                                   android:layout_height="wrap_content"
-                                   android:text="Expires in "
-                                   android:textAppearance="?android:attr/textAppearanceMedium"
-                                   android:textStyle="bold" />
-
-                               <TextView
                                    android:id="@+id/view_order_timeout"
                                    android:layout_width="wrap_content"
                                    android:layout_height="wrap_content"
-                                   android:text="3 min"
+                                   android:text="Expires in &lt; 3 min"
                                    android:textAppearance="?android:attr/textAppearanceMedium"
                                    android:textStyle="bold" />
                            </LinearLayout>

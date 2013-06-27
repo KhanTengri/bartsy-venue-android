@@ -209,7 +209,7 @@ public class Order  {
 		last_status = status;
 		status = ORDER_STATUS_TIMEOUT;
 		state_transitions[status] = new Date();
-		errorReason = "Communication with the server seems compromised. Please check with your Bartsy rep immediately!";
+		errorReason = "Server unreachable. Check your internet connection and notficy Bartsy customer support.";
 
 		Log.v(TAG, "Order " + this.serverID + " moved from state " + last_status + " to timeout state " + status);
 	}
@@ -326,16 +326,16 @@ public class Order  {
 		}
 		
 		// Compute timers
-		long timeout_ms	 = timeOut * 60000;
-		long elapsed_ms;
+		double timeout_ms	 = timeOut * 60000;
+		double elapsed_ms;
 		if (state_transitions[last_status] != null)
 			elapsed_ms = System.currentTimeMillis() - (state_transitions[last_status]).getTime();
 		else
 			// For now don't bother resetting timers in the case we just uninstalled and reinstalled the app
 			elapsed_ms = 0;
-		long left_ms     = timeout_ms - elapsed_ms;
-		long elapsed_min = elapsed_ms / 60000;
-		long left_min    = left_ms / 60000;
+		double left_ms     = timeout_ms - elapsed_ms;
+		double elapsed_min = elapsed_ms / (double) 60000;
+		double left_min    = Math.ceil(left_ms / (double) 60000);
 		
 		// Set the background color of the order depending on how much time has elapsed as a percent of the timeout green->orange->red
 		if (elapsed_ms <= timeout_ms / 3.0)
@@ -356,10 +356,10 @@ public class Order  {
 			((TextView) view.findViewById(R.id.view_order_state_description)).setText(errorReason);
 
 			// Update timer since last state
-			((TextView) view.findViewById(R.id.view_order_timer)).setText(String.valueOf(elapsed_min)+" min");
+			((TextView) view.findViewById(R.id.view_order_timer)).setText(String.valueOf((int)elapsed_min)+" min");
 
 			// Update timeout counter to always be expired even if there is some left (due to clock inconsistencies between local and server)
-			((TextView) view.findViewById(R.id.view_order_timeout)).setText("0 min");
+			((TextView) view.findViewById(R.id.view_order_timeout)).setText("Expired");
 			
 			// Set tag to self for clicks
 			view.findViewById(R.id.view_order_button_expired).setTag(this);
@@ -371,15 +371,13 @@ public class Order  {
 		} else {
 
 			// Update timer since last state
-			((TextView) view.findViewById(R.id.view_order_timer)).setText(String.valueOf(elapsed_min)+" min");
+			((TextView) view.findViewById(R.id.view_order_timer)).setText(String.valueOf((int)elapsed_min)+" min");
 
 			// Update timout counter		
 			if (left_min > 0) 
-				((TextView) view.findViewById(R.id.view_order_timeout)).setText(String.valueOf(left_min)+" min");
+				((TextView) view.findViewById(R.id.view_order_timeout)).setText("Expires in < " + String.valueOf((int)left_min)+" min");
 			else
-				((TextView) view.findViewById(R.id.view_order_timeout)).setText("0 min");
-
-			((Button) view.findViewById(R.id.view_order_button_positive)).setText(positive);
+				((TextView) view.findViewById(R.id.view_order_timeout)).setText("Expired");
 			((Button) view.findViewById(R.id.view_order_button_positive)).setTag(this);
 			((Button) view.findViewById(R.id.view_order_button_negative)).setText(negative);
 			((Button) view.findViewById(R.id.view_order_button_negative)).setTag(this);
