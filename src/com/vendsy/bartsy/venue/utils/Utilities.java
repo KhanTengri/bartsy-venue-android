@@ -234,6 +234,7 @@ public final class Utilities {
 			// Bad date format - leave time blank
 			e.printStackTrace();
 			Log.e(TAG, "Bad date format in getPastOrders syscall");
+			return null;
 		}
 		return output; 
 	}
