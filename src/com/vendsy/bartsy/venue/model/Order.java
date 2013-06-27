@@ -35,11 +35,11 @@ public class Order  {
 	public int image_resource;
 	
 	// Fees: total = base + tax + fee + tip
-	public float baseAmount;
-	public float feeAmount;
-	public float taxAmount;
-	public float tipAmount;
-	public float totalAmount;
+	public Float baseAmount;
+	public Float feeAmount;
+	public Float taxAmount;
+	public Float tipAmount;
+	public Float totalAmount;
 	
 	public String updatedDate;
 	public String createdDate;
@@ -288,9 +288,7 @@ public class Order  {
 		((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(baseAmount));
 		
 		// Set the totals (we'll update again if we have more mini orders...)
-		((TextView) view.findViewById(R.id.view_order_tip_amount)).setText(df.format(tipAmount));
-		((TextView) view.findViewById(R.id.view_order_tax_amount)).setText(df.format(taxAmount));
-		((TextView) view.findViewById(R.id.view_order_total_amount)).setText(df.format(totalAmount)); 
+		updateTipTaxTotalView(tipAmount, taxAmount, totalAmount);
 		
 		if (orderSender != null ) {
 
@@ -401,6 +399,11 @@ public class Order  {
 			((TextView) view.findViewById(R.id.view_order_tip_amount)).setText(df.format(tipAmount));
 			((TextView) view.findViewById(R.id.view_order_tax_amount)).setText(df.format(taxAmount));
 			((TextView) view.findViewById(R.id.view_order_total_amount)).setText(df.format(totalAmount));
+
+			// Set the tags of these views with the actual values (used for computing totals later)
+			((TextView) view.findViewById(R.id.view_order_tip_amount)).setTag(tipAmount);
+			((TextView) view.findViewById(R.id.view_order_tax_amount)).setTag(taxAmount);
+			((TextView) view.findViewById(R.id.view_order_total_amount)).setTag(totalAmount);		
 		}
 	}
 	

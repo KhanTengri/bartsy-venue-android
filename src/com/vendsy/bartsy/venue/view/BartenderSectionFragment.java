@@ -172,15 +172,18 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 				if (layoutOrder.status != Order.ORDER_STATUS_CANCELLED && // Don't insert in expired orders
 						layoutOrder.status != Order.ORDER_STATUS_TIMEOUT &&
 						layoutOrder.orderSender.userID.equalsIgnoreCase(order.orderSender.userID)) {
-					// Found an existing order from the same user. Insert a mini-view of the order
 					
+					// Found an existing order from the same user. Insert a mini-view of the order
 					LinearLayout miniLayout = (LinearLayout) view.findViewById(R.id.view_order_mini);
 					View miniView = order.getMiniView(mInflater, mContainer);
 					miniView.findViewById(R.id.view_order_button_remove).setOnClickListener(this);
 					miniLayout.addView(miniView);
 					
 					// Update the view (not the order itself) of the master order total values to include the order just added
-					layoutOrder.updateTipTaxTotalView(layoutOrder.tipAmount + order.tipAmount, layoutOrder.taxAmount + order.taxAmount, layoutOrder.totalAmount + order.totalAmount);
+					Float tipAmount = (Float) view.findViewById(R.id.view_order_tip_amount).getTag();
+					Float taxAmount = (Float) view.findViewById(R.id.view_order_tax_amount).getTag();
+					Float totalAmount = (Float) view.findViewById(R.id.view_order_total_amount).getTag();
+					layoutOrder.updateTipTaxTotalView(tipAmount + order.tipAmount, taxAmount + order.taxAmount, totalAmount + order.totalAmount);
 					
 					return;
 				}
