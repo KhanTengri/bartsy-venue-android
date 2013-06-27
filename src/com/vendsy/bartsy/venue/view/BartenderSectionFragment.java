@@ -178,6 +178,10 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 					View miniView = order.getMiniView(mInflater, mContainer);
 					miniView.findViewById(R.id.view_order_button_remove).setOnClickListener(this);
 					miniLayout.addView(miniView);
+					
+					// Update the view (not the order itself) of the master order total values to include the order just added
+					layoutOrder.updateTipTaxTotalView(layoutOrder.tipAmount + order.tipAmount, layoutOrder.taxAmount + order.taxAmount, layoutOrder.totalAmount + order.totalAmount);
+					
 					return;
 				}
 			}

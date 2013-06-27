@@ -393,6 +393,16 @@ public class Order  {
 		
 	}
 	
+	/**
+	 * Update the view of the order only with the given tip, tax and total amounts 
+	 */
+	public void updateTipTaxTotalView(float tipAmount,float taxAmount,float totalAmount){
+		if(view!=null){
+			((TextView) view.findViewById(R.id.view_order_tip_amount)).setText(df.format(tipAmount));
+			((TextView) view.findViewById(R.id.view_order_tax_amount)).setText(df.format(taxAmount));
+			((TextView) view.findViewById(R.id.view_order_total_amount)).setText(df.format(totalAmount));
+		}
+	}
 	
 	public View getMiniView(LayoutInflater inflater, ViewGroup container ) {
 		
