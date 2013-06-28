@@ -426,6 +426,7 @@ public class Order  {
 
 			// Set up buttons
 			((Button) view.findViewById(R.id.view_order_button_positive)).setTag(this);
+			((Button) view.findViewById(R.id.view_order_button_positive)).setText(positive);
 			((Button) view.findViewById(R.id.view_order_button_negative)).setText(negative);
 			((Button) view.findViewById(R.id.view_order_button_negative)).setTag(this);
 			((Button) view.findViewById(R.id.view_order_button_remove)).setTag(this);
