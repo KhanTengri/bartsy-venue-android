@@ -3,40 +3,58 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
+	
     <TextView
         android:id="@+id/orderId"
-        android:layout_width="wrap_content"
+        android:layout_width="70dp"
+        android:layout_margin="1dp"
+        android:padding="1dp"
         android:layout_height="wrap_content"
+        android:background="@drawable/rounded_corner"
         android:text="OrderId" />
 
     <TextView
         android:id="@+id/itemName"
         android:layout_width="wrap_content"
+        android:layout_margin="1dp"
+        android:padding="1dp"
         android:layout_height="wrap_content"
+        android:background="@drawable/rounded_corner"
         android:text="ItemName" />
 
     <TextView
         android:id="@+id/orderStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="1dp"
+        android:padding="1dp"
+        android:background="@drawable/rounded_corner"
         android:text="OrderStatus" />
 
     <TextView
         android:id="@+id/dateCreated"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+         android:layout_margin="1dp"
+         android:padding="1dp"
+        android:background="@drawable/rounded_corner"
         android:text="DateCreated" />
 
     <TextView
         android:id="@+id/basePrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="1dp"
+        android:padding="1dp"
+        android:background="@drawable/rounded_corner"
         android:text="BasePrice" />
-     <TextView
+     <TextView 
         android:id="@+id/description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="1dp"
+        android:padding="1dp"
+        android:background="@drawable/rounded_corner"
         android:text="Description" />
 
 </TableRow>

@@ -1,13 +1,10 @@
 package com.vendsy.bartsy.venue;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
@@ -45,7 +42,6 @@ import com.vendsy.bartsy.venue.dialog.PeopleDialogFragment;
 import com.vendsy.bartsy.venue.model.AppObservable;
 import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.model.Profile;
-import com.vendsy.bartsy.venue.service.ConnectionCheckingService;
 import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
@@ -53,6 +49,7 @@ import com.vendsy.bartsy.venue.view.AppObserver;
 import com.vendsy.bartsy.venue.view.BartenderSectionFragment;
 import com.vendsy.bartsy.venue.view.DrinksSectionFragment;
 import com.vendsy.bartsy.venue.view.InventorySectionFragment;
+import com.vendsy.bartsy.venue.view.PastOrdersFragment;
 import com.vendsy.bartsy.venue.view.PeopleSectionFragment;
 
 public class MainActivity extends FragmentActivity implements
@@ -101,6 +98,7 @@ public class MainActivity extends FragmentActivity implements
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	ViewPager mViewPager;
+	private PastOrdersFragment mPastOrdersFragment;
 
 	private static final int HANDLE_APPLICATION_QUIT_EVENT = 0;
 	private static final int HANDLE_HISTORY_CHANGED_EVENT = 1;
@@ -395,6 +393,19 @@ public class MainActivity extends FragmentActivity implements
 			Log.v(TAG, "People fragment found.");
 			mDrinksFragment = drinksFragment;
 		}
+		
+		// Initialize drinks fragment - reuse the fragment if it's already in memory
+		
+		if (mPastOrdersFragment == null) {
+			Log.v(TAG, "Past orders not found. Creating one.");
+			mPastOrdersFragment = new PastOrdersFragment();
+		} else {
+			PastOrdersFragment pastOrdersFragment = (PastOrdersFragment) getSupportFragmentManager().findFragmentById(R.string.title_menu);
+			Log.v(TAG, "Past orders fragment found.");
+			mPastOrdersFragment = pastOrdersFragment;
+		}
+		
+		
 	}
 
 	@Override
@@ -486,12 +497,6 @@ public class MainActivity extends FragmentActivity implements
 			startActivity(intent);
 			break;
 			
-	    case R.id.action_previous_orders:
-			Intent pastOrderActivity = new Intent().setClass(this, PastOrdersActivity.class);
-			pastOrderActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(pastOrderActivity);
-			break;
-
 		case R.id.action_settings:
 			Intent settingsActivity = new Intent(getBaseContext(),
 					SettingsActivity.class);
@@ -588,7 +593,7 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	MainActivity main_activity = this;
 
-	private static final int mTabs[] = { R.string.title_bartender, R.string.title_people, R.string.title_menu, R.string.title_inventory};
+	private static final int mTabs[] = { R.string.title_bartender, R.string.title_past_orders , R.string.title_people, R.string.title_menu, R.string.title_inventory};
 	
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
@@ -602,8 +607,10 @@ public class MainActivity extends FragmentActivity implements
 			switch (mTabs[position]) {
 			case R.string.title_bartender: // The order tab (for bar owners)
 				return (mBartenderFragment);
+			case R.string.title_past_orders: // Past orders tab
+				return (mPastOrdersFragment);
 			case R.string.title_inventory: // The customers tab (for bar owners)
-				return (new InventorySectionFragment());
+				return (mInventoryFragment);
 			case R.string.title_people: // The people tab shows who's local,
 										// allows to send them a drink or a chat
 										// request if they're available and
