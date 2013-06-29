@@ -149,6 +149,7 @@ public class Order  {
 			// Setup last updated date (time the order was updated last)  *** MAKE SURE to have updated status before getting here ***
 			if (json.has("updateTime")) {
 				// User server provided creation date in the following format: 27 Jun 2013 12:03:04 GMT
+				updatedDate = json.getString("updateTime");
 				state_transitions[status] = parseWeirdDate(json.getString("updateTime"));
 			} else {
 				// If no created date use current date for the update time
@@ -377,20 +378,21 @@ public class Order  {
 			break;
 		}
 		
-		// Compute timers
+		// Compute timers. Placed shows the time since the order was placed. Expires shows the time left in the current state until timeout.
+		double current_ms	= System.currentTimeMillis() ;
 		double timeout_ms	= timeOut * 60000;
-		double elapsed_ms	= System.currentTimeMillis() - (state_transitions[ORDER_STATUS_NEW]).getTime();
-		double left_ms     = timeout_ms - elapsed_ms;
-		double elapsed_min = elapsed_ms / (double) 60000;
-		double left_min    = Math.ceil(left_ms / (double) 60000);
+		double elapsed_ms	= current_ms - state_transitions[ORDER_STATUS_NEW].getTime();
+		double left_ms     	= timeout_ms - (current_ms - state_transitions[status].getTime());
+		double elapsed_min 	= elapsed_ms / (double) 60000;
+		double left_min    	= Math.ceil(left_ms / (double) 60000);
 		
 		// Set the background color of the order depending on how much time has elapsed as a percent of the timeout green->orange->red
-		if (elapsed_ms <= timeout_ms / 3.0)
-			view.findViewById(R.id.view_order_header).setBackgroundResource(android.R.color.holo_green_dark);
-		else if (elapsed_ms <=  timeout_ms * 2.0 / 3.0)
+		if (left_ms <= timeout_ms / 3.0)
+			view.findViewById(R.id.view_order_header).setBackgroundResource(android.R.color.holo_red_dark);
+		else if (left_ms <=  timeout_ms * 2.0 / 3.0)
 			view.findViewById(R.id.view_order_header).setBackgroundResource(android.R.color.holo_orange_dark);
 		else
-			view.findViewById(R.id.view_order_header).setBackgroundResource(android.R.color.holo_red_dark);
+			view.findViewById(R.id.view_order_header).setBackgroundResource(android.R.color.holo_green_dark);
 
 
 		// Update timer since the order was placed
