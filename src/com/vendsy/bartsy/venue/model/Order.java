@@ -80,7 +80,10 @@ public class Order  {
 	public static final int ORDER_STATUS_INCOMPLETE	 	= 6;
 	public static final int ORDER_STATUS_CANCELLED	 	= 7;
 	public static final int ORDER_STATUS_TIMEOUT 		= 8;
-	public static final int ORDER_STATUS_COUNT 			= 9;
+	
+	
+	// Total order status count
+	public static final int ORDER_STATUS_COUNT 			= 10;
 	
 	public String errorReason = ""; // used to send an error reason for negative order states
     public Date[] state_transitions = new Date[ORDER_STATUS_COUNT];
