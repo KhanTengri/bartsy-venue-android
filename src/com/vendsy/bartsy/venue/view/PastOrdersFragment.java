@@ -1,5 +1,12 @@
 package com.vendsy.bartsy.venue.view;
 
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,6 +39,8 @@ public class PastOrdersFragment extends Fragment{
 	private LayoutInflater mInflater;
 	private ViewGroup mContainer;
 	private View mRootView;
+    DecimalFormat df = new DecimalFormat();
+
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,6 +55,10 @@ public class PastOrdersFragment extends Fragment{
 		// Setup application pointer
 		mApp = (BartsyApplication) getActivity().getApplication();
 		ordersTableLayout = (TableLayout) mRootView.findViewById(R.id.pastordersLayout);
+		
+		df.setMaximumFractionDigits(2);
+		df.setMinimumFractionDigits(2);
+
 		
 		new PastOrders().execute("params");
 		
@@ -70,9 +83,17 @@ public class PastOrdersFragment extends Fragment{
 		@Override
 		protected void onPostExecute(String result) {
 
+			tipAmount = 0;
+			totalAmount = 0;	
+			
 			if (result != null) {
 				updateOrdersView(result);
 			}
+
+			
+
+			((TextView) mRootView.findViewById(R.id.past_tip_total)).setText("$ " + df.format(tipAmount));
+			((TextView) mRootView.findViewById(R.id.past_total_amount)).setText("$ " + df.format(totalAmount));
 
 		}
 
@@ -95,11 +116,11 @@ public class PastOrdersFragment extends Fragment{
 			JSONObject object = new JSONObject(response);
 			JSONArray array = object.getJSONArray("pastOrders");
 			if (array != null) {
+
 				// To add Table headers
-				final View itemView1 = mInflater.inflate(
-						R.layout.pastorderrow, null);
-	
+				final View itemView1 = mInflater.inflate(R.layout.orders_past_row, null);
 				ordersTableLayout.addView(itemView1);
+				
 				for (int i = 0; i < array.length(); i++) {
 					JSONObject json = null;
 					json = array.getJSONObject(i);
@@ -110,6 +131,10 @@ public class PastOrdersFragment extends Fragment{
 		} catch (JSONException e) {
 		}
 	}
+	
+	private double totalAmount = 0;
+	private double tipAmount = 0;
+	
 	/**
 	 * To add new order to the table view
 	 * 
@@ -117,14 +142,43 @@ public class PastOrdersFragment extends Fragment{
 	 */
 	private void addNewOrderRow(Order order) {
 		
-		LayoutInflater inflater = mInflater;
-		final View itemView = inflater.inflate(R.layout.pastorderrow, null);
-		// Get all text views from the view
-		TextView orderId = (TextView) itemView.findViewById(R.id.orderId);
-		orderId.setText(order.serverID);
 		
-		TextView itemName = (TextView) itemView.findViewById(R.id.itemName);
-		itemName.setText(order.title);
+		// Extract time from UTC field
+		String inputText = order.createdDate.replace("T", " ").replace("Z", ""); // example: 2013-06-27 10:20:15
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        inputFormat.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
+        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date;
+        String time = "";
+        try {
+			date = inputFormat.parse(inputText);
+			time = outputFormat.format(date);
+		} catch (ParseException e) {
+			// Bad date format - leave time blank
+			e.printStackTrace();
+			Log.e("PastOrdersFragment", "Bad date format in getPastOrders syscall");
+			return;
+		} 
+		
+        // Don't display order placed before beta starts
+        SimpleDateFormat betaDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Date betaDate;
+        try {
+			betaDate = betaDateFormat.parse("2013-06-30 20:15:00");
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return;
+		}
+        if (date.before(betaDate)) {
+        	// Don't show rows before the beta start date
+        	return;
+        }
+        
+		final View itemView = mInflater.inflate(R.layout.orders_past_row, null);
+
+
+		((TextView) itemView.findViewById(R.id.dateCreated)).setText(time);
+		((TextView) itemView.findViewById(R.id.orderId)).setText(order.serverID);
 		
 		String status = "?";
 		switch(order.status) {
@@ -154,17 +208,23 @@ public class PastOrdersFragment extends Fragment{
 			break;
 		}
 		
-		TextView orderStatus = (TextView) itemView.findViewById(R.id.orderStatus);
-		orderStatus.setText(status);
+		((TextView) itemView.findViewById(R.id.orderStatus)).setText(String.valueOf(status));
+		((TextView) itemView.findViewById(R.id.itemName)).setText(order.title);
 		
-		TextView dateCreated = (TextView) itemView.findViewById(R.id.dateCreated);
-		dateCreated.setText(order.createdDate);
 		
-		TextView basePrice = (TextView) itemView.findViewById(R.id.basePrice);
-		basePrice.setText(String.valueOf(order.totalAmount));
+		// Totals
 		
-		TextView description = (TextView) itemView.findViewById(R.id.description);
-		description.setText(order.description);
+		if (order.status == Order.ORDER_STATUS_COMPLETE) {
+		
+			totalAmount += order.totalAmount;
+			tipAmount += order.tipAmount;
+			
+			((TextView) itemView.findViewById(R.id.tipAmount)).setText("$ " + df.format(order.tipAmount));
+			((TextView) itemView.findViewById(R.id.totalPrice)).setText("$ " + df.format(order.totalAmount));
+		} else {
+			((TextView) itemView.findViewById(R.id.tipAmount)).setText("-");
+			((TextView) itemView.findViewById(R.id.totalPrice)).setText("-");
+		}
 
 		ordersTableLayout.addView(itemView);
 	}
