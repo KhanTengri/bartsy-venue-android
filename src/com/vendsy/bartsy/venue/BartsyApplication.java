@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Application;
 import android.content.ComponentName;
@@ -33,6 +34,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
 
@@ -140,7 +142,11 @@ public class BartsyApplication extends Application implements AppObservable {
 			loadCSVfilesAndSaveInDB();
 		}
 	}
-	// To load csv file in background
+	
+	
+	/**
+	 *  To load csv file in background
+	 */
 	private void loadCSVfilesAndSaveInDB() {
 		new Thread(){
 			public void run() {
@@ -157,7 +163,164 @@ public class BartsyApplication extends Application implements AppObservable {
 		
 	}
 
+
 	/**
+	 * TODO - Synchronization
+	 * 
+	 * This is the main synchronization function with the server. It's called if a discrepancy is found in our state versus the server state.
+	 * It performs all necessary synchronizations between our state and the server state.
+	 * @param message
+	 * @param background  - run in the background or not
+	 */
+	
+	
+	synchronized public void performHeartbeat() {
+		
+		Log.v(TAG, "performHeartbeat()");
+		
+		if (venueProfileID == null) {
+			return;
+		}
+		
+		try {
+			// Create json object
+			JSONObject postData = new JSONObject();
+			postData.put("venueId", venueProfileID);
+			
+			// Heart beat Webservice calling - this is useless for now in checking state so use the more complete syscall 
+			WebServices.postRequest(Constants.URL_HEART_BEAT_VENUE,	postData, getApplicationContext());
+
+			
+			// Web service call to get lost local data from server
+			JSONObject json = WebServices.syncWithServer(venueProfileID, BartsyApplication.this);
+			if(json == null)
+				return;
+
+			// Verify checked in users match server list
+			
+			if(json.has("checkedInUsers")){
+				
+				JSONArray users = json.getJSONArray("checkedInUsers");
+				
+				// Check sizes match
+				if (users.length() != mPeople.size()) {
+					syncPeople(users);
+					return;
+				}
+				
+				// Check Id's match
+				for(int i=0; i<users.length() ; i++){
+					JSONObject userJson = users.getJSONObject(i);
+					
+					boolean found = false;
+					for (Profile person : mPeople) {
+						if (person.userID.equalsIgnoreCase(userJson.getString("bartsyId"))) {
+							found = true;
+						}
+					}
+
+					// No matching order found - perform sync.
+					if (!found) {
+						syncPeople(users);
+						return;
+					}
+				}
+			}
+			
+			// Get the order list and make sure it matches our local list. If not, synchronize with the server.
+
+			// Make sure the local and remote orders list are the same length and perform recovery if not
+			if (!json.has("orders")) {
+				if (mOrders.size() == 0) {
+					return;
+				} else {
+					syncOrders(json);
+					return;
+				}
+			}
+			
+			// Check sizes
+			JSONArray orders = json.getJSONArray("orders");
+			if (mOrders.size() != orders.length()) {
+				syncOrders(json);
+				return;
+			}
+
+			// Make sure all order IDs exist with the same status in our list of orders, if not recover
+			for(int j=0; j<orders.length();j++){
+				int status = -1;
+				String serverId = "";
+				JSONObject orderJSON = orders.getJSONObject(j);
+				if (orderJSON.has("orderStatus"))
+					status = Integer.parseInt(orderJSON.getString("orderStatus"));
+				if (orderJSON.has("orderId"))
+					serverId = orderJSON.getString("orderId");
+	
+				boolean found = false;
+				for (Order order : mOrders ) {
+					if (order.status == status && order.serverID == serverId) {
+						found =true;
+						break;
+					}
+				}
+				if (!found) {
+					syncOrders(json);
+					return;
+				}
+			}
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	synchronized private void syncPeople(JSONArray users) {
+		Log.w(TAG, "syncPeople()");
+		
+		try {
+			mPeople.clear();
+			for(int i=0; i<users.length() ; i++) {
+					mPeople.add(new Profile(users.getJSONObject(i)));
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		notifyObservers(PEOPLE_UPDATED);
+
+	}
+	
+	synchronized private void syncOrders(JSONObject json) {
+					
+		Log.w(TAG, "syncOrders()");
+	
+		try {
+			JSONArray orders = json.getJSONArray("orders");
+
+			mOrders.clear();
+			for(int j=0; j<orders.length();j++){
+				
+				JSONObject orderJSON = orders.getJSONObject(j);
+		
+				if (!orderJSON.has("orderTimeout") && json.has("orderTimeout"))
+					orderJSON.put("orderTimeout", json.getInt("orderTimeout"));
+				
+				Order order = new Order(orderJSON);
+												
+				addOrderWithOutNotify(order);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	
+		notifyObservers(ORDERS_UPDATED);
+		
+	}
+	
+	
+	/**
+	 * 
+	 * TODO - Vennue profile
 	 * 
 	 * This venue ID represents the venue in which this tablet is setup. This is
 	 * used only on the tablet.
@@ -281,6 +444,8 @@ public class BartsyApplication extends Application implements AppObservable {
 
 	/**********
 	 * 
+	 * TODO - Orders
+	 * 
 	 * The order list is saved in the global application state. This is done to
 	 * avoid losing any orders while the other activities are swapped in and out
 	 * as the user navigates in different screens.
@@ -323,6 +488,15 @@ public class BartsyApplication extends Application implements AppObservable {
 			WebServices.orderStatusChanged(order, this);
 			return;
 		}
+		
+		// Make sure we don't already have this order (a race condition when the heartbeat has found the order first
+		for (Order existing : mOrders) {
+			if (existing.serverID.equalsIgnoreCase(order.serverID)) {
+				Log.d(TAG, "FOUND DUPLICATE ORDER - skipping it: " + order.serverID);
+				return;
+			}
+		}
+		
 
 		// Add the order to the list of orders
 		mOrders.add(order);

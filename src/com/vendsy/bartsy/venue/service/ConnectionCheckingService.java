@@ -1,7 +1,5 @@
 package com.vendsy.bartsy.venue.service;
 
-import org.json.JSONObject;
-
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -11,13 +9,12 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.BartsyApplication;
-import com.vendsy.bartsy.venue.model.AppObservable;
 import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.WebServices;
-import com.vendsy.bartsy.venue.view.AppObserver;
 
-public class ConnectionCheckingService extends Service implements AppObserver {
+public class ConnectionCheckingService extends Service {
 
 	private static final String TAG = "ConnectionCheckingService";
 	
@@ -78,6 +75,13 @@ public class ConnectionCheckingService extends Service implements AppObserver {
 			while (isRunning) {
 				try {
 					
+					// Print log
+					String orders = "\n";
+					for (Order order : mApp.mOrders) {
+						orders += order + "\n";
+					}
+					Log.d(TAG, ">>> Open orders:  " + orders);
+
 					
 					// refresh the UI to update the timers in the order
 					mApp.updateOrderTimers();
@@ -85,7 +89,7 @@ public class ConnectionCheckingService extends Service implements AppObserver {
 					
 					// Handle WIFI failures
 						
-					if (!WebServices .isNetworkAvailable(ConnectionCheckingService.this)) {
+					if (!WebServices .isNetworkAvailable(ConnectionCheckingService.this)) {	
 						
 						Log.w(TAG, "Network unavailable");
 						
@@ -115,9 +119,8 @@ public class ConnectionCheckingService extends Service implements AppObserver {
 						});
 					}
 					// Network is available
-					else{
-						heartBeatSysCall();
-					}
+					else 
+						mApp.performHeartbeat();
 
 				} catch (Exception e) {
 					Log.w("connection checking service",
@@ -132,40 +135,8 @@ public class ConnectionCheckingService extends Service implements AppObserver {
 
 					e.printStackTrace();
 				}
-
 			}
 		}
-
-	}
-
-	@Override
-	public void update(AppObservable o, Object arg) {
-				
-	}
-	
-	// HeartBeat web service calling 
-	private void heartBeatSysCall() {
-
-			Log.v(TAG, "handlingHeartBeat");
-			
-			new Thread() {
-				public void run() {
-					Log.v(TAG, "In thread");
-					// Checking venue id is null or not
-						if (mApp.venueProfileID!=null) {
-							try {
-								// Created jsonobject
-								JSONObject postData = new JSONObject();
-								postData.put("venueId", mApp.venueProfileID);
-								// Heart beat Webservice calling
-								WebServices.postRequest(Constants.URL_HEART_BEAT_VENUE,	postData, getApplicationContext());
-	
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-				}
-			}.start();
 	}
 
 }

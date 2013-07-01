@@ -97,7 +97,30 @@ public class Order  {
 		df.setMinimumFractionDigits(2);
 	}
 
-	
+	@Override
+	public String toString() {
+		
+		JSONObject orderData = new JSONObject();
+		
+		try {
+			orderData.put("itemId", itemId);
+			orderData.put("itemName", title);
+			orderData.put("basePrice", String.valueOf(baseAmount));
+			orderData.put("tipPercentage", String.valueOf(tipAmount));
+			orderData.put("totalPrice", String.valueOf(totalAmount));
+			orderData.put("orderStatus", ORDER_STATUS_NEW);
+			orderData.put("description", description);
+			
+			// these fields are not used by the host but give a more details picture of the order
+			orderData.put("status", status);
+			orderData.put("orderTimeout", timeOut);
+			orderData.put("serverId", serverID);
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return orderData.toString();
+	}
 
 	
 	/**
@@ -250,21 +273,19 @@ public class Order  {
 		
 		Log.v(TAG, "setTimeoutState()");
 
-		// Don't change orders that have already this status because their last_status would get lost
-		if (status == ORDER_STATUS_TIMEOUT ||
-				status == ORDER_STATUS_REJECTED ||
-				status == ORDER_STATUS_FAILED ||
-				status == ORDER_STATUS_INCOMPLETE) {
+		if (status == ORDER_STATUS_NEW || status == ORDER_STATUS_READY || status == ORDER_STATUS_IN_PROGRESS) {
+			// Change status of orders 
+			last_status = status;
+			status = ORDER_STATUS_TIMEOUT;
+			state_transitions[status] = new Date();
+			errorReason = "Server unreachable. Check your internet connection and notify Bartsy customer support.";
+
+			Log.v(TAG, "Order " + this.serverID + " moved from state " + last_status + " to timeout state " + status);
+		} else {
 			Log.v(TAG, "Order " + this.serverID + "with last status " + last_status + " not changed to timeout status because the status was " + status + " with reason " + errorReason);
 			return;
 		}
 		
-		last_status = status;
-		status = ORDER_STATUS_TIMEOUT;
-		state_transitions[status] = new Date();
-		errorReason = "Server unreachable. Check your internet connection and notficy Bartsy customer support.";
-
-		Log.v(TAG, "Order " + this.serverID + " moved from state " + last_status + " to timeout state " + status);
 	}
 	
 	/**
@@ -420,7 +441,7 @@ public class Order  {
 		
 		} else {
 
-			// Update timout counter		
+			// Update timeout counter		
 			if (left_min > 0) 
 				((TextView) view.findViewById(R.id.view_order_timeout)).setText("Expires in < " + String.valueOf((int)left_min)+" min");
 			else

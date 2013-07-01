@@ -34,7 +34,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.vendsy.bartsy.venue.PastOrdersActivity;
 import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Cocktail;
