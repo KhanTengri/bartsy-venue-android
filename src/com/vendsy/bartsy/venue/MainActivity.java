@@ -244,12 +244,15 @@ public class MainActivity extends FragmentActivity implements
 							
 							
 							for(int j=0; j<orders.length();j++){
-								Order order = new Order(orders.getJSONObject(j));
 								
-								// Set the order timeout value
-								if (json.has("orderTimeout"))
-									order.timeOut = json.getInt("orderTimeout");
+								JSONObject orderJSON = orders.getJSONObject(j);
+
+								// If the server is incorrectly sending the order timeout as a venue-wide variable, insert it in the order JSON
+								if (!orderJSON.has("orderTimeout") && json.has("orderTimeout"))
+									orderJSON.put("orderTimeout", json.getInt("orderTimeout"));
 								
+								Order order = new Order(orderJSON);
+																
 								mApp.addOrderWithOutNotify(order);
 								// Set the order time
 
@@ -540,7 +543,11 @@ public class MainActivity extends FragmentActivity implements
 			if (mTabs[i] == R.string.title_bartender)
 				break;
 		}
-		
+
+		// No Orders tab
+		if (i == mTabs.length)
+			return;
+
 		// update the orders tab title
 		getActionBar().getTabAt(i).setText(
 				"Orders (" + mApp.getOrderCount() + ")");
@@ -557,6 +564,10 @@ public class MainActivity extends FragmentActivity implements
 			if (mTabs[i] == R.string.title_people)
 				break;
 		}
+		
+		// No people tab
+		if (i == mTabs.length)
+			return;
 		
 		// update the people tab title
 		getActionBar().getTabAt(i).setText(
@@ -593,7 +604,9 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	MainActivity main_activity = this;
 
-	private static final int mTabs[] = { R.string.title_bartender, R.string.title_past_orders , R.string.title_people, R.string.title_menu, R.string.title_inventory};
+	
+	// Use this structure to insert, rearrange or remove tabs
+	private static final int mTabs[] = { R.string.title_bartender, R.string.title_people, R.string.title_past_orders , R.string.title_menu, R.string.title_inventory};
 	
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
