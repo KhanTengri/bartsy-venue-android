@@ -1,5 +1,7 @@
 package com.vendsy.bartsy.venue;
 
+import java.io.FileNotFoundException;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -9,6 +11,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources.NotFoundException;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -16,10 +21,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.Toast;
 
 import com.vendsy.bartsy.venue.utils.Constants;
@@ -34,11 +38,20 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 	BartsyApplication mApp;
 	
 	// Form elements
-	private EditText locuId, paypal, wifiName, wifiPassword,orderTimeOut;
+	private EditText locuId, wifiName, wifiPassword,orderTimeOut;
 	private Handler handler = new Handler();
 	
 	// Progress dialog
 	private ProgressDialog progressDialog;
+	private static final int SELECT_PHOTO = 1000;
+
+	private ImageView venueImage;
+
+	private EditText managerUsernameEditText;
+
+	private EditText managerPasswordEditText;
+
+	private EditText confirmPasswordEditText;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -49,18 +62,92 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 		mApp = (BartsyApplication) getApplication();
 		
 		// Try to get all form elements from the XML
+		venueImage = (ImageView)findViewById(R.id.view_profile_venue_image);
 		locuId = (EditText) findViewById(R.id.locuId);
-		paypal = (EditText) findViewById(R.id.paypalEdit);
 		wifiName = (EditText) findViewById(R.id.wifiName);
 		wifiPassword = (EditText) findViewById(R.id.wifiPassword);
 		orderTimeOut = (EditText) findViewById(R.id.orderTimeOut);
+		
+		managerUsernameEditText = (EditText) findViewById(R.id.managerUserNameEditText);
+		managerPasswordEditText = (EditText) findViewById(R.id.managerPasswordEditText);
+		confirmPasswordEditText = (EditText) findViewById(R.id.confirmPasswordEditText);
+		
+		orderTimeOut = (EditText) findViewById(R.id.orderTimeOut);
+		
+		// Add click listener for venue image
+		venueImage.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.v(TAG, "Clicked on image");
+				Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+				photoPickerIntent.setType("image/*");
+				startActivityForResult(photoPickerIntent, SELECT_PHOTO); 
+			}
+		});
 
 		// Setup listeners
 		findViewById(R.id.view_registration_button_submit).setOnClickListener(this);
 		findViewById(R.id.view_registration_button_cancel).setOnClickListener(this);
 		findViewById(R.id.view_registration_wifi_checkbox).setOnClickListener(this);
 	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) { 
+	    super.onActivityResult(requestCode, resultCode, data); 
 
+	    switch(requestCode) { 
+	    case SELECT_PHOTO:
+	        if(resultCode == RESULT_OK){  
+	            Uri selectedImage = data.getData();
+				
+				// Down-sample selected image to make sure we don't get exceptions
+				Bitmap bitmap = null;
+				try {
+	            	bitmap = decodeUri(selectedImage);
+				} catch (FileNotFoundException e) {
+					// Failure - don't change the venue image
+					e.printStackTrace();
+					Log.e(TAG, "Failed to downsample image");
+					return;
+				}
+
+				// Display the image and set the tag to the bitmap, indicating it's a valid profile picture.
+				venueImage.setImageBitmap(bitmap);
+				venueImage.setTag(bitmap);
+	        }
+	        break;
+	    }
+	}
+	
+	private Bitmap decodeUri(Uri selectedImage) throws FileNotFoundException {
+
+        // Decode image size
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage), null, o);
+
+        // The new size we want to scale to
+        final int REQUIRED_SIZE = 140;
+
+        // Find the correct scale value. It should be the power of 2.
+        int width_tmp = o.outWidth, height_tmp = o.outHeight;
+        int scale = 1;
+        while (true) {
+            if (width_tmp / 2 < REQUIRED_SIZE
+               || height_tmp / 2 < REQUIRED_SIZE) {
+                break;
+            }
+            width_tmp /= 2;
+            height_tmp /= 2;
+            scale *= 2;
+        }
+
+        // Decode with inSampleSize
+        BitmapFactory.Options o2 = new BitmapFactory.Options();
+        o2.inSampleSize = scale;
+        return BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage), null, o2);
+
+    }
 	
 	/**
 	 * Click listener
@@ -73,9 +160,10 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 			
 			case R.id.view_registration_button_submit:
 				Log.d("Bartsy", "Clicked on submit button");
-				
-				// Perform registration - for now assume all will go well
-				processRegistration();
+				if(validateVenueInformation()){
+					// Perform registration - for now assume all will go well
+					processRegistration();
+				}
 				break;
 				
 			case R.id.view_registration_button_cancel:
@@ -93,7 +181,33 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 		}
 	}
 	
-	
+	/**
+	 * Check all venue information is valid or not
+	 * 
+	 * @return valid or not
+	 */
+	private boolean validateVenueInformation() {
+		if(managerUsernameEditText.getText().toString().trim().equals("")){
+			managerUsernameEditText.setError("Please enter username/email");
+			return false;
+			
+		}else if(managerPasswordEditText.getText().toString().trim().equals("")){
+			managerPasswordEditText.setError("Please enter password");
+			return false;
+			
+		}else if(confirmPasswordEditText.getText().toString().trim().equals("")){
+			confirmPasswordEditText.setError("Please retype your password");
+			return false;
+			
+		}else if(!confirmPasswordEditText.getText().toString().equals(managerPasswordEditText.getText().toString())){
+			confirmPasswordEditText.setError("Password does not match");
+			return false;
+			
+		}
+		
+		return true;
+	}
+
 	/**
 	 * Validates input then sends to server and starts main activity
 	 */
@@ -124,9 +238,21 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 				postData.put("typeOfAuthentication",
 						typeOfAuthentication == null ? ""
 								: typeOfAuthentication.getText().toString());
-				postData.put("paypalId", paypal.getText().toString());
 				postData.put("deviceType", "0");
 				postData.put("cancelOrderTime",orderTimeOut.getText().toString());
+				postData.put("totalTaxRate", ((EditText) findViewById(R.id.taxRateEdit)).getText().toString());
+				postData.put("routingNumber", ((EditText) findViewById(R.id.routingNumberEditText)).getText().toString());
+				postData.put("accountNumber", ((EditText) findViewById(R.id.accountNumberEditText)).getText().toString());
+				postData.put("managerName", ((EditText) findViewById(R.id.managerNameEditText)).getText().toString());
+				postData.put("venueLogin", ((EditText) findViewById(R.id.managerUserNameEditText)).getText().toString());
+				postData.put("venuePassword", ((EditText) findViewById(R.id.managerPasswordEditText)).getText().toString());
+				postData.put("vendsyRepName", ((EditText) findViewById(R.id.vendsyRepNameEditText)).getText().toString());
+				postData.put("vendsyRepEmail", ((EditText) findViewById(R.id.vendsyRepEmailEditText)).getText().toString());
+				postData.put("vendsyRepPhone", ((EditText) findViewById(R.id.vendsyRepPhoneEditText)).getText().toString());
+				postData.put("locuSection", ((EditText) findViewById(R.id.locuSectionEditText)).getText().toString());
+				postData.put("venueName", ((EditText) findViewById(R.id.venueNameEditText)).getText().toString());
+				postData.put("address", ((EditText) findViewById(R.id.addressEditText)).getText().toString());
+				postData.put("phone", ((EditText) findViewById(R.id.phoneEditText)).getText().toString());
 				
 				if (((CheckBox) findViewById(R.id.view_registration_wifi_checkbox)).isChecked())
 					postData.put("wifiPresent", "1");
@@ -145,17 +271,16 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 			new Thread() {
 				@Override
 				public void run() {
-					try {
+						try {
 						// Post venue details to the server
-						final String response = WebServices.postRequest(
-								Constants.URL_SAVE_VENUEDETAILS, postData,
-								VenueProfileActivity.this);
+						// For now it is hard coded for image - null
+						final String response = WebServices.postVenue(Constants.URL_SAVE_VENUEDETAILS, postData, (Bitmap)venueImage.getTag(),
+											VenueProfileActivity.this);
 
 						Log.d("Bartsy", "response :: " + response);
-						
-						
-							// Handler to access UI thread
-							handler.post(new Runnable() {
+									
+						// Handler to access UI thread
+						handler.post(new Runnable() {
 
 								@Override
 								public void run() {
@@ -164,19 +289,19 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 									if (response != null) {
 										try {
 											processVenueResponse(new JSONObject(response));
-										} catch (JSONException e) {
-											e.printStackTrace();
-										}
+											} catch (JSONException e) {
+											}
 									}
 								}
-							});
+						});
 
 					} catch (Exception e) {
-						Log.d("Venue Reg", "Exception :: " + e);
-					}
-
+					Log.d("Venue Reg", "Exception :: " + e);
 				}
-			}.start();
+
+			}
+		}.start();
+		
 		} 
 		// To stop sending details to server if the GCM device token is failed
 		else {

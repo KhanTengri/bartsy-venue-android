@@ -48,7 +48,7 @@
                             android:layout_marginRight="@dimen/activity_horizontal_margin" >
 
                             <ImageView
-                                android:id="@+id/view_profile_user_image"
+                                android:id="@+id/view_profile_venue_image"
                                 android:layout_width="fill_parent"
                                 android:layout_height="fill_parent"
                                 android:clickable="true"
@@ -84,7 +84,7 @@
                                     android:text="Name:" />
 
                                 <EditText
-                                    android:id="@+id/view_profile_nickname"
+                                    android:id="@+id/venueNameEditText"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="2"
@@ -106,7 +106,7 @@
                                     android:text="Address:" />
 
                                 <EditText
-                                    android:id="@+id/EditText08"
+                                    android:id="@+id/addressEditText"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="2"
@@ -371,7 +371,7 @@
                                 android:text="Name:" />
 
                             <EditText
-                                android:id="@+id/EditText04"
+                                android:id="@+id/managerNameEditText"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -393,7 +393,7 @@
                                 android:text="Username/Email:" />
 
                             <EditText
-                                android:id="@+id/EditText03"
+                                android:id="@+id/managerUserNameEditText"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -415,7 +415,7 @@
                                 android:text="Password:" />
 
                             <EditText
-                                android:id="@+id/EditText01"
+                                android:id="@+id/managerPasswordEditText"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -436,7 +436,7 @@
                                 android:text="Confirm:" />
 
                             <EditText
-                                android:id="@+id/EditText02"
+                                android:id="@+id/confirmPasswordEditText"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -458,7 +458,7 @@
                                 android:text="Cell:" />
 
                             <EditText
-                                android:id="@+id/EditText05"
+                                android:id="@+id/phoneEditText"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -499,7 +499,7 @@
                                 android:text="Name:" />
 
                             <EditText
-                                android:id="@+id/EditText06"
+                                android:id="@+id/vendsyRepNameEditText"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -522,7 +522,7 @@
                                 android:text="Email:" />
 
                             <EditText
-                                android:id="@+id/view_profile_email"
+                                android:id="@+id/vendsyRepEmailEditText"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -545,7 +545,7 @@
                                 android:text="Cell:" />
 
                             <EditText
-                                android:id="@+id/view_profile_password"
+                                android:id="@+id/vendsyRepPhoneEditText"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -600,7 +600,7 @@
                                 android:layout_weight="1"
                                 android:ems="14"
                                 android:hint="Optional for menu display"
-                                android:text="beec9320f3921035e4d7"
+                                android:text="49be3dcf7e507f6b4775"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
                         </LinearLayout>
 
@@ -617,7 +617,7 @@
                                 android:text="Locu section" />
 
                             <EditText
-                                android:id="@+id/EditText10"
+                                android:id="@+id/locuSectionEditText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -683,7 +683,7 @@
                                 android:text="Total tax rate:" />
 
                             <EditText
-                                android:id="@+id/paypalEdit"
+                                android:id="@+id/taxRateEdit"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:ems="3"
@@ -730,7 +730,7 @@
                                 android:text="Routing number:" />
 
                             <EditText
-                                android:id="@+id/EditText09"
+                                android:id="@+id/routingNumberEditText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -751,7 +751,7 @@
                                 android:text="Account number:" />
 
                             <EditText
-                                android:id="@+id/EditText07"
+                                android:id="@+id/accountNumberEditText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"

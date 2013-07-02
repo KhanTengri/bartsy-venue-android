@@ -1,6 +1,7 @@
 package com.vendsy.bartsy.venue.utils;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -8,6 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -15,7 +17,14 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -350,6 +359,90 @@ public class WebServices {
 		return null;
 	}
 	
+	/**
+	 * @methodName: postProfile
+	 * 
+	 *             Service call for venue profile information
+	 *  
+	 * @param url
+	 * @param json
+	 * @param bitmap
+	 * @param context
+	 * @return
+	 */
+	public static String postVenue(String url, JSONObject json, Bitmap bitmap, Context context) {
+
+		byte[] dataFirst = null;
+
+		// Setup connection parameters
+		int TIMEOUT_MILLISEC = 10000; // = 10 seconds
+		HttpParams my_httpParams = new BasicHttpParams();
+		HttpConnectionParams.setConnectionTimeout(my_httpParams, TIMEOUT_MILLISEC); 
+		HttpConnectionParams.setSoTimeout(my_httpParams, TIMEOUT_MILLISEC); 
+
+		try {
+
+			// Converting venue profile bitmap image into byte array
+			if (bitmap!=null) {
+				// Image found - converting it to a byte array and adding to syscall
+
+				Log.i(TAG,"===> postRequestMultipart("+ url  + ", " + json + ")");
+
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+				dataFirst = baos.toByteArray();
+
+
+			} else {
+				// Could not find image
+				Log.i(TAG,"===> postRequest("+ url  + ", " + json + ")");
+			}
+
+			// String details = URLEncoder.encode(json.toString(), "UTF-8");
+			// url = url + details;
+
+			// Execute HTTP Post Request
+			
+			json.put("apiVersion", Constants.API_VERSION);
+			
+			HttpPost postRequest = new HttpPost(url);
+			HttpClient client = new DefaultHttpClient();
+			ByteArrayBody babFirst = null;
+
+			if (dataFirst != null)
+				babFirst = new ByteArrayBody(dataFirst, "venueImage" + ".jpg");
+
+			MultipartEntity reqEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+			
+
+			// added profile image into MultipartEntity
+
+			if (babFirst != null){
+				reqEntity.addPart("venueImage", babFirst);
+			}
+			
+			if (json != null)
+				reqEntity.addPart("details", new StringBody(json.toString(), Charset.forName("UTF-8")));
+			postRequest.setEntity(reqEntity);
+			HttpResponse responses = client.execute(postRequest);
+
+			// Check response 
+
+			if (responses != null){
+				
+				String responseofmain = EntityUtils.toString(responses.getEntity());
+				Log.v(TAG, "postVenueProfileResponseChecking " + responseofmain);
+								
+				return responseofmain;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+
 	public static String deleteIngredients(Ingredient ingredient, String venueId, Context context){
 		
 		try {
