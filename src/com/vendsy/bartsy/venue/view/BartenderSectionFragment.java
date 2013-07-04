@@ -105,11 +105,13 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		
 		// Add any existing orders in the layout, one by one
 		
-		Log.v("Bartsy", "mApp.mOrders list size = " + mApp.getOrderCount());
+		Log.v(TAG, "mApp.mOrders list size = " + mApp.getOrderCount());
+		
+		ArrayList<Order> ordersClone = mApp.cloneOrders();
 
-		for (Order order : mApp.mOrders) {
+		for (Order order : ordersClone) {
 			
-			Log.v("Bartsy", "Adding order " + order.serverID + " with status " + order.status + " and last status " + order.last_status + " to the layout");
+			Log.v(TAG, "Adding order " + order.serverID + " with status " + order.status + " and last status " + order.last_status + " to the layout");
 			
 			// Update the view's main layout 
 			order.view = mInflater.inflate(R.layout.bartender_order, mContainer, false);
@@ -171,7 +173,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 				
 				if (layoutOrder.status != Order.ORDER_STATUS_CANCELLED && // Don't insert in expired orders
 						layoutOrder.status != Order.ORDER_STATUS_TIMEOUT &&
-						layoutOrder.orderSender.userID.equalsIgnoreCase(order.orderSender.userID)) {
+						layoutOrder.orderRecipient.userID.equalsIgnoreCase(order.orderRecipient.userID)) {
 					
 					// Found an existing order from the same user. Insert a mini-view of the order
 					LinearLayout miniLayout = (LinearLayout) view.findViewById(R.id.view_order_mini);
@@ -217,9 +219,9 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		Log.v(TAG, "onClick()");
 
 		Order order = (Order) v.getTag();
-		ArrayList<Order> orders = (ArrayList<Order>) mApp.mOrders.clone();
+		ArrayList<Order> orders = mApp.cloneOrders();
 		int status = order.status;
-		String userID = order.orderSender.userID;
+		String userID = order.orderRecipient.userID;
 
 		// Update the order status locally 
 		
@@ -235,20 +237,21 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 
 			for (Order orderItem : orders) {
 				
-				Log.v(TAG, "Processing child order " + orderItem.serverID + " from " + orderItem.orderSender.userID + " with status " + orderItem.status);
+				Log.v(TAG, "Processing child order " + orderItem.serverID + " from " + orderItem.orderRecipient.userID + " with status " + orderItem.status);
 				
-				if (orderItem.status == status && orderItem.orderSender.userID.equalsIgnoreCase(userID)) {
+				if (orderItem.status == status && orderItem.orderRecipient.userID.equalsIgnoreCase(userID)) {
 
 					orderItem.nextPositiveState();	
 					Log.v(TAG, "Child matches parent - update status to " + orderItem.status);
 
-					if (orderItem.status == Order.ORDER_STATUS_COMPLETE) {
-						Log.v(TAG, "Removing child with status COMPLETE");
-						orderItem.view = null;
-						mApp.removeOrder(orderItem);
-					}
+//					if (orderItem.status == Order.ORDER_STATUS_COMPLETE) {
+//						Log.v(TAG, "Removing child with status COMPLETE");
+//						orderItem.view = null;
+//						mApp.removeOrder(orderItem);
+//					}
 					// Send updated order status to the remote
-					((MainActivity) getActivity()).sendOrderStatusChanged(orderItem);
+					mApp.update();
+//					((MainActivity) getActivity()).sendOrderStatusChanged(orderItem);
 				}
 			}
 
@@ -264,12 +267,13 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 
 				Log.v(TAG, "Processing order " + orderItem.serverID);
 				
-				if (orderItem.status == status && orderItem.orderSender.userID.equalsIgnoreCase(userID)) {
+				if (orderItem.status == status && orderItem.orderRecipient.userID.equalsIgnoreCase(userID)) {
 					orderItem.nextNegativeState("Order rejected by the bartender");	
-					orderItem.view = null;
-					mApp.removeOrder(orderItem);
+//					orderItem.view = null;
+//					mApp.removeOrder(orderItem);
 					// Send updated order status to the remote
-					((MainActivity) getActivity()).sendOrderStatusChanged(orderItem);
+					mApp.update();
+//					((MainActivity) getActivity()).sendOrderStatusChanged(orderItem);
 				}
 			}
 			
@@ -278,10 +282,11 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		case R.id.view_order_button_remove:
 			Log.v(TAG, "Clicked on order remove button");
 			order.nextNegativeState("Individual order rejected by the bartender");
-			order.view = null;
-			mApp.removeOrder(order);
+//			order.view = null;
+//			mApp.removeOrder(order);
 			// Send updated order status to the remote
-			((MainActivity) getActivity()).sendOrderStatusChanged(order);
+			mApp.update();
+//			((MainActivity) getActivity()).sendOrderStatusChanged(order);
 			break;
 
 		case R.id.view_order_button_expired:

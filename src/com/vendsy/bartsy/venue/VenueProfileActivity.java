@@ -346,8 +346,7 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 				// Start a new venue
 				mApp.venueProfileID = venueId;
 				mApp.venueProfileName = venueName;
-				mApp.mOrders.clear();
-				mApp.mPeople.clear();
+				mApp.update();
 				
 				
 				// Remove progress dialog

@@ -22,22 +22,23 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-
+import java.util.concurrent.locks.ReentrantLock;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.util.Base64;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
-
+import android.widget.Toast;
 import com.google.android.gcm.GCMRegistrar;
 import com.vendsy.bartsy.venue.db.DatabaseManager;
 import com.vendsy.bartsy.venue.model.AppObservable;
@@ -92,7 +93,7 @@ import com.vendsy.bartsy.venue.view.AppObserver;
  * is required to correctly display Activities when they are recreated.
  */
 public class BartsyApplication extends Application implements AppObservable {
-	private static final String TAG = "Bartsy";
+	private static final String TAG = "BartsyApplication";
 	public static String PACKAGE_NAME;
 
 	/**
@@ -145,6 +146,49 @@ public class BartsyApplication extends Application implements AppObservable {
 	
 	
 	/**
+	 * Convenience functions to generate notifications and Toasts 
+	 */
+
+	public Handler mHandler = new Handler();
+
+	public void makeText(final String toast, final int length) {
+		mHandler.post(new Runnable() {
+			public void run() {
+				Log.v(TAG, toast);
+				Toast.makeText(BartsyApplication.this, toast, length).show();
+			}
+		});
+	}
+	
+	private void generateNotification(final String title, final String body, final int count) {
+		mHandler.post(new Runnable() {
+			public void run() {
+				
+				int icon = R.drawable.ic_launcher;
+				long when = System.currentTimeMillis();
+				NotificationManager notificationManager = (NotificationManager) BartsyApplication.this
+						.getSystemService(Context.NOTIFICATION_SERVICE);
+				Notification notification = new Notification(icon, body, when);
+		
+				Intent notificationIntent = new Intent(BartsyApplication.this, MainActivity.class);
+				// set intent so it does not start a new activity
+				notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+						| Intent.FLAG_ACTIVITY_SINGLE_TOP);
+				PendingIntent intent = PendingIntent.getActivity(BartsyApplication.this, 0,
+						notificationIntent, 0);
+				notification.setLatestEventInfo(BartsyApplication.this, title, body, intent);
+				notification.flags |= Notification.FLAG_AUTO_CANCEL;
+				notification.number = count;
+
+				// // Play default notification sound
+				notification.defaults = Notification.DEFAULT_SOUND;
+				notificationManager.notify(0, notification);
+			}
+		});
+	}
+	
+	
+	/**
 	 *  To load csv file in background
 	 */
 	private void loadCSVfilesAndSaveInDB() {
@@ -165,7 +209,7 @@ public class BartsyApplication extends Application implements AppObservable {
 
 
 	/**
-	 * TODO - Synchronization
+	 * TODO - Synchronize orders
 	 * 
 	 * This is the main synchronization function with the server. It's called if a discrepancy is found in our state versus the server state.
 	 * It performs all necessary synchronizations between our state and the server state.
@@ -190,17 +234,357 @@ public class BartsyApplication extends Application implements AppObservable {
 			// Heart beat Webservice calling - this is useless for now in checking state so use the more complete syscall 
 			WebServices.postRequest(Constants.URL_HEART_BEAT_VENUE,	postData, getApplicationContext());
 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	/**
+	 * Accessors for the main update function. These decide if we should access in the current
+	 * thread of spin up a new thread. They also can return a cloned version of the orders list
+	 * instead of performing an update
+	 */
+	
+	synchronized public ArrayList<Order> cloneOrders() {
+		return accessOrders(ACCESS_ORDERS_VIEW);
+	}
+	
+	synchronized public void update()  {
+	
+		if (Looper.myLooper() == Looper.getMainLooper()) {
+			// We're in the main thread - execute the update in the background with a new asynchronous task
+			Log.w(TAG, "Running updateOrders() in an async task");
+/*			mHandler.post(new Runnable() {
+				
+				@Override
+				public void run() {
+					new Thread () {
+						@Override 
+						public void run() {
+							accessOrders(BartsyApplication.ACCESS_ORDERS_UPDATE);				
+						};
+					}.start();
+				};
+			});
+*/
+			new UpdateAsync().execute();
+		} else {
+			// We're not in the main thread - don't spin up a thread
+			Log.w(TAG, "Running updateOrders()");
+			accessOrders(ACCESS_ORDERS_UPDATE);
+		}
+		
+		return;
+	}
+	
+	private class UpdateAsync extends AsyncTask<Void, Void, Void>{
+		@Override
+		protected void onPreExecute(){
+		}
+		
+		@Override
+		protected Void doInBackground(Void... Voids) {
+			accessOrders(ACCESS_ORDERS_UPDATE);
+			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(Void params){
+		}
+	}
+	
+	/**
+	 * 
+	 * This is the main function of the bunch. It performs most of the work using helper functions. It looks at the server
+	 * state and updates the current state by adding, removing and updated orders.
+	 * 
+	 */
+	public static final int ACCESS_ORDERS_UPDATE	= 0;
+	public static final int ACCESS_ORDERS_VIEW		= 1;
+	
+	@SuppressWarnings("unchecked")
+	synchronized private ArrayList<Order> accessOrders(int options) {
+		
+		if (options == ACCESS_ORDERS_VIEW) {
+			return (ArrayList<Order>) mOrders.clone();
+		}
+
+		
+		// Print orders before update
+		String ordersString = "\n";
+		for (Order order : mOrders) {
+			ordersString += order + "\n";
+		}
+		Log.w(TAG, ">>> Open orders before update:\n" + ordersString);
+
+		
+		boolean network = false;
+		try {
+			network = WebServices.isNetworkAvailable(BartsyApplication.this);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
+
+		
+		if (network) {	
 			
-			// Web service call to get lost local data from server
 			JSONObject json = WebServices.syncWithServer(venueProfileID, BartsyApplication.this);
 			if(json == null)
-				return;
+				return null;
+	
+			// Synchronize people 
+			updatePeople(json);
+			
+			// Get remote orders list
+			ArrayList<Order> remoteOrders = extractOrders(json);
+	
+			// Find new orders, existing orders and missing orders.
+			ArrayList<Order> addedOrders = processAddedOrders(mOrders, remoteOrders);
+			ArrayList<Order> removedOrders = processRemovedOrders(mOrders, remoteOrders);
+			ArrayList<Order> updatedOrders = processExistingOrders(mOrders, remoteOrders);
+	
+			
+			// Generate notifications
+			if (addedOrders.size() > 0 || removedOrders.size() > 0 || updatedOrders.size() > 0) {
+				String message = "";
+				int count = 0;
+				if (addedOrders.size() > 0) {
+					message += "Added orders:\n";
+					for (Order order : addedOrders) {
+						message += order.title + " for " + order.getRecipientName(mPeople) + "\n";
+						count++;
+					}
+					message += "\n";
+				}	
+				if (updatedOrders.size() > 0) {
+					message += "Updated orders:\n";
+					for (Order order : updatedOrders) {
+						message += order.title + " for " + order.getRecipientName(mPeople) + "\n";
+						count++;
+					}
+					message += "\n";
+				}	
+				if (removedOrders.size() > 0) {
+					message += "Removed orders:\n";
+					for (Order order : removedOrders) {
+						message += order.title + " for " + order.getRecipientName(mPeople) + "\n";
+						count++;
+					}
+				}	
+	
+				// Print and generate modifications
+				Log.w(TAG, message);
+				generateNotification("Orders updated", message, count);
+			}		
+	
+			// Print orders after update
+			ordersString = "\n";
+			for (Order order : mOrders) {
+				ordersString += order + "\n";
+			}
+			Log.w(TAG, ">>> Open orders after update:\n" + ordersString);
+		}
+		
+		// Update timers and notify observers of status changes
+		updateOrderTimers();
+		notifyObservers(ORDERS_UPDATED);
+		
+		return null;
+	}
+	
+	ArrayList<Order> extractOrders(JSONObject json) {
+		
+		ArrayList<Order> orders = new ArrayList<Order>();
+		
+		try {
+			// To parse orders from JSON object
+			if (json.has("orders")) {
+				JSONArray ordersJson = json.getJSONArray("orders");
+				
+				for(int j=0; j<ordersJson.length();j++){
+					
+					JSONObject orderJSON = ordersJson.getJSONObject(j);
+	
+					// If the server is incorrectly sending the order timeout as a venue-wide variable, insert it in the order JSON
+					if (!orderJSON.has("orderTimeout") && json.has("orderTimeout"))
+						orderJSON.put("orderTimeout", json.getInt("orderTimeout"));
+					
+					Order order = new Order(orderJSON);
+					orders.add(order);
+				}
+			}
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return orders;
+	}
+	
+	Order findMatchingOrder(ArrayList<Order> orders, Order order) {
+		for (Order found : orders) {
+			if (found.serverID.equals(order.serverID))
+				return found;
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * These are the processing helper functions of the main update function. They process orders that were in the server
+	 * but not in the local state (new orders), orders that are in the local state but were not in the server state (removed 
+	 * orders) and orders that are both in the server state and the local state (updated orders)
+	 * 
+	 */
+	
+	ArrayList<Order> processAddedOrders(ArrayList<Order> localOrders, ArrayList<Order> remoteOrders) {
 
-			// Verify checked in users match server list
+		// Find the orders to remove and store them in a separate list to avoid iterator issues
+		ArrayList<Order> processedOrders = new ArrayList<Order>();
+		for (Order order : remoteOrders) {
+			if (findMatchingOrder(localOrders, order) == null) {
+
+				switch(order.status) {
+				case Order.ORDER_STATUS_CANCELLED:
+				case Order.ORDER_STATUS_NEW:
+				case Order.ORDER_STATUS_IN_PROGRESS:
+				case Order.ORDER_STATUS_READY:
+					// Legal state - add new orders to the list of work and notify the user
+					processedOrders.add(order);
+					break;
+				default:
+					// Illegal state - print message
+					Log.e(TAG, "Skipping illegal order: " + order.serverID + " with status: " + order.status);
+					break;
+				}
+			}
+		}
+		
+		// Add the orders found
+		ArrayList<Order> addedOrders = new ArrayList<Order>();
+		for (Order order : processedOrders) {
+			if (addOrder(order)) {
+				Log.e(TAG, "Adding order: " + order.serverID + " with status: " + order.status);
+				addedOrders.add(order);
+			} else {
+				Log.e(TAG, "Could not add order: " + order.serverID + " with status: " + order.status);
+			}
+		}
+		
+		return addedOrders;
+	}
+	
+	ArrayList<Order> processRemovedOrders(ArrayList<Order> localOrders, ArrayList<Order> remoteOrders) {
+		
+		// Find the orders to remove and store them in a separate list to avoid iterator issues
+		ArrayList<Order> removedOrders = new ArrayList<Order>();
+		for (Order order : localOrders) {
+			Order remoteOrder = findMatchingOrder(remoteOrders, order);
+			if ( remoteOrder == null) {
+
+				switch(order.status) {
+				
+				case Order.ORDER_STATUS_COMPLETE:
+				case Order.ORDER_STATUS_REJECTED:
+				case Order.ORDER_STATUS_FAILED:
+				case Order.ORDER_STATUS_INCOMPLETE:
+					removedOrders.add(order);
+					break;
+				case Order.ORDER_STATUS_CANCELLED:
+				case Order.ORDER_STATUS_TIMEOUT:
+					break;
+				default:
+					order.setTimeoutState();
+					break;
+				}
+			}
+		}
+		
+		// Remove orders found
+		for (Order order : removedOrders) {
+			localOrders.remove(order);
+		}
+		
+		return removedOrders;
+	}		
+	
+	ArrayList<Order> processExistingOrders(ArrayList<Order> localOrders, ArrayList<Order> remoteOrders) {
+		ArrayList<Order> updatedOrders = new ArrayList<Order>();
+
+		for (Order remoteOrder : remoteOrders) {
+			
+			Order localOrder = findMatchingOrder(localOrders, remoteOrder);
+			
+			if ( localOrder != null && localOrder.status != remoteOrder.status) {
+				
+				switch (remoteOrder.status) {
+				case Order.ORDER_STATUS_CANCELLED:
+					// <=== orderTimeout - **** Change the state and leave it in the order list until user acknowledges the time out ****
+					localOrder.setCancelledState("This order took too long and it timed out. Please accept orders promptly.");
+					updatedOrders.add(localOrder);
+					break;
+				}
+				
+				switch (localOrder.status) {
+				case Order.ORDER_STATUS_CANCELLED:
+				case Order.ORDER_STATUS_TIMEOUT:
+					break;
+				default:
+					WebServices.orderStatusChanged(localOrder, BartsyApplication.this);
+					break;
+				}
+				
+			}
+		}
+		return updatedOrders;
+	}		
+	
+	
+
+	/**
+	 * 
+	 * This functions updates the timers of the various orders and moves them to the expired state in case of a local timeout
+	 * 
+	 */
+	
+	private synchronized void updateOrderTimers() {
+
+		Log.v(TAG, "updateOrderTimers()");
+		
+		for (Order order : mOrders) {
+
+			// The additional timeout when we check for local timeouts gives the server the opportunity to always time out an order first. This 
+			long duration  = Constants.timoutDelay + order.timeOut - ((System.currentTimeMillis() - (order.state_transitions[order.status]).getTime()))/60000;
+			
+			if (duration <= 0) {
+
+				Log.v(TAG, "Order " + order.serverID + " timed out. Status " + order.status + " (" + order.state_transitions[order.status] + 
+						"), last_status: " + order.last_status + " (" + order.state_transitions[order.last_status] + 
+						"), placed (" + order.state_transitions[Order.ORDER_STATUS_NEW] + ")");
+
+				// Order time out - set it to that state (this won't have an effect if already in that state as the called function guarantees that)
+				order.setTimeoutState();
+			}
+		}
+	}
+	
+
+	/**
+	 * 
+	 * TODO - Synchronize people
+	 * 
+	 * 
+	 * 
+	 */
+	
+	synchronized private void updatePeople(JSONObject json) {
+		// Verify checked in users match server list
+		try {
 			
 			if(json.has("checkedInUsers")){
 				
-				JSONArray users = json.getJSONArray("checkedInUsers");
+				JSONArray users;
+					users = json.getJSONArray("checkedInUsers");
 				
 				// Check sizes match
 				if (users.length() != mPeople.size()) {
@@ -218,62 +602,19 @@ public class BartsyApplication extends Application implements AppObservable {
 							found = true;
 						}
 					}
-
-					// No matching order found - perform sync.
+	
 					if (!found) {
 						syncPeople(users);
 						return;
 					}
 				}
 			}
-			
-			// Get the order list and make sure it matches our local list. If not, synchronize with the server.
-
-			// Make sure the local and remote orders list are the same length and perform recovery if not
-			if (!json.has("orders")) {
-				if (mOrders.size() == 0) {
-					return;
-				} else {
-					syncOrders(json);
-					return;
-				}
-			}
-			
-			// Check sizes
-			JSONArray orders = json.getJSONArray("orders");
-			if (mOrders.size() != orders.length()) {
-				syncOrders(json);
-				return;
-			}
-
-			// Make sure all order IDs exist with the same status in our list of orders, if not recover
-			for(int j=0; j<orders.length();j++){
-				int status = -1;
-				String serverId = "";
-				JSONObject orderJSON = orders.getJSONObject(j);
-				if (orderJSON.has("orderStatus"))
-					status = Integer.parseInt(orderJSON.getString("orderStatus"));
-				if (orderJSON.has("orderId"))
-					serverId = orderJSON.getString("orderId");
-	
-				boolean found = false;
-				for (Order order : mOrders ) {
-					if (order.status == status && order.serverID == serverId) {
-						found =true;
-						break;
-					}
-				}
-				if (!found) {
-					syncOrders(json);
-					return;
-				}
-			}
-		
-		} catch (Exception e) {
+		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+
 	}
-	
+
 	synchronized private void syncPeople(JSONArray users) {
 		Log.w(TAG, "syncPeople()");
 		
@@ -290,34 +631,7 @@ public class BartsyApplication extends Application implements AppObservable {
 
 	}
 	
-	synchronized private void syncOrders(JSONObject json) {
-					
-		Log.w(TAG, "syncOrders()");
-	
-		try {
-			JSONArray orders = json.getJSONArray("orders");
 
-			mOrders.clear();
-			for(int j=0; j<orders.length();j++){
-				
-				JSONObject orderJSON = orders.getJSONObject(j);
-		
-				if (!orderJSON.has("orderTimeout") && json.has("orderTimeout"))
-					orderJSON.put("orderTimeout", json.getInt("orderTimeout"));
-				
-				Order order = new Order(orderJSON);
-												
-				addOrderWithOutNotify(order);
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	
-		notifyObservers(ORDERS_UPDATED);
-		
-	}
-	
-	
 	/**
 	 * 
 	 * TODO - Vennue profile
@@ -352,25 +666,6 @@ public class BartsyApplication extends Application implements AppObservable {
 	public ArrayList<Profile> mPeople = new ArrayList<Profile>();
 	public static final String PEOPLE_UPDATED = "PEOPLE_UPDATED";
 
-	/*
-	 * Called when we have a new person check in a venue
-	 */
-
-	synchronized void addPerson(String userid, String name, String location, String info,
-			String description, String image // base64 encoded image
-	) {
-		Log.v(TAG, "New user checked in: " + name + " (" + userid + ")");
-
-		// Decode the user image and create a new incoming profile
-		byte[] decodedString = Base64.decode(image, Base64.DEFAULT);
-		Bitmap img = BitmapFactory.decodeByteArray(decodedString, 0,
-				decodedString.length);
-		Profile profile = new Profile(userid, name, location, info,
-				description, img);
-
-		mPeople.add(profile);
-		notifyObservers(PEOPLE_UPDATED);
-	}
 
 	/**
 	 * To add profile to the existing checked in people list
@@ -379,18 +674,15 @@ public class BartsyApplication extends Application implements AppObservable {
 	 */
 	synchronized public void addPerson(Profile profile) {
 
-		// // Decode the user image and create a new incoming profile
-		// byte[] decodedString = Base64.decode(image, Base64.DEFAULT);
-		// Bitmap img = BitmapFactory.decodeByteArray(decodedString, 0,
-		// decodedString.length);
-		Profile existingPeople = null;
-		for (Profile people : mPeople) {
-			if (profile.userID.equals(people.userID)) {
-				existingPeople = people;
+		// Don't add duplicates
+		Profile found = null;
+		for (Profile person : mPeople) {
+			if (profile.userID.equals(person.userID)) {
+				found = person;
 				break;
 			}
 		}
-		if (existingPeople == null) {
+		if (found == null) {
 			mPeople.add(profile);
 			notifyObservers(PEOPLE_UPDATED);
 		}
@@ -452,7 +744,8 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * 
 	 */
 
-	public ArrayList<Order> mOrders = new ArrayList<Order>();
+	private ArrayList<Order> mOrders = new ArrayList<Order>();
+	public ReentrantLock mOrdersLock = new ReentrantLock();		// used to synchronize access to the orders list on any operation that changes its structure
 
 	public static final String ORDERS_UPDATED = "ORDERS_UPDATED";
 
@@ -466,43 +759,37 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * Called from the push notification when the order receives from the user
 	 * 
 	 * @param order
+	 * @return 	true if all went well
+	 * 			false if order was not added
 	 */
 	
-	public synchronized void addOrder(Order order) {
-		// Find the person who placed the order in the list of people in this
-		// bar. If not found, don't accept the order
-		order.orderSender = null;
+	private synchronized boolean addOrder(Order order) {
+
+		// Make sure the receiver of the order is present in our list of people
+		Profile userFound = null;
 		for (Profile p : mPeople) {
-			if (p.userID.equalsIgnoreCase(order.profileId)) {
+			if (p.userID.equals(order.recipientId)) {
 				// User found
-				order.orderSender = p;
+				userFound = p;
+				order.orderRecipient = p;
 				break;
 			}
 		}
-		if (order.orderSender == null) {
-			// User placing the order not in the list of user - decline order and send updated order status to the remote
-
+		
+		// Decline order if the recipient was not found
+		if (userFound == null) {
+			// User placing the order not in the list of users - decline order and send updated order status to the remote
 			Log.d(TAG, "Error processing order " + order.serverID + ". User not checked in: " + order.profileId);
 			order.nextNegativeState("User not checked in. Please check out and check back in the venue.");
 			order.view = null;
 			WebServices.orderStatusChanged(order, this);
-			return;
+			return false;
 		}
 		
-		// Make sure we don't already have this order (a race condition when the heartbeat has found the order first
-		for (Order existing : mOrders) {
-			if (existing.serverID.equalsIgnoreCase(order.serverID)) {
-				Log.d(TAG, "FOUND DUPLICATE ORDER - skipping it: " + order.serverID);
-				return;
-			}
-		}
-		
-
-		// Add the order to the list of orders
-		mOrders.add(order);
-		notifyObservers(ORDERS_UPDATED);
+		// Add the order to the list 
+		return mOrders.add(order);
 	}
-
+	
 	
 	/**
 	 * Remove the orders based on the json array which is getting from the user check out PN
@@ -510,104 +797,58 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * @param expiredOrders
 	 */
 	
-	public synchronized String cancelOrders(JSONArray expiredOrders, String cancelReason) {
+	synchronized String cancelOrders(JSONArray expiredOrders, String cancelReason) {
 
 		Log.v(TAG, "expireOrders(" + expiredOrders +", " + cancelReason + ")");
 		
-		// If cancelled orders count greater than 0
-		for (int i = 0; i < expiredOrders.length(); i++) {
+		// Lock the orders list
+		mOrdersLock.lock();
 
-			String orderId = null;
-			try {
-				// To get the cancelled orderId from the jsonArray response
-				orderId = expiredOrders.getString(i);
-				Log.v(TAG, "Trying to find order " + orderId);
-
-				for (int j = 0; j < mOrders.size(); j++) {
-					// To get the order object from the existing orders list
-					Order order = mOrders.get(j);
-
-					// Matching order - flag it as expired
-					if (order.serverID.equalsIgnoreCase(orderId)) {
-						order.setCancelledState(cancelReason);
-						break;
+		try {
+			// If cancelled orders count greater than 0
+			for (int i = 0; i < expiredOrders.length(); i++) {
+	
+				String orderId = null;
+				try {
+					// To get the cancelled orderId from the jsonArray response
+					orderId = expiredOrders.getString(i);
+					Log.v(TAG, "Trying to find order " + orderId);
+	
+					for (int j = 0; j < mOrders.size(); j++) {
+						// To get the order object from the existing orders list
+						Order order = mOrders.get(j);
+	
+						// Matching order - flag it as expired
+						if (order.serverID.equalsIgnoreCase(orderId)) {
+							order.setCancelledState(cancelReason);
+							break;
+						}
 					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+					return null;
 				}
-			} catch (JSONException e) {
-				e.printStackTrace();
-				return null;
 			}
+		} finally {
+			mOrdersLock.unlock();
 		}
-
+			
+			
 		// Notify views to display the updated order list
 		notifyObservers(ORDERS_UPDATED);
 		
 		return expiredOrders.toString();
 	}
 
-	/**
-	 * Order updated with orderSender profile and add to the orders list
-	 * 
-	 * @param order
-	 */
-	public synchronized void addOrderWithOutNotify(Order order) {
-		// Find the person who placed the order in the list of people in this
-		// bar. If not found, don't accept the order
-		order.orderSender = null;
-		for (Profile p : mPeople) {
-			if (p.userID.equalsIgnoreCase(order.profileId)) {
-				// User found
-				order.orderSender = p;
-				break;
-			}
-		}
-		if (order.orderSender == null) {
-			Log.d(TAG, "Error processing command. user not checked in: "
-					+ order.profileId);
-			return;
-		}
-
-		// Add the order to the list of orders
-		mOrders.add(order);
-	}
-	
-	
-	/**
-	 * 
-	 * This handles a local order timeout. This scenario should be rare and only if WIFI is long irreparably. This in itself is pretty 
-	 * catastrophic, but regardless, we don't want orders to stick around forever in the local display so some time after the server timeout
-	 * (the additional time is indicated by the Constants.timeoutDelay value) we expire the orders locally 
-	 * 
-	 */
-	
-	public synchronized void updateOrderTimers() {
-
-		Log.v(TAG, "updateOrderTimers()");
-		
-		for (Order order : mOrders) {
-
-			// The additional timeout when we check for local timeouts gives the server the opportunity to always time out an order first. This 
-			long duration  = Constants.timoutDelay + order.timeOut - ((System.currentTimeMillis() - (order.state_transitions[order.status]).getTime()))/60000;
-			
-			if (duration <= 0) {
-
-				Log.v(TAG, "Order " + order.serverID + " timed out. Status " + order.status + " (" + order.state_transitions[order.status] + 
-						"), last_status: " + order.last_status + " (" + order.state_transitions[order.last_status] + 
-						"), placed (" + order.state_transitions[Order.ORDER_STATUS_NEW] + ")");
-
-				// Order time out - set it to that state (this won't have an effect if already in that state as the called function guarantees that)
-				order.setTimeoutState();
-				
-			}
-		}
-		
-		notifyObservers(ORDERS_UPDATED);
-	}
 	
 	public synchronized void removeOrder(Order order) {
 		// Add the order to the list of orders
-		mOrders.remove(order);
+		removeOrderWihtOutNotify(order);
 		notifyObservers(ORDERS_UPDATED);
+	}
+	
+	private synchronized void removeOrderWihtOutNotify(Order order) {
+		mOrders.remove(order);
 	}
 
 	public int getOrderCount() {

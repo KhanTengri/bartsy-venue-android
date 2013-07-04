@@ -53,28 +53,22 @@ import com.vendsy.bartsy.venue.model.Profile;
 public class WebServices {
 
 	private static String TAG="WebServices";
-	// checking internet connection
+	
+	/**
+	 * Make sure we have internet
+	 * @param context
+	 * @return
+	 * @throws Exception
+	 */
 	public static boolean isNetworkAvailable(Context context) throws Exception {
 
-		ConnectivityManager cm = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		if (cm.getActiveNetworkInfo() != null
-				&& cm.getActiveNetworkInfo().isFailover())
+		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if (cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isFailover())
 			return false;
-		else if (cm.getActiveNetworkInfo() != null
-
-		&& cm.getActiveNetworkInfo().isAvailable()
-				&& cm.getActiveNetworkInfo().isConnected()) {
-
+		else if (cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isAvailable() && cm.getActiveNetworkInfo().isConnected())
 			return true;
-
-		}
-
-		else {
-
+		else
 			return false;
-		}
-
 	}
 
 	/**
@@ -145,7 +139,6 @@ public class WebServices {
 			json.put("venueId", venueID);
 			response = postRequest(Constants.URL_GET_BAR_LIST, json, context);
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -185,28 +178,24 @@ public class WebServices {
 	 * @param model
 	 * @param imageView
 	 */
-	public static void downloadImage(final String fileUrl, final Object model,
-			final ImageView imageView) {
+	public static void downloadImage(final String fileUrl, final Object model, final ImageView imageView) {
 
 		System.out.println("download file");
 		new AsyncTask<String, Void, Bitmap>() {
 			Bitmap bitmapImg;
 
 			protected void onPreExecute() {
-				// TODO Auto-generated method stub
 				super.onPreExecute();
 
 			}
 
 			protected Bitmap doInBackground(String... params) {
-				// TODO Auto-generated method stub
 
 				System.out.println("doing back ground");
 				URL myFileUrl = null;
 				try {
 					myFileUrl = new URL(fileUrl);
 				} catch (MalformedURLException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				try {
@@ -219,7 +208,6 @@ public class WebServices {
 					bitmapImg = BitmapFactory.decodeStream(is);
 
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -227,7 +215,6 @@ public class WebServices {
 			}
 
 			protected void onPostExecute(Bitmap result) {
-				// TODO Auto-generated method stub
 				System.out.println("on post ******************");
 				if (model instanceof Profile) {
 					Profile profile = (Profile) model;
@@ -527,19 +514,16 @@ public class WebServices {
 	 * @param order
 	 * @param context
 	 */
-	public static JSONObject syncWithServer(final String venueId,
-			final Context context) {
+	public static JSONObject syncWithServer(final String venueId, final Context context) {
 
 		try {
 			String response;
-			// To get all checked in profiles and open orders data based on the
-			// venue Id
+			// To get all checked in profiles and open orders data based on the venue Id
 			JSONObject json = new JSONObject();
 			json.put("venueId", venueId);
 
 			// Sync service call
-			response = postRequest(Constants.URL_SYNC_WITH_SERVER, json,
-					context);
+			response = postRequest(Constants.URL_SYNC_WITH_SERVER, json, context);
 
 			// Return response in JSON object
 			return new JSONObject(response);

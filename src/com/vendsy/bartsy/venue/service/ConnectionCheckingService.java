@@ -75,22 +75,17 @@ public class ConnectionCheckingService extends Service {
 			while (isRunning) {
 				try {
 					
-					// Print log
-					String orders = "\n";
-					for (Order order : mApp.mOrders) {
-						orders += order + "\n";
-					}
-					Log.d(TAG, ">>> Open orders:  " + orders);
-
+					// The main synchronization function that runs periodically
+					mApp.update();
 					
-					// refresh the UI to update the timers in the order
-					mApp.updateOrderTimers();
-						
+					// The less interesting hearteat syscall
+					if (WebServices .isNetworkAvailable(ConnectionCheckingService.this)) {	
+						mApp.performHeartbeat();
+					}
 					
 					// Handle WIFI failures
-						
-					if (!WebServices .isNetworkAvailable(ConnectionCheckingService.this)) {	
-						
+					
+						/*		
 						Log.w(TAG, "Network unavailable");
 						
 						// Attempt recovery by turning wifi off / on
@@ -107,25 +102,14 @@ public class ConnectionCheckingService extends Service {
 							 Log.v(TAG, "WiFi status: " + wifiManager.getWifiState());							
 						}
 						
-						
-						// Handler to show UI-related events
-						handler.post(new Runnable() {
-
-							@Override
-							public void run() {
-								
-								Toast.makeText(ConnectionCheckingService.this, "Network not available. Trying to fix this issue... If you need to work with the WIFI please manually kill the Bartsy Venue app in the tablet's preferences.", Toast.LENGTH_LONG).show();
-							}
-						});
-					}
-					// Network is available
-					else 
-						mApp.performHeartbeat();
+						mApp.makeText("Network not available. Trying to fix this issue... If you need to work with the WIFI please manually kill " +
+								"the Bartsy Venue app in the tablet's preferences.", Toast.LENGTH_LONG);
+					 */
+					
 
 				} catch (Exception e) {
-					Log.w("connection checking service",
-							" ******************************** Exception ***********************************"
-									+ e.getMessage());
+					Log.w(TAG, " ******************************** Exception ***********************************");
+					Log.e(TAG, e.getMessage());
 					e.printStackTrace();
 				}
 				try {

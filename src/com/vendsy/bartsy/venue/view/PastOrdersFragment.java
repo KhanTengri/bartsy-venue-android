@@ -183,28 +183,28 @@ public class PastOrdersFragment extends Fragment{
 		String status = "?";
 		switch(order.status) {
 		case Order.ORDER_STATUS_CANCELLED:
-			status = "Failed";
+			status = "Timeout";
 			break;
 		case Order.ORDER_STATUS_COMPLETE:
 			status = "OK";
 			break;
 		case Order.ORDER_STATUS_READY:
-			status = "Open";
+			status = "Ready";
 			break;
 		case Order.ORDER_STATUS_FAILED:
 			status = "Failed";
 			break;
 		case Order.ORDER_STATUS_IN_PROGRESS:
-			status = "Open";
+			status = "In progress";
 			break;
 		case Order.ORDER_STATUS_INCOMPLETE:
-			status = "Failed";
+			status = "Unfinished";
 			break;
 		case Order.ORDER_STATUS_NEW:
-			status = "Open";
+			status = "New";
 			break;
 		case Order.ORDER_STATUS_REJECTED:
-			status = "Failed";
+			status = "Rejected";
 			break;
 		}
 		

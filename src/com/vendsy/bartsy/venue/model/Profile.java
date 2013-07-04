@@ -45,25 +45,16 @@ public class Profile {
 
 	}
 
-	public Profile(String userid, String username, String location,
-			String info, String description, Bitmap image) {
-		this.image = image;
-		this.userID = userid;
-		this.username = username;
-		this.location = location;
-		this.info = info;
-		this.description = description;
-	}
-
 	public Profile(JSONObject json) {
 		try {
-			userID = json.getString("bartsyId");
-			gender = json.getString("gender");
-			name = json.getString("name");
-			profileImageUrl = json.getString("userImagePath");
-			this.profileImageUrl = Constants.DOMAIN_NAME
-					+ profileImageUrl.trim();
-
+			if (json.has("bartsyId"))
+				userID = json.getString("bartsyId");
+			if (json.has("gender"))
+				gender = json.getString("gender");
+			if (json.has("name"))
+				name = json.getString("name");
+			if (json.has("userImagePath")) 
+				profileImageUrl = Constants.DOMAIN_NAME +  json.getString("userImagePath").trim();
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

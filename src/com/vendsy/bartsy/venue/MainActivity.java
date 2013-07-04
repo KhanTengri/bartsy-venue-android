@@ -204,8 +204,14 @@ public class MainActivity extends FragmentActivity implements
 		 * from other components.
 		 */
 		mApp.addObserver(this);
+	
+		// Update people and orders
+		mApp.update();
 		
-
+		
+		
+		
+/*
 		if (!Constants.USE_ALLJOYN && (mApp.getOrderCount()==0 || mApp.mPeople.size()==0) ) {
 			// Start progress dialog from here
 			handler.post(new Runnable() {
@@ -217,7 +223,7 @@ public class MainActivity extends FragmentActivity implements
 				}
 			});
 			
-
+			
 			// Call web service in the background
 			new Thread() {
 				@Override
@@ -254,8 +260,6 @@ public class MainActivity extends FragmentActivity implements
 								Order order = new Order(orderJSON);
 																
 								mApp.addOrderWithOutNotify(order);
-								// Set the order time
-
 							}
 						}
 						
@@ -269,7 +273,11 @@ public class MainActivity extends FragmentActivity implements
 			}.start();
 
 		}
+		*/
+		
 	}
+	
+	
 	/**
 	 * This Method is used to add Bar status to spinner of action bar
 	 */
@@ -774,22 +782,6 @@ public class MainActivity extends FragmentActivity implements
 			appendStatus("AllJoyn ERROR!!!!!!");
 			// showDialog(DIALOG_ALLJOYN_ERROR_ID);
 		}
-	}
-
-
-	/*
-	 * 
-	 * TODO - Send/receive order status changed command
-	 */
-
-	public void sendOrderStatusChanged(Order order) {
-		// Expects the order status and the server ID to be already set on this end
-		appendStatus("Sending order response for order: " + order.serverID);
-
-		WebServices.orderStatusChanged(order, this);
-
-		// Update tab title with the number of open orders
-		updateOrdersCount();
 	}
 
 	

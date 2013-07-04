@@ -104,9 +104,11 @@ public class GCMIntentService extends GCMBaseIntentService {
 					// <=== placeOrder - **** new order placed ****
 					
 					// Add order to order list
-					Order order = new Order(json);
-					app.addOrder(order);
-					notificationMessage = "New order: " + order.title + " for " + order.receiverId + " from " + order.senderId;
+//					Order order = new Order(json);
+//					app.addOrder(order);
+//					notificationMessage = "New order: " + order.title + " for " + order.receiverId + " from " + order.senderId;
+	
+					app.update();
 					
 				} else if (json.getString("messageType").equals("userCheckIn")) {
 					
@@ -120,19 +122,21 @@ public class GCMIntentService extends GCMBaseIntentService {
 					
 					// <=== orderTimeout - **** Change the state and leave it in the order list until user acknowledges the time out ****
 					
-					JSONArray expiredOrders = json.has("ordersCancelled") ? json.getJSONArray("ordersCancelled") : null;
+//					JSONArray expiredOrders = json.has("ordersCancelled") ? json.getJSONArray("ordersCancelled") : null;
 					
 					// When user checkout from venue, it is required to remove user open orders
-					if (expiredOrders != null && expiredOrders.length() > 0) {
+//					if (expiredOrders != null && expiredOrders.length() > 0) {
 						// For removing the cancelled orders
-						notificationMessage = app.cancelOrders(expiredOrders, "This order took too long and it timed out. Please accept orders promptly.");
-					}
+//						notificationMessage = app.cancelOrders(expiredOrders, "This order took too long and it timed out. Please accept orders promptly.");
+//					}
 
 					// Make sure we successfully removed some orders and set up notification message accordingly
-					if (notificationMessage == null) {
-						notificationMessage = "System error: Received a timeout, but no orders were attached";
-						Log.e(TAG, notificationMessage);
-					}
+//					if (notificationMessage == null) {
+//						notificationMessage = "System error: Received a timeout, but no orders were attached";
+//						Log.e(TAG, notificationMessage);
+//					}
+					
+					app.update();
 				}
 
 				else if (json.getString("messageType").equals("userCheckOut")) {

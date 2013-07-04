@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -53,9 +54,9 @@ public class Order  {
 	
 	// Each order contains the sender and the recipient (another single in the bar or a friend to pick the order up)
 	public Profile orderSender;
-	public Profile orderReceiver;
+	public Profile orderRecipient;
 	public String senderId;
-	public String receiverId;
+	public String recipientId;
 	
 	// The view displaying this order or null. The view is the display of the order in a list. 
 	// The list could be either on the client or the server and it looks different in both cases
@@ -79,11 +80,17 @@ public class Order  {
 	public static final int ORDER_STATUS_COMPLETE	 	= 5;
 	public static final int ORDER_STATUS_INCOMPLETE	 	= 6;
 	public static final int ORDER_STATUS_CANCELLED	 	= 7;
-	public static final int ORDER_STATUS_TIMEOUT 		= 8;
+
+	// These remote statuses are not to be shown locally. Orders of this status should be ignored.
+	public static final int ORDER_STATUS_OFFER_REJECTED = 8;
+	public static final int ORDER_STATUS_OFFERED 		= 9;
+	public static final int ORDER_STATUS_REMOVED		= 10;
 	
+	// Local order states
+	public static final int ORDER_STATUS_TIMEOUT 		= 11;
 	
 	// Total order status count
-	public static final int ORDER_STATUS_COUNT 			= 10;
+	public static final int ORDER_STATUS_COUNT 			= 12;
 	
 	public String errorReason = ""; // used to send an error reason for negative order states
     public Date[] state_transitions = new Date[ORDER_STATUS_COUNT];
@@ -171,6 +178,12 @@ public class Order  {
 				// If no created date use current date for the creation state
 				state_transitions[ORDER_STATUS_NEW] = new Date();
 			}
+			
+			// Setup sender and recipient
+			if (json.has("senderBartsyId"))
+				senderId = json.getString("senderBartsyId");
+			if (json.has("recipientBartsyId"))
+				recipientId = json.getString("recipientBartsyId");
 
 			// Setup last updated date (time the order was updated last)  *** MAKE SURE to have updated status before getting here ***
 			if (json.has("updateTime")) {
@@ -221,6 +234,27 @@ public class Order  {
 		return d;
 	}
 	
+	
+	public String getRecipientName(ArrayList<Profile> people) {
+
+		if (orderRecipient != null) {
+			return orderRecipient.getName();
+		}
+		
+		if (recipientId == null)
+			return "<unkown>";
+					
+		for (Profile p : people) {
+			if (p.userID.equals(recipientId)) {
+				// User found
+				orderRecipient = p;
+				return p.getName();
+			}
+		}
+		return "<unkown>";
+	}
+	
+
 	
 	/**
 	 * To process next positive state for the order
@@ -367,21 +401,21 @@ public class Order  {
 		// Set the totals (we'll update again if we have more mini orders...)
 		updateTipTaxTotalView(tipAmount, taxAmount, totalAmount);
 		
-		if (orderSender != null ) {
+		if (orderRecipient != null ) {
 
 			// Update sender profile section
 			
 			ImageView profileImageView = ((ImageView)view.findViewById(R.id.view_order_profile_picture));
-			if (orderSender.image==null) {
+			if (orderRecipient.image==null) {
 				// Download image from the profile URL
-				WebServices.downloadImage(orderSender.getProfileImageUrl(), orderSender, profileImageView);
+				WebServices.downloadImage(orderRecipient.getProfileImageUrl(), orderRecipient, profileImageView);
 			} else {
 				// Set the saved image to the imageView
-				profileImageView.setImageBitmap(orderSender.image);
+				profileImageView.setImageBitmap(orderRecipient.image);
 			}
 			
 			
-			((TextView) view.findViewById(R.id.view_order_profile_name)).setText(orderSender.getName());
+			((TextView) view.findViewById(R.id.view_order_profile_name)).setText(orderRecipient.getName());
 		}
 
 		// Update buttons and background
