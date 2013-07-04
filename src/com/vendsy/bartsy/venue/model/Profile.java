@@ -33,6 +33,8 @@ public class Profile {
 	private String birthday;
 	private String aboutMe;
 	private String relationshipStatus;
+	
+	private boolean imageDownloaded;
 
 	ArrayList<Profile> likes = new ArrayList<Profile>();
 	ArrayList<Profile> favorites = new ArrayList<Profile>();
@@ -163,6 +165,15 @@ public class Profile {
 	public void setProfileImageUrl(String profileImageUrl) {
 		this.profileImageUrl = profileImageUrl;
 	}
+	
+
+	public boolean isImageDownloaded() {
+		return imageDownloaded;
+	}
+
+	public void setImageDownloaded(boolean imageDownloaded) {
+		this.imageDownloaded = imageDownloaded;
+	}
 
 	public void updateView(OnClickListener listener) {
 
@@ -170,7 +181,7 @@ public class Profile {
 
 		// Update the profile image - if the image doesn't exist locally, get it from the server
 		ImageView profileImageView = (ImageView) view.findViewById(R.id.view_user_list_image_resource);
-		if (image == null) {
+		if (image == null && !imageDownloaded) {
 			WebServices.downloadImage(this.profileImageUrl, this, profileImageView);
 		} else {
 			profileImageView.setImageBitmap(image);

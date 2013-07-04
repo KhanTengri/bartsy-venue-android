@@ -219,6 +219,7 @@ public class WebServices {
 				if (model instanceof Profile) {
 					Profile profile = (Profile) model;
 					profile.setImage(result);
+					profile.setImageDownloaded(true);
 				}
 				imageView.setImageBitmap(result);
 

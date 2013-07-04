@@ -406,15 +406,10 @@ public class Order  {
 			// Update sender profile section
 			
 			ImageView profileImageView = ((ImageView)view.findViewById(R.id.view_order_profile_picture));
-			if (orderRecipient.image==null) {
-				// Download image from the profile URL
-				WebServices.downloadImage(orderRecipient.getProfileImageUrl(), orderRecipient, profileImageView);
-			} else {
-				// Set the saved image to the imageView
-				profileImageView.setImageBitmap(orderRecipient.image);
-			}
 			
-			
+			// Set the saved image to the imageView
+			profileImageView.setImageBitmap(orderRecipient.image);
+						
 			((TextView) view.findViewById(R.id.view_order_profile_name)).setText(orderRecipient.getName());
 		}
 
