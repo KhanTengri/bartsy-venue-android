@@ -12,6 +12,7 @@ import com.vendsy.bartsy.venue.MainActivity;
 import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.Utilities;
+import com.vendsy.bartsy.venue.utils.WebServices;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -20,6 +21,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -66,11 +69,11 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		updateOrdersView();
 		
 		// Check and set development environment display
-		if (Constants.DOMAIN_NAME.equalsIgnoreCase("http://54.235.76.180:8080/") && 
-				Utilities.SENDER_ID.equalsIgnoreCase("605229245886")) 
+		if (WebServices.DOMAIN_NAME.equalsIgnoreCase("http://54.235.76.180:8080/") && 
+				WebServices.SENDER_ID.equalsIgnoreCase("605229245886")) 
 			((TextView) mRootView.findViewById(R.id.view_main_deployment_environment)).setText("Server: DEV");
-		else if (Constants.DOMAIN_NAME.equalsIgnoreCase("http://app.bartsy.vendsy.com/") && 
-				Utilities.SENDER_ID.equalsIgnoreCase("560663323691")) 
+		else if (WebServices.DOMAIN_NAME.equalsIgnoreCase("http://app.bartsy.vendsy.com/") && 
+				WebServices.SENDER_ID.equalsIgnoreCase("560663323691")) 
 			((TextView) mRootView.findViewById(R.id.view_main_deployment_environment)).setText("Server: PROD");
 		else 
 			((TextView) mRootView.findViewById(R.id.view_main_deployment_environment)).setText("** INCONSISTENT DEPLOYMENT **");
@@ -192,15 +195,23 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			}
 		}
 		
-		
 		// No previous order was found, insert the order at the top level
 		
 		layout.addView(order.view);
 		order.view.findViewById(R.id.view_order_button_positive).setOnClickListener(this);
+		order.view.findViewById(R.id.view_order_button_positive).setTag(order);
+		
 		order.view.findViewById(R.id.view_order_button_negative).setOnClickListener(this);
+		order.view.findViewById(R.id.view_order_button_negative).setTag(order);
+		
 		order.view.findViewById(R.id.view_order_button_remove).setOnClickListener(this);
-		order.view.findViewById(R.id.view_order_button_remove).setOnClickListener(this);
+		order.view.findViewById(R.id.view_order_button_remove).setTag(order);
+
 		order.view.findViewById(R.id.view_order_button_expired).setOnClickListener(this);
+		order.view.findViewById(R.id.view_order_button_expired).setTag(order);
+		
+		order.view.findViewById(R.id.view_order_button_customer_details).setOnClickListener(this);
+		order.view.findViewById(R.id.view_order_button_customer_details).setTag(order);
 	}
 	
 
@@ -295,6 +306,10 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			mApp.removeOrder(order);
 			break;
 
+		case R.id.view_order_button_customer_details:
+			Log.v(TAG, "Clicked on the customers details button - toggle customer details view");
+			order.showCustomerDetails = !order.showCustomerDetails;
+			break;
 		default:
 			break;
 		}

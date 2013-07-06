@@ -274,8 +274,7 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 						try {
 						// Post venue details to the server
 						// For now it is hard coded for image - null
-						final String response = WebServices.postVenue(Constants.URL_SAVE_VENUEDETAILS, postData, (Bitmap)venueImage.getTag(),
-											VenueProfileActivity.this);
+						final String response = WebServices.postVenue(WebServices.URL_SAVE_VENUEDETAILS, postData, (Bitmap)venueImage.getTag(), mApp);
 
 						Log.d("Bartsy", "response :: " + response);
 									

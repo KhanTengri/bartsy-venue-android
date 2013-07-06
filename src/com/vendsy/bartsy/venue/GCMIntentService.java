@@ -15,8 +15,6 @@
  */
 package com.vendsy.bartsy.venue;
 
-import static com.vendsy.bartsy.venue.utils.Utilities.SENDER_ID;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,12 +52,12 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 	public GCMIntentService() {
 
-		super(SENDER_ID);
+		super(WebServices.SENDER_ID);
 	}
 
 	@Override
 	protected void onRegistered(Context context, String registrationId) {
-		Log.v(TAG, "senderid :::" + SENDER_ID);
+		Log.v(TAG, "senderid :::" + WebServices.SENDER_ID);
 		Log.v(TAG, "in on registered method");
 		Log.v(TAG, "Device registered: regId = " + registrationId);
 

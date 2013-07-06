@@ -56,7 +56,7 @@ public class Profile {
 			if (json.has("name"))
 				name = json.getString("name");
 			if (json.has("userImagePath")) 
-				profileImageUrl = Constants.DOMAIN_NAME +  json.getString("userImagePath").trim();
+				profileImageUrl = WebServices.DOMAIN_NAME +  json.getString("userImagePath").trim();
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

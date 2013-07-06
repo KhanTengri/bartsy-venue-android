@@ -170,7 +170,7 @@ public class InventorySectionFragment extends Fragment {
 					}
 					
 					// Ingredients Web service call
-					response = WebServices.saveIngredients(selectedCategory, ingredients, venueId, getActivity());
+					response = WebServices.saveIngredients(selectedCategory, ingredients, venueId, mApp);
 					
 				}else if(selectedType.equals(Category.COCKTAILS_TYPE) && cocktails !=null){
 					// Save cocktails updated information in the database
@@ -179,7 +179,7 @@ public class InventorySectionFragment extends Fragment {
 					}
 					
 					// Save Cocktail Web service call
-					response = WebServices.saveCocktails(cocktails, venueId, getActivity());
+					response = WebServices.saveCocktails(cocktails, venueId, mApp);
 				}
 				
 				// To call UI thread
@@ -579,7 +579,7 @@ public class InventorySectionFragment extends Fragment {
 		new Thread(){
 			public void run() {
 				
-				String response = WebServices.deleteIngredients(ingredient, venueId, getActivity());
+				String response = WebServices.deleteIngredients(ingredient, venueId, mApp);
 				
 				Log.d("InventorySectionFragment", "deleteIngredientFromServer():: Response: "+response);
 				

@@ -77,7 +77,7 @@ public class PastOrdersFragment extends Fragment{
 		@Override
 		protected String doInBackground(String... params) {
 			
-			return WebServices.getPastOrders(getActivity(), mApp.venueProfileID);
+			return WebServices.getPastOrders(mApp, mApp.venueProfileID);
 		}
 
 		@Override
@@ -181,7 +181,7 @@ public class PastOrdersFragment extends Fragment{
 		((TextView) itemView.findViewById(R.id.orderId)).setText(order.serverID);
 		
 		String status = "?";
-		switch(order.status) {
+		switch(order.last_status) {
 		case Order.ORDER_STATUS_CANCELLED:
 			status = "Timeout";
 			break;
