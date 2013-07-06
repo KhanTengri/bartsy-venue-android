@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -96,6 +97,7 @@ public class Order  {
     public Date[] state_transitions = new Date[ORDER_STATUS_COUNT];
 
     DecimalFormat df = new DecimalFormat();
+    public boolean showCustomerDetails = false;
     
     
 	/**
@@ -214,6 +216,9 @@ public class Order  {
 				last_status = ORDER_STATUS_IN_PROGRESS;
 				break;
 			}
+			
+			if (json.has("lastState"))
+				last_status = Integer.parseInt(json.getString("lastState"));
 			
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
@@ -390,7 +395,7 @@ public class Order  {
 		// Set main order parameters
 		((TextView) view.findViewById(R.id.view_order_number)).setText(serverID);
 		((TextView) view.findViewById(R.id.view_order_title)).setText(title);
-		if (description != null && !description.equalsIgnoreCase(""))
+		if (description != null && !description.equals(""))
 			((TextView) view.findViewById(R.id.view_order_description)).setText(description);
 		else
 			view.findViewById(R.id.view_order_description).setVisibility(View.GONE);
@@ -401,16 +406,18 @@ public class Order  {
 		// Set the totals (we'll update again if we have more mini orders...)
 		updateTipTaxTotalView(tipAmount, taxAmount, totalAmount);
 		
-		if (orderRecipient != null ) {
+		if (orderRecipient != null) {
 
-			// Update sender profile section
-			
-			ImageView profileImageView = ((ImageView)view.findViewById(R.id.view_order_profile_picture));
-			
-			// Set the saved image to the imageView
-			profileImageView.setImageBitmap(orderRecipient.image);
-						
+			// Update customer visible name
 			((TextView) view.findViewById(R.id.view_order_profile_name)).setText(orderRecipient.getName());
+
+			// Update sender profile section if the details view is showing
+			if (showCustomerDetails ) {
+				ImageView profileImageView = ((ImageView)view.findViewById(R.id.view_order_profile_picture));
+				
+				// Set the saved image to the imageView
+				profileImageView.setImageBitmap(orderRecipient.image);
+			}			
 		}
 
 		// Update buttons and background
@@ -430,6 +437,19 @@ public class Order  {
 			negative = "NO SHOW";
 			break;
 		}
+
+		// Set up button text
+		((Button) view.findViewById(R.id.view_order_button_positive)).setText(positive);
+		((Button) view.findViewById(R.id.view_order_button_negative)).setText(negative);
+
+		// Show/hide customer details
+		if (showCustomerDetails) {
+			view.findViewById(R.id.view_order_customer_details).setVisibility(View.VISIBLE);
+			((ImageButton) view.findViewById(R.id.view_order_button_customer_details)).setImageResource(R.drawable.arrowexpanded);
+		} else {
+			view.findViewById(R.id.view_order_customer_details).setVisibility(View.GONE);
+			((ImageButton) view.findViewById(R.id.view_order_button_customer_details)).setImageResource(R.drawable.arrowexpand);
+		}
 		
 		// Compute timers. Placed shows the time since the order was placed. Expires shows the time left in the current state until timeout.
 		double current_ms	= System.currentTimeMillis() ;
@@ -441,11 +461,11 @@ public class Order  {
 		
 		// Set the background color of the order depending on how much time has elapsed as a percent of the timeout green->orange->red
 		if (left_ms <= timeout_ms / 3.0)
-			view.findViewById(R.id.view_order_header).setBackgroundResource(android.R.color.holo_red_dark);
+			view.findViewById(R.id.view_order_background).setBackgroundResource(android.R.color.holo_red_light);
 		else if (left_ms <=  timeout_ms * 2.0 / 3.0)
-			view.findViewById(R.id.view_order_header).setBackgroundResource(android.R.color.holo_orange_dark);
+			view.findViewById(R.id.view_order_background).setBackgroundResource(android.R.color.holo_orange_light);
 		else
-			view.findViewById(R.id.view_order_header).setBackgroundResource(android.R.color.holo_green_dark);
+			view.findViewById(R.id.view_order_background).setBackgroundResource(android.R.color.holo_green_light);
 
 
 		// Update timer since the order was placed
@@ -457,6 +477,7 @@ public class Order  {
 			// Change the order display to hide the normal action buttons and to show the timeout acknowledgment
 			view.findViewById(R.id.view_order_actions).setVisibility(View.GONE);
 			view.findViewById(R.id.view_order_expired).setVisibility(View.VISIBLE);
+			view.findViewById(R.id.view_order_background).setBackgroundResource(android.R.color.holo_red_light);
 			
 			// Set text based on reason
 			((TextView) view.findViewById(R.id.view_order_state_description)).setText(errorReason);
@@ -478,13 +499,6 @@ public class Order  {
 				((TextView) view.findViewById(R.id.view_order_timeout)).setText("Expires in < " + String.valueOf((int)left_min)+" min");
 			else
 				((TextView) view.findViewById(R.id.view_order_timeout)).setText("About to expire");
-
-			// Set up buttons
-			((Button) view.findViewById(R.id.view_order_button_positive)).setTag(this);
-			((Button) view.findViewById(R.id.view_order_button_positive)).setText(positive);
-			((Button) view.findViewById(R.id.view_order_button_negative)).setText(negative);
-			((Button) view.findViewById(R.id.view_order_button_negative)).setTag(this);
-			((Button) view.findViewById(R.id.view_order_button_remove)).setTag(this);
 		}
 		
 		// Set a pointer to the object being displayed 
@@ -513,7 +527,10 @@ public class Order  {
 		LinearLayout view = (LinearLayout) inflater.inflate(R.layout.bartender_order_mini, container, false);
 		
 		((TextView) view.findViewById(R.id.view_order_title)).setText(title);
-		((TextView) view.findViewById(R.id.view_order_description)).setText(description);
+		if (description.equals(""))
+			((TextView) view.findViewById(R.id.view_order_description)).setVisibility(View.GONE);
+		else 
+			((TextView) view.findViewById(R.id.view_order_description)).setText(description);
 		((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(baseAmount));
 
 		// Set a pointer to hte object being displayed
