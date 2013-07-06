@@ -52,8 +52,9 @@
                                 android:layout_width="fill_parent"
                                 android:layout_height="fill_parent"
                                 android:clickable="true"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/profile" />
+                                android:paddingRight="8dp"
+                                android:scaleType="centerInside"
+                                android:src="@drawable/ic_launcher" />
 
                             <TextView
                                 android:id="@+id/textView2"
@@ -91,7 +92,9 @@
                                     android:ems="14"
                                     android:hint="Venue name"
                                     android:inputType="text"
+                                    android:text="Finn McCool&apos;s"
                                     android:textAppearance="?android:attr/textAppearanceSmall" />
+
                             </LinearLayout>
 
                             <LinearLayout
@@ -378,7 +381,9 @@
                                 android:ems="10"
                                 android:hint="Your name"
                                 android:inputType="textCapWords"
+                                android:text="Tobias Oerum"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
+
                         </LinearLayout>
 
                         <LinearLayout
@@ -400,7 +405,9 @@
                                 android:ems="10"
                                 android:hint="This will also be your login"
                                 android:inputType="textEmailAddress"
+                                android:text="tobias.oerum@vendsy.com"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
+
                         </LinearLayout>
 
                         <LinearLayout
@@ -422,7 +429,9 @@
                                 android:ems="10"
                                 android:hint="6 or more characters"
                                 android:inputType="textPassword"
+                                android:text="Vendsy2013!"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
+
                         </LinearLayout>
 
                         <LinearLayout
@@ -443,7 +452,9 @@
                                 android:ems="10"
                                 android:hint="retype your password"
                                 android:inputType="textPassword"
+                                android:text="Vendsy2013!"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
+
                         </LinearLayout>
 
                         <LinearLayout
@@ -506,6 +517,7 @@
                                 android:ems="10"
                                 android:hint="Your representative&apos;s name"
                                 android:inputType="textCapWords"
+                                android:text="Tobias Oerum"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
                         </LinearLayout>
@@ -529,6 +541,7 @@
                                 android:ems="10"
                                 android:hint="Your representative&apos;s @Vendsy email"
                                 android:inputType="textEmailAddress"
+                                android:text="tobias.oerum@vendsy.com"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
                         </LinearLayout>
@@ -598,10 +611,12 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
+                                android:contentDescription="5a0999dda39f9fe07a44"
                                 android:ems="14"
-                                android:hint="Optional for menu display"
-                                android:text="49be3dcf7e507f6b4775"
+                                android:hint="49be3dcf7e507f6b4775"
+                                android:text="beec9320f3921035e4d7"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
+
                         </LinearLayout>
 
                         <LinearLayout

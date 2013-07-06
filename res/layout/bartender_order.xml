@@ -2,41 +2,112 @@
            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                android:layout_width="fill_parent"
                android:layout_height="wrap_content"
-               android:orientation="vertical"
-               android:padding="4dp" >
+               android:orientation="vertical" >
 
                <LinearLayout
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content"
-                   android:background="@drawable/rounded_corner_dark"
-                   android:padding="2dp" >
+                   android:background="@android:color/background_dark"
+                   android:padding="1dp" >
 
                    <LinearLayout
                        android:id="@+id/view_order_background"
                        android:layout_width="fill_parent"
                        android:layout_height="wrap_content"
-                       android:background="@drawable/rounded_corner"
-                       android:orientation="vertical"
-                       android:padding="2dp" >
+                       android:background="@android:color/holo_green_light"
+                       android:orientation="vertical" >
 
                        <LinearLayout
-                           android:id="@+id/view_order_mini"
+                           android:id="@+id/view_order_header"
+                           android:layout_width="fill_parent"
+                           android:layout_height="wrap_content"
+                           android:orientation="horizontal" >
+
+                           <TextView
+                               android:id="@+id/TextView03"
+                               android:layout_width="wrap_content"
+                               android:layout_height="wrap_content"
+                               android:layout_gravity="center_vertical"
+                               android:gravity="center_vertical"
+                               android:paddingLeft="4dp"
+                               android:text="#"
+                               android:textAppearance="?android:attr/textAppearanceLarge"
+                               android:textStyle="bold" />
+
+                           <TextView
+                               android:id="@+id/view_order_number"
+                               android:layout_width="wrap_content"
+                               android:layout_height="wrap_content"
+                               android:layout_gravity="center_vertical"
+                               android:gravity="center_vertical"
+                               android:text="100012"
+                               android:textAppearance="?android:attr/textAppearanceLarge"
+                               android:textStyle="bold" />
+
+                           <TextView
+                               android:id="@+id/TextView07"
+                               android:layout_width="wrap_content"
+                               android:layout_height="wrap_content"
+                               android:layout_gravity="center_vertical"
+                               android:gravity="center_vertical"
+                               android:paddingLeft="@dimen/activity_vertical_margin"
+                               android:text="("
+                               android:textAppearance="?android:attr/textAppearanceLarge"
+                               android:textStyle="bold" />
+
+                           <TextView
+                               android:id="@+id/view_order_profile_name"
+                               android:layout_width="wrap_content"
+                               android:layout_height="wrap_content"
+                               android:layout_gravity="center_vertical"
+                               android:text="Peter Kellis"
+                               android:textAppearance="?android:attr/textAppearanceLarge"
+                               android:textStyle="bold" />
+
+                           <TextView
+                               android:id="@+id/TextView10"
+                               android:layout_width="0dp"
+                               android:layout_height="wrap_content"
+                               android:layout_gravity="center_vertical"
+                               android:layout_weight="2"
+                               android:gravity="center_vertical"
+                               android:paddingRight="@dimen/activity_vertical_margin"
+                               android:text=")"
+                               android:textAppearance="?android:attr/textAppearanceLarge"
+                               android:textStyle="bold" />
+
+                           <ImageButton
+                               android:id="@+id/view_order_button_customer_details"
+                               android:layout_width="wrap_content"
+                               android:layout_height="wrap_content"
+                               android:src="@drawable/arrowexpand" />
+
+                       </LinearLayout>
+
+                       <LinearLayout
+                           android:id="@+id/view_order_body"
                            android:layout_width="match_parent"
                            android:layout_height="wrap_content"
+                           android:layout_marginBottom="2dp"
+                           android:layout_marginLeft="2dp"
+                           android:layout_marginRight="2dp"
+                           android:background="@android:color/background_light"
+                           android:divider="?android:dividerHorizontal"
                            android:orientation="vertical"
-                           android:padding="4dp" >
+                           android:showDividers="beginning" >
 
                            <LinearLayout
-                               android:id="@+id/view_order_header"
+                               android:id="@+id/view_order_customer_details"
                                android:layout_width="fill_parent"
                                android:layout_height="wrap_content"
-                               android:background="@drawable/rounded_corner_dark" >
+                               android:visibility="gone" >
 
                                <ImageView
                                    android:id="@+id/view_order_profile_picture"
-                                   android:layout_width="100dp"
-                                   android:layout_height="100dp"
-                                   android:scaleType="fitCenter" />
+                                   android:layout_width="80dp"
+                                   android:layout_height="80dp"
+                                   android:scaleType="fitCenter"
+                                   android:src="@drawable/profile" />
 
                                <LinearLayout
                                    android:layout_width="fill_parent"
@@ -45,42 +116,47 @@
                                    android:orientation="vertical" >
 
                                    <TextView
-                                       android:id="@+id/view_order_number"
+                                       android:id="@+id/textView1"
                                        android:layout_width="wrap_content"
                                        android:layout_height="wrap_content"
-                                       android:gravity="center_vertical"
-                                       android:paddingLeft="@dimen/activity_vertical_margin"
-                                       android:paddingRight="@dimen/activity_vertical_margin"
-                                       android:text="100012"
-                                       android:textAppearance="?android:attr/textAppearanceLargeInverse"
-                                       android:textSize="48sp"
-                                       android:textStyle="bold" />
+                                       android:text="Customer since: 4/15/2013" />
 
                                    <TextView
-                                       android:id="@+id/view_order_profile_name"
+                                       android:id="@+id/textView2"
                                        android:layout_width="wrap_content"
                                        android:layout_height="wrap_content"
-                                       android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                                       android:paddingLeft="@dimen/activity_horizontal_margin"
-                                       android:text="Peter Kellis"
-                                       android:textAppearance="?android:attr/textAppearanceMediumInverse"
-                                       android:textStyle="bold" />
-                                   
-                                   
+                                       android:text="Status: Platinum"
+                                       android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                                   <TextView
+                                       android:id="@+id/textView3"
+                                       android:layout_width="wrap_content"
+                                       android:layout_height="wrap_content"
+                                       android:text="Total orders: 23"
+                                       android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                                   <TextView
+                                       android:id="@+id/textView4"
+                                       android:layout_width="wrap_content"
+                                       android:layout_height="wrap_content"
+                                       android:text="Orders today: 2"
+                                       android:textAppearance="?android:attr/textAppearanceSmall" />
                                </LinearLayout>
                            </LinearLayout>
 
                            <LinearLayout
+                               android:id="@+id/view_order_timing"
                                android:layout_width="fill_parent"
                                android:layout_height="wrap_content"
-                               android:padding="4dp" >
+                               android:paddingLeft="4dp"
+                               android:paddingRight="4dp" >
 
                                <TextView
                                    android:id="@+id/TextView04"
                                    android:layout_width="wrap_content"
                                    android:layout_height="wrap_content"
                                    android:text="Placed "
-                                   android:textAppearance="?android:attr/textAppearanceMedium"
+                                   android:textAppearance="?android:attr/textAppearanceSmall"
                                    android:textStyle="bold" />
 
                                <TextView
@@ -88,7 +164,7 @@
                                    android:layout_width="wrap_content"
                                    android:layout_height="wrap_content"
                                    android:text="3 min"
-                                   android:textAppearance="?android:attr/textAppearanceMedium"
+                                   android:textAppearance="?android:attr/textAppearanceSmall"
                                    android:textStyle="bold" />
 
                                <TextView
@@ -96,7 +172,7 @@
                                    android:layout_width="wrap_content"
                                    android:layout_height="wrap_content"
                                    android:text=" ago. "
-                                   android:textAppearance="?android:attr/textAppearanceMedium"
+                                   android:textAppearance="?android:attr/textAppearanceSmall"
                                    android:textStyle="bold" />
 
                                <TextView
@@ -104,7 +180,7 @@
                                    android:layout_width="0dp"
                                    android:layout_height="wrap_content"
                                    android:layout_weight="2"
-                                   android:textAppearance="?android:attr/textAppearanceMedium"
+                                   android:textAppearance="?android:attr/textAppearanceSmall"
                                    android:textStyle="bold" />
 
                                <TextView
@@ -112,190 +188,177 @@
                                    android:layout_width="wrap_content"
                                    android:layout_height="wrap_content"
                                    android:text="Expires in &lt; 3 min"
-                                   android:textAppearance="?android:attr/textAppearanceMedium"
+                                   android:textAppearance="?android:attr/textAppearanceSmall"
                                    android:textStyle="bold" />
-                           </LinearLayout>
-
-                           <LinearLayout
-                               android:id="@+id/view_order_expired"
-                               style="?android:attr/buttonBarStyle"
-                               android:layout_width="match_parent"
-                               android:layout_height="wrap_content"
-                               android:layout_gravity="center_horizontal"
-                               android:background="@drawable/rounded_corner_red"
-                               android:orientation="vertical"
-                               android:visibility="gone" >
-
-                               <TextView
-                                   android:id="@+id/view_order_state_description"
-                                   android:layout_width="fill_parent"
-                                   android:layout_height="fill_parent"
-                                   android:layout_marginTop="@dimen/activity_vertical_margin"
-                                   android:gravity="center"
-                                   android:text="ORDER EXPIRED"
-                                   android:textAppearance="?android:attr/textAppearanceMedium"
-                                   android:textColor="#ffffff"
-                                   android:textStyle="bold" />
-
-                               <Button
-                                   android:id="@+id/view_order_button_expired"
-                                   style="?android:attr/buttonStyle"
-                                   android:layout_width="fill_parent"
-                                   android:layout_height="wrap_content"
-                                   android:text="Save to failed orders"
-                                   android:textStyle="bold" />
-
                            </LinearLayout>
 
                            <LinearLayout
                                android:id="@+id/view_order_mini"
                                android:layout_width="match_parent"
                                android:layout_height="wrap_content"
-                               android:orientation="vertical" >
+                               android:divider="?android:dividerHorizontal"
+                               android:dividerPadding="4dp"
+                               android:orientation="vertical"
+                               android:showDividers="beginning|end" >
 
                                <include
                                    android:layout_width="fill_parent"
                                    android:layout_height="wrap_content"
                                    layout="@layout/bartender_order_mini" />
-
                            </LinearLayout>
 
-                       </LinearLayout>
+                           <LinearLayout
+                               android:id="@+id/view_order_totals"
+                               android:layout_width="fill_parent"
+                               android:layout_height="wrap_content" >
 
-                       <FrameLayout
-                           android:layout_width="match_parent"
-                           android:layout_height="2dp"
-                           android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                           android:layout_marginRight="@dimen/activity_horizontal_margin"
-                           android:background="@drawable/rounded_corner" >
+                               <TextView
+                                   android:id="@+id/TextView11"
+                                   android:layout_width="wrap_content"
+                                   android:layout_height="fill_parent"
+                                   android:layout_gravity="center_vertical"
+                                   android:gravity="center_vertical"
+                                   android:text=" Tip: "
+                                   android:textAppearance="?android:attr/textAppearanceSmall" />
 
-                       </FrameLayout>
+                               <TextView
+                                   android:id="@+id/view_order_tip_mini"
+                                   android:layout_width="wrap_content"
+                                   android:layout_height="fill_parent"
+                                   android:gravity="center_vertical"
+                                   android:text="$"
+                                   android:textAppearance="?android:attr/textAppearanceSmall"
+                                   android:textSize="14sp"
+                                   android:textStyle="bold" />
 
-                       <LinearLayout
-                           android:layout_width="fill_parent"
-                           android:layout_height="wrap_content"
-                           android:paddingBottom="@dimen/activity_vertical_margin"
-                           android:paddingLeft="@dimen/activity_vertical_margin"
-                           android:paddingRight="@dimen/activity_vertical_margin"
-                           android:paddingTop="4dp" >
+                               <TextView
+                                   android:id="@+id/view_order_tip_amount"
+                                   android:layout_width="wrap_content"
+                                   android:layout_height="fill_parent"
+                                   android:layout_gravity="center_vertical"
+                                   android:layout_marginRight="@dimen/activity_horizontal_margin"
+                                   android:gravity="center_vertical"
+                                   android:text="2.00"
+                                   android:textAppearance="?android:attr/textAppearanceSmall"
+                                   android:textStyle="bold" />
 
-                           <TextView
-                               android:id="@+id/TextView11"
-                               android:layout_width="wrap_content"
-                               android:layout_height="fill_parent"
-                               android:layout_gravity="center_vertical"
-                               android:gravity="center_vertical"
-                               android:text=" Tip: "
-                               android:textAppearance="?android:attr/textAppearanceSmall" />
+                               <TextView
+                                   android:id="@+id/TextViewTotal"
+                                   android:layout_width="wrap_content"
+                                   android:layout_height="fill_parent"
+                                   android:gravity="center_vertical"
+                                   android:text="Tax: "
+                                   android:textAppearance="?android:attr/textAppearanceSmall" />
 
-                           <TextView
-                               android:id="@+id/view_order_tip_mini"
-                               android:layout_width="wrap_content"
-                               android:layout_height="fill_parent"
-                               android:gravity="center_vertical"
-                               android:text="$"
-                               android:textAppearance="?android:attr/textAppearanceSmall"
-                               android:textSize="14sp"
-                               android:textStyle="bold" />
+                               <TextView
+                                   android:id="@+id/TextView05"
+                                   android:layout_width="wrap_content"
+                                   android:layout_height="fill_parent"
+                                   android:gravity="center_vertical"
+                                   android:text="$"
+                                   android:textAppearance="?android:attr/textAppearanceSmall"
+                                   android:textSize="14sp"
+                                   android:textStyle="bold" />
 
-                           <TextView
-                               android:id="@+id/view_order_tip_amount"
-                               android:layout_width="wrap_content"
-                               android:layout_height="fill_parent"
-                               android:layout_gravity="center_vertical"
-                               android:layout_marginRight="@dimen/activity_horizontal_margin"
-                               android:gravity="center_vertical"
-                               android:text="2.00"
-                               android:textAppearance="?android:attr/textAppearanceSmall"
-                               android:textSize="14sp"
-                               android:textStyle="bold" />
+                               <TextView
+                                   android:id="@+id/view_order_tax_amount"
+                                   android:layout_width="wrap_content"
+                                   android:layout_height="fill_parent"
+                                   android:gravity="center_vertical"
+                                   android:text="10.00"
+                                   android:textAppearance="?android:attr/textAppearanceSmall"
+                                   android:textStyle="bold" />
 
-                           <TextView
-                               android:id="@+id/TextViewTotal"
-                               android:layout_width="wrap_content"
-                               android:layout_height="fill_parent"
-                               android:gravity="center_vertical"
-                               android:text="Tax: "
-                               android:textAppearance="?android:attr/textAppearanceSmall"
-                               android:textSize="14sp" />
+                               <FrameLayout
+                                   android:layout_width="10dp"
+                                   android:layout_height="fill_parent"
+                                   android:layout_weight="2" >
+                               </FrameLayout>
 
-                           <TextView
-                               android:id="@+id/TextView05"
-                               android:layout_width="wrap_content"
-                               android:layout_height="fill_parent"
-                               android:gravity="center_vertical"
-                               android:text="$"
-                               android:textAppearance="?android:attr/textAppearanceSmall"
-                               android:textSize="14sp"
-                               android:textStyle="bold" />
+                               <TextView
+                                   android:id="@+id/TextView06"
+                                   android:layout_width="wrap_content"
+                                   android:layout_height="fill_parent"
+                                   android:gravity="center_vertical"
+                                   android:text=" Total: "
+                                   android:textAppearance="?android:attr/textAppearanceSmall" />
 
-                           <TextView
-                               android:id="@+id/view_order_tax_amount"
-                               android:layout_width="wrap_content"
-                               android:layout_height="fill_parent"
-                               android:gravity="center_vertical"
-                               android:text="10.00"
-                               android:textAppearance="?android:attr/textAppearanceSmall"
-                               android:textSize="14sp"
-                               android:textStyle="bold" />
+                               <TextView
+                                   android:id="@+id/TextView01"
+                                   android:layout_width="wrap_content"
+                                   android:layout_height="fill_parent"
+                                   android:gravity="center_vertical"
+                                   android:text="$"
+                                   android:textAppearance="?android:attr/textAppearanceSmall"
+                                   android:textStyle="bold" />
 
-                           <FrameLayout
-                               android:layout_width="10dp"
-                               android:layout_height="fill_parent"
-                               android:layout_weight="2" >
-                           </FrameLayout>
+                               <TextView
+                                   android:id="@+id/view_order_total_amount"
+                                   android:layout_width="wrap_content"
+                                   android:layout_height="fill_parent"
+                                   android:layout_marginRight="4dp"
+                                   android:gravity="center_vertical"
+                                   android:text="10.00"
+                                   android:textAppearance="?android:attr/textAppearanceSmall"
+                                   android:textStyle="bold" />
+                           </LinearLayout>
 
-                           <TextView
-                               android:id="@+id/TextView06"
-                               android:layout_width="wrap_content"
-                               android:layout_height="fill_parent"
-                               android:gravity="center_vertical"
-                               android:text=" Total: "
-                               android:textAppearance="?android:attr/textAppearanceSmall"
-                               android:textSize="14sp" />
-
-                           <TextView
-                               android:id="@+id/TextView01"
-                               android:layout_width="wrap_content"
-                               android:layout_height="fill_parent"
-                               android:gravity="center_vertical"
-                               android:text="$"
-                               android:textAppearance="?android:attr/textAppearanceSmall"
-                               android:textSize="18sp"
-                               android:textStyle="bold" />
-
-                           <TextView
-                               android:id="@+id/view_order_total_amount"
-                               android:layout_width="wrap_content"
-                               android:layout_height="fill_parent"
-                               android:layout_marginRight="4dp"
-                               android:gravity="center_vertical"
-                               android:text="10.00"
-                               android:textAppearance="?android:attr/textAppearanceSmall"
-                               android:textSize="18sp"
-                               android:textStyle="bold" />
-
-                       </LinearLayout>
-
-                       <LinearLayout
-                           android:id="@+id/view_order_actions"
-                           android:layout_width="match_parent"
-                           android:layout_height="fill_parent"
-                           android:gravity="center_vertical" >
-
-                           <Button
-                               android:id="@+id/view_order_button_negative"
-                               android:layout_width="wrap_content"
+                           <LinearLayout
+                               android:id="@+id/view_order_footer"
+                               android:layout_width="match_parent"
                                android:layout_height="wrap_content"
-                               android:layout_weight="20"
-                               android:text="Reject" />
+                               android:orientation="vertical" >
 
-                           <Button
-                               android:id="@+id/view_order_button_positive"
-                               android:layout_width="wrap_content"
-                               android:layout_height="wrap_content"
-                               android:layout_weight="80"
-                               android:text="Accept" />
+                               <LinearLayout
+                                   android:id="@+id/view_order_actions"
+                                   android:layout_width="match_parent"
+                                   android:layout_height="fill_parent"
+                                   android:gravity="center_vertical" >
+
+                                   <Button
+                                       android:id="@+id/view_order_button_negative"
+                                       android:layout_width="wrap_content"
+                                       android:layout_height="wrap_content"
+                                       android:layout_weight="20"
+                                       android:text="Reject" />
+
+                                   <Button
+                                       android:id="@+id/view_order_button_positive"
+                                       android:layout_width="wrap_content"
+                                       android:layout_height="wrap_content"
+                                       android:layout_weight="80"
+                                       android:text="Accept" />
+                               </LinearLayout>
+
+                               <LinearLayout
+                                   android:id="@+id/view_order_expired"
+                                   style="?android:attr/buttonBarStyle"
+                                   android:layout_width="match_parent"
+                                   android:layout_height="wrap_content"
+                                   android:orientation="horizontal"
+                                   android:visibility="gone" >
+
+                                   <TextView
+                                       android:id="@+id/view_order_state_description"
+                                       android:layout_width="0dp"
+                                       android:layout_height="fill_parent"
+                                       android:layout_marginLeft="4dp"
+                                       android:layout_weight="2"
+                                       android:gravity="left|center_vertical"
+                                       android:text="Order has expired"
+                                       android:textAppearance="?android:attr/textAppearanceSmall"
+                                       android:textStyle="bold" />
+
+                                   <Button
+                                       android:id="@+id/view_order_button_expired"
+                                       style="?android:attr/buttonStyle"
+                                       android:layout_width="wrap_content"
+                                       android:layout_height="wrap_content"
+                                       android:text="OK"
+                                       android:textAppearance="?android:attr/textAppearanceMedium"
+                                       android:textStyle="bold" />
+                               </LinearLayout>
+                           </LinearLayout>
 
                        </LinearLayout>
                    </LinearLayout>
