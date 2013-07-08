@@ -25,7 +25,7 @@ public class CSVReader {
     private boolean linesSkiped;
 
     /** The default separator to use if none is supplied to the constructor. */
-    public static final char DEFAULT_SEPARATOR = '|';
+    public static final char DEFAULT_SEPARATOR = ',';
 
     /**
      * The default quote character to use if none is supplied to the
