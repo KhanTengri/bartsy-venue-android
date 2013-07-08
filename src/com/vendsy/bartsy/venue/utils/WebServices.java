@@ -159,7 +159,7 @@ public class WebServices {
 			e.printStackTrace();
 		}
 		
-		Log.i(TAG, "<=== postRequest response: "+response);
+		Log.i(TAG, "<=== postRequest response: " + url + ", " + response);
 		
 		
 		return response;
@@ -315,7 +315,7 @@ public class WebServices {
 	 * This Method i am using for each and every request which is going through
 	 * get() method.
 	 */
-	public static String getRequest(String url, Context context) {
+/*	private static String getRequest(String url, Context context) {
 		
 		Log.i(TAG,"===> getRequest("+ url + ")");
 
@@ -350,11 +350,11 @@ public class WebServices {
 			e.printStackTrace();
 		}
 
-		
-		Log.i(TAG,"<=== getRequest response: "+ result);
+		Log.i(TAG,"<=== getRequest response: " + url + ", " + result);
 
 		return result;
 	}
+*/
 	
 	/**
 	 * To send ingredients to the server
@@ -473,7 +473,8 @@ public class WebServices {
 					responseofmain = null;
 				}
 
-				
+				Log.i(TAG,"<=== postRequest response: "+ url  + ", " + json);
+
 				return responseofmain;
 			}
 
