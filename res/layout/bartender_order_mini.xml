@@ -51,7 +51,7 @@
 	        android:layout_height="fill_parent"
 	        android:gravity="center_vertical"
 	        android:text="$"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	        android:textAppearance="?android:attr/textAppearanceSmall" />
 	
 	    <TextView
 	        android:id="@+id/view_order_mini_base_amount"
@@ -60,7 +60,7 @@
 	        android:layout_marginRight="@dimen/activity_horizontal_margin"
 	        android:gravity="center_vertical"
 	        android:text="12"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	        android:textAppearance="?android:attr/textAppearanceSmall" />
 	
 	</LinearLayout>
 

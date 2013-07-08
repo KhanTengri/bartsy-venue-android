@@ -52,8 +52,7 @@
                                android:gravity="center_vertical"
                                android:paddingLeft="@dimen/activity_vertical_margin"
                                android:text="("
-                               android:textAppearance="?android:attr/textAppearanceLarge"
-                               android:textStyle="bold" />
+                               android:textAppearance="?android:attr/textAppearanceLarge" />
 
                            <TextView
                                android:id="@+id/view_order_profile_name"
@@ -61,8 +60,7 @@
                                android:layout_height="wrap_content"
                                android:layout_gravity="center_vertical"
                                android:text="Peter Kellis"
-                               android:textAppearance="?android:attr/textAppearanceLarge"
-                               android:textStyle="bold" />
+                               android:textAppearance="?android:attr/textAppearanceLarge" />
 
                            <TextView
                                android:id="@+id/TextView10"
@@ -71,15 +69,13 @@
                                android:layout_gravity="center_vertical"
                                android:layout_weight="2"
                                android:gravity="center_vertical"
-                               android:paddingRight="@dimen/activity_vertical_margin"
                                android:text=")"
-                               android:textAppearance="?android:attr/textAppearanceLarge"
-                               android:textStyle="bold" />
+                               android:textAppearance="?android:attr/textAppearanceLarge" />
 
                            <ImageButton
                                android:id="@+id/view_order_button_customer_details"
                                android:layout_width="wrap_content"
-                               android:layout_height="wrap_content"
+                               android:layout_height="35dp"
                                android:src="@drawable/arrowexpand" />
 
                        </LinearLayout>
@@ -213,13 +209,44 @@
                                android:layout_height="wrap_content" >
 
                                <TextView
+                                   android:id="@+id/TextViewTotal"
+                                   android:layout_width="wrap_content"
+                                   android:layout_height="fill_parent"
+                                   android:gravity="center_vertical"
+                                   android:text=" Tax: "
+                                   android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                               <TextView
+                                   android:id="@+id/TextView05"
+                                   android:layout_width="wrap_content"
+                                   android:layout_height="fill_parent"
+                                   android:gravity="center_vertical"
+                                   android:text="$"
+                                   android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                               <TextView
+                                   android:id="@+id/view_order_tax_amount"
+                                   android:layout_width="wrap_content"
+                                   android:layout_height="fill_parent"
+                                   android:gravity="center_vertical"
+                                   android:text="10.00"
+                                   android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                               <FrameLayout
+                                   android:layout_width="10dp"
+                                   android:layout_height="fill_parent"
+                                   android:layout_weight="2" >
+                               </FrameLayout>
+
+                               <TextView
                                    android:id="@+id/TextView11"
                                    android:layout_width="wrap_content"
                                    android:layout_height="fill_parent"
                                    android:layout_gravity="center_vertical"
                                    android:gravity="center_vertical"
                                    android:text=" Tip: "
-                                   android:textAppearance="?android:attr/textAppearanceSmall" />
+                                   android:textAppearance="?android:attr/textAppearanceSmall"
+                                   android:textColor="@android:color/holo_blue_dark" />
 
                                <TextView
                                    android:id="@+id/view_order_tip_mini"
@@ -228,6 +255,7 @@
                                    android:gravity="center_vertical"
                                    android:text="$"
                                    android:textAppearance="?android:attr/textAppearanceSmall"
+                                   android:textColor="@android:color/holo_blue_dark"
                                    android:textSize="14sp"
                                    android:textStyle="bold" />
 
@@ -240,33 +268,7 @@
                                    android:gravity="center_vertical"
                                    android:text="2.00"
                                    android:textAppearance="?android:attr/textAppearanceSmall"
-                                   android:textStyle="bold" />
-
-                               <TextView
-                                   android:id="@+id/TextViewTotal"
-                                   android:layout_width="wrap_content"
-                                   android:layout_height="fill_parent"
-                                   android:gravity="center_vertical"
-                                   android:text="Tax: "
-                                   android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                               <TextView
-                                   android:id="@+id/TextView05"
-                                   android:layout_width="wrap_content"
-                                   android:layout_height="fill_parent"
-                                   android:gravity="center_vertical"
-                                   android:text="$"
-                                   android:textAppearance="?android:attr/textAppearanceSmall"
-                                   android:textSize="14sp"
-                                   android:textStyle="bold" />
-
-                               <TextView
-                                   android:id="@+id/view_order_tax_amount"
-                                   android:layout_width="wrap_content"
-                                   android:layout_height="fill_parent"
-                                   android:gravity="center_vertical"
-                                   android:text="10.00"
-                                   android:textAppearance="?android:attr/textAppearanceSmall"
+                                   android:textColor="@android:color/holo_blue_dark"
                                    android:textStyle="bold" />
 
                                <FrameLayout
@@ -289,8 +291,7 @@
                                    android:layout_height="fill_parent"
                                    android:gravity="center_vertical"
                                    android:text="$"
-                                   android:textAppearance="?android:attr/textAppearanceSmall"
-                                   android:textStyle="bold" />
+                                   android:textAppearance="?android:attr/textAppearanceSmall" />
 
                                <TextView
                                    android:id="@+id/view_order_total_amount"
@@ -299,20 +300,23 @@
                                    android:layout_marginRight="4dp"
                                    android:gravity="center_vertical"
                                    android:text="10.00"
-                                   android:textAppearance="?android:attr/textAppearanceSmall"
-                                   android:textStyle="bold" />
+                                   android:textAppearance="?android:attr/textAppearanceSmall" />
+
                            </LinearLayout>
 
                            <LinearLayout
                                android:id="@+id/view_order_footer"
                                android:layout_width="match_parent"
                                android:layout_height="wrap_content"
-                               android:orientation="vertical" >
+                               android:divider="?android:dividerHorizontal"
+                               android:orientation="vertical"
+                               android:showDividers="beginning" >
 
                                <LinearLayout
                                    android:id="@+id/view_order_actions"
                                    android:layout_width="match_parent"
                                    android:layout_height="fill_parent"
+                                   android:layout_gravity="center_vertical"
                                    android:gravity="center_vertical" >
 
                                    <Button
@@ -332,27 +336,27 @@
 
                                <LinearLayout
                                    android:id="@+id/view_order_expired"
-                                   style="?android:attr/buttonBarStyle"
                                    android:layout_width="match_parent"
                                    android:layout_height="wrap_content"
-                                   android:orientation="horizontal"
+                                   android:divider="?android:dividerHorizontal"
+                                   android:orientation="vertical"
+                                   android:showDividers="beginning"
                                    android:visibility="gone" >
 
                                    <TextView
                                        android:id="@+id/view_order_state_description"
-                                       android:layout_width="0dp"
+                                       android:layout_width="fill_parent"
                                        android:layout_height="fill_parent"
                                        android:layout_marginLeft="4dp"
-                                       android:layout_weight="2"
                                        android:gravity="left|center_vertical"
                                        android:text="Order has expired"
-                                       android:textAppearance="?android:attr/textAppearanceSmall"
-                                       android:textStyle="bold" />
+                                       android:textAppearance="?android:attr/textAppearanceMedium"
+                                       android:textColor="@android:color/holo_red_dark" />
 
                                    <Button
                                        android:id="@+id/view_order_button_expired"
                                        style="?android:attr/buttonStyle"
-                                       android:layout_width="wrap_content"
+                                       android:layout_width="fill_parent"
                                        android:layout_height="wrap_content"
                                        android:text="OK"
                                        android:textAppearance="?android:attr/textAppearanceMedium"

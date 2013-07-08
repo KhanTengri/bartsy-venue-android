@@ -112,6 +112,11 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		
 		ArrayList<Order> ordersClone = mApp.cloneOrders();
 
+		// Counters for insterted orders in the different layouts
+		int newOrdersCount = 0;
+		int acceptedOrdersCount = 0;
+		int completedOrdersCount = 0;
+		
 		for (Order order : ordersClone) {
 			
 			Log.v(TAG, "Adding order " + order.serverID + " with status " + order.status + " and last status " + order.last_status + " to the layout");
@@ -123,38 +128,92 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			switch (order.status) {
 			case Order.ORDER_STATUS_NEW:
 				// add order to the top of the accepted orders list view
-				insertOrderInLayout(order,mNewOrdersView);
+				newOrdersCount += insertOrderInLayout(order,mNewOrdersView);
 				break;
 			case Order.ORDER_STATUS_IN_PROGRESS:
 				// add order to the top of the accepted orders list view
-				insertOrderInLayout(order, mAcceptedOrdersView);
+				acceptedOrdersCount += insertOrderInLayout(order, mAcceptedOrdersView);
 				break;
 			case Order.ORDER_STATUS_READY:
 				// add order to the bottom of the completed orders list view 
-				insertOrderInLayout(order, mCompletedOrdersView);
+				completedOrdersCount += insertOrderInLayout(order, mCompletedOrdersView);
 				break;
 			case Order.ORDER_STATUS_CANCELLED:
 			case Order.ORDER_STATUS_TIMEOUT:
 				// add cancelled order in the right layout based on its last state
 				switch (order.last_status) {
 				case Order.ORDER_STATUS_NEW:
-					insertOrderInLayout(order, mNewOrdersView);
+					newOrdersCount += insertOrderInLayout(order, mNewOrdersView);
 					break;
 				case Order.ORDER_STATUS_IN_PROGRESS:
-					insertOrderInLayout(order, mAcceptedOrdersView);
+					acceptedOrdersCount += insertOrderInLayout(order, mAcceptedOrdersView);
 					break;
 				case Order.ORDER_STATUS_READY:
-					insertOrderInLayout(order, mCompletedOrdersView);
+					completedOrdersCount += insertOrderInLayout(order, mCompletedOrdersView);
 					break;
 				default:
 					// We should not have gotten there. Show the order regardless but warn the user...
 					order.errorReason = "This order is cancelled, but in the wrong state. Please let the Bartsy team know.";
-					insertOrderInLayout(order, mCompletedOrdersView);
-					
+					completedOrdersCount += insertOrderInLayout(order, mCompletedOrdersView);
 				}
 				break;
 			}
 		}
+		
+		// Get order timeouts
+		int minTimeout = 0;
+		int maxTimeout = 0;
+		for (Order order : ordersClone) {
+			minTimeout = Math.min(order.timeOut, minTimeout);
+			maxTimeout = Math.max(order.timeOut, maxTimeout);
+		}
+		String timeoutString;
+		if (minTimeout == 0 && maxTimeout == 0)
+			timeoutString = "";
+		else if (minTimeout == 0)
+			timeoutString = "(" + maxTimeout + " min timeout)";
+		else if (maxTimeout == 0)
+			timeoutString = "(" + minTimeout + " min timeout)";
+		else
+			timeoutString = "(" + minTimeout + "-" + maxTimeout + " min timeout)";
+		
+		// Set title for new orders layout
+		String title = "";
+		switch (newOrdersCount) {
+		case 0:
+			title = "No new orders";
+			break;
+		case 1:
+			title = "1 new order " + timeoutString;
+			break;
+		default:
+			title = newOrdersCount	+ " new orders " + timeoutString;
+		}
+		((Button) mRootView.findViewById(R.id.view_order_new_button)).setText(title);
+		
+		// Set title for accepted orders layout
+		switch (acceptedOrdersCount) {
+		case 0:
+			title = "No orders in progress";
+			break;
+		case 1:
+			title = "1 order in progress " + timeoutString;
+			break;
+		default:
+			title = newOrdersCount	+ " orders in progress " + timeoutString;
+		}
+		((Button) mRootView.findViewById(R.id.view_order_in_progress_button)).setText(title);
+		
+		// Set title for completed orders layout
+		switch (completedOrdersCount) {
+		case 0:
+			title = "No completed orders";
+			break;
+		default:
+			title = "Click to enter customer pickup code" ;
+			break;
+		}
+		((Button) mRootView.findViewById(R.id.view_order_ready_button)).setText(title);
 	}
 
 	
@@ -162,7 +221,10 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 	 * Bundles orders of a user together using the same order number for convenience
 	 */
 	
-	void insertOrderInLayout(Order order, LinearLayout layout) {
+	int insertOrderInLayout(Order order, LinearLayout layout) {
+		
+		// How many orders we're inserted in the layout
+		int count = 0; 
 		
 		// Never bundle expired or cancelled orders 
 		if (order.status != Order.ORDER_STATUS_CANCELLED && order.status != Order.ORDER_STATUS_TIMEOUT) {
@@ -190,14 +252,16 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 					Float totalAmount = (Float) view.findViewById(R.id.view_order_total_amount).getTag();
 					layoutOrder.updateTipTaxTotalView(tipAmount + order.tipAmount, taxAmount + order.taxAmount, totalAmount + order.totalAmount);
 					
-					return;
+					return count;
 				}
 			}
 		}
 		
 		// No previous order was found, insert the order at the top level
-		
 		layout.addView(order.view);
+		count++;
+		
+		// Update order view buttons
 		order.view.findViewById(R.id.view_order_button_positive).setOnClickListener(this);
 		order.view.findViewById(R.id.view_order_button_positive).setTag(order);
 		
@@ -212,6 +276,8 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		
 		order.view.findViewById(R.id.view_order_button_customer_details).setOnClickListener(this);
 		order.view.findViewById(R.id.view_order_button_customer_details).setTag(order);
+		
+		return count;
 	}
 	
 
