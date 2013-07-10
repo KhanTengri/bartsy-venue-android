@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.BartsyApplication;
 import com.vendsy.bartsy.venue.MainActivity;
+import com.vendsy.bartsy.venue.dialog.CodeDialogFragment;
 import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.Utilities;
@@ -43,14 +44,20 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 	public BartsyApplication mApp = null;
 	
 
+    // Viewing modes - these control additional features of the view such as customer-centric view
+    private int mViewMode = VIEW_MODE_ALL;
+    private String mViewModeOptions = null;
+    public static final int VIEW_MODE_ALL		= 0; // View all orders in the layout
+    public static final int VIEW_MODE_CUSTOMER	= 1; // View only orders specified in the viewModeOptions field
+    
+
 	/*
 	 * Creates a map view, which is for now a mock image. Listen for clicks on the image
 	 * and toggle the bar details image
 	 */ 
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
 		Log.v("Bartsy", "OrdersSectionFragment.onCreateView()");
 
@@ -69,19 +76,43 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		updateOrdersView();
 		
 		// Check and set development environment display
-		if (WebServices.DOMAIN_NAME.equalsIgnoreCase("http://54.235.76.180:8080/") && 
-				WebServices.SENDER_ID.equalsIgnoreCase("605229245886")) 
+		if (WebServices.DOMAIN_NAME.equalsIgnoreCase("http://54.235.76.180:8080/") && WebServices.SENDER_ID.equalsIgnoreCase("605229245886")) 
 			((TextView) mRootView.findViewById(R.id.view_main_deployment_environment)).setText("Server: DEV");
-		else if (WebServices.DOMAIN_NAME.equalsIgnoreCase("http://app.bartsy.vendsy.com/") && 
-				WebServices.SENDER_ID.equalsIgnoreCase("560663323691")) 
+		else if (WebServices.DOMAIN_NAME.equalsIgnoreCase("http://app.bartsy.vendsy.com/") && WebServices.SENDER_ID.equalsIgnoreCase("560663323691")) 
 			((TextView) mRootView.findViewById(R.id.view_main_deployment_environment)).setText("Server: PROD");
 		else 
 			((TextView) mRootView.findViewById(R.id.view_main_deployment_environment)).setText("** INCONSISTENT DEPLOYMENT **");
 		
+		// Set up button listeners
+		mRootView.findViewById(R.id.view_order_new_button).setOnClickListener(this);
+		mRootView.findViewById(R.id.view_order_in_progress_button).setOnClickListener(this);
+		mRootView.findViewById(R.id.view_order_ready_button).setOnClickListener(this);
+		mRootView.findViewById(R.id.view_customer_mode_button).setOnClickListener(this);
+		
 		return mRootView;
-
 	}
 	
+
+	/**
+	 * Sets the view modes of this view
+	 * @param mode
+	 * @param options
+	 */
+	public void setViewMode(int mode, String options) {
+		switch (mode) {
+		case VIEW_MODE_ALL:
+			mViewMode = mode;
+			mViewModeOptions = options;
+			break;
+		case VIEW_MODE_CUSTOMER:
+			mViewMode = mode;
+			mViewModeOptions = options;
+			break;
+		}
+		
+		// Notify of the change in view
+		mApp.notifyObservers(BartsyApplication.ORDERS_UPDATED);
+	}
 	
 	/***
 	 * Updates the orders view
@@ -100,6 +131,17 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		if (mNewOrdersView == null || mAcceptedOrdersView == null || mCompletedOrdersView == null)
 			return;
 		
+		// Setup view options
+		switch (mViewMode) {
+		case VIEW_MODE_ALL:
+			mRootView.findViewById(R.id.view_customer_mode).setVisibility(View.GONE);
+			break;
+		case VIEW_MODE_CUSTOMER:
+			((TextView) mRootView.findViewById(R.id.view_customer_pickup_code)).setText("Customer code: " + mViewModeOptions);
+			mRootView.findViewById(R.id.view_customer_mode).setVisibility(View.VISIBLE);
+			break;
+		}
+		
 		// Make sure the list views are all empty
 		
 		mNewOrdersView.removeAllViews();
@@ -112,51 +154,58 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		
 		ArrayList<Order> ordersClone = mApp.cloneOrders();
 
-		// Counters for insterted orders in the different layouts
+		// Counters for inserted orders in the different layouts
 		int newOrdersCount = 0;
 		int acceptedOrdersCount = 0;
 		int completedOrdersCount = 0;
 		
 		for (Order order : ordersClone) {
 			
-			Log.v(TAG, "Adding order " + order.serverID + " with status " + order.status + " and last status " + order.last_status + " to the layout");
+			// If we're in customer mode check to see if we can exit that mode 
+			if (mViewMode == VIEW_MODE_CUSTOMER && !mViewModeOptions.equals(order.userSessionCode)) {
+
+				Log.v(TAG, "Customer mode - Skipping order " + order.serverId + " with status " + order.status + " and last status " + order.last_status + " to the layout");
 			
-			// Update the view's main layout 
-			order.view = mInflater.inflate(R.layout.bartender_order, mContainer, false);
-			order.updateView();
-			
-			switch (order.status) {
-			case Order.ORDER_STATUS_NEW:
-				// add order to the top of the accepted orders list view
-				newOrdersCount += insertOrderInLayout(order,mNewOrdersView);
-				break;
-			case Order.ORDER_STATUS_IN_PROGRESS:
-				// add order to the top of the accepted orders list view
-				acceptedOrdersCount += insertOrderInLayout(order, mAcceptedOrdersView);
-				break;
-			case Order.ORDER_STATUS_READY:
-				// add order to the bottom of the completed orders list view 
-				completedOrdersCount += insertOrderInLayout(order, mCompletedOrdersView);
-				break;
-			case Order.ORDER_STATUS_CANCELLED:
-			case Order.ORDER_STATUS_TIMEOUT:
-				// add cancelled order in the right layout based on its last state
-				switch (order.last_status) {
+			} else {
+				Log.v(TAG, "Adding order " + order.serverId + " with status " + order.status + " and last status " + order.last_status + " to the layout");
+				
+				// Update the view's main layout 
+				order.updateView(mInflater, mContainer, mViewMode);
+				
+				switch (order.status) {
 				case Order.ORDER_STATUS_NEW:
-					newOrdersCount += insertOrderInLayout(order, mNewOrdersView);
+					// add order to the top of the accepted orders list view
+					newOrdersCount += insertOrderInLayout(order,mNewOrdersView);
 					break;
 				case Order.ORDER_STATUS_IN_PROGRESS:
+					// add order to the top of the accepted orders list view
 					acceptedOrdersCount += insertOrderInLayout(order, mAcceptedOrdersView);
 					break;
 				case Order.ORDER_STATUS_READY:
+					// add order to the bottom of the completed orders list view 
 					completedOrdersCount += insertOrderInLayout(order, mCompletedOrdersView);
 					break;
-				default:
-					// We should not have gotten there. Show the order regardless but warn the user...
-					order.errorReason = "This order is cancelled, but in the wrong state. Please let the Bartsy team know.";
-					completedOrdersCount += insertOrderInLayout(order, mCompletedOrdersView);
+				case Order.ORDER_STATUS_CANCELLED:
+				case Order.ORDER_STATUS_TIMEOUT:
+					// add cancelled order in the right layout based on its last state
+					switch (order.last_status) {
+					case Order.ORDER_STATUS_NEW:
+						newOrdersCount += insertOrderInLayout(order, mNewOrdersView);
+						break;
+					case Order.ORDER_STATUS_IN_PROGRESS:
+						acceptedOrdersCount += insertOrderInLayout(order, mAcceptedOrdersView);
+						break;
+					case Order.ORDER_STATUS_READY:
+						completedOrdersCount += insertOrderInLayout(order, mCompletedOrdersView);
+						break;
+					default:
+						// We should not have gotten there. Show the order regardless but warn the user...
+						order.errorReason = "This order is cancelled, but in the wrong state. Please let the Bartsy team know.";
+						completedOrdersCount += insertOrderInLayout(order, mCompletedOrdersView);
+					}
+					break;
+
 				}
-				break;
 			}
 		}
 		
@@ -210,7 +259,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			title = "No completed orders";
 			break;
 		default:
-			title = "Click to enter customer pickup code" ;
+			title = "Click to enter pickup code" ;
 			break;
 		}
 		((Button) mRootView.findViewById(R.id.view_order_ready_button)).setText(title);
@@ -218,7 +267,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 
 	
 	/**
-	 * Bundles orders of a user together using the same order number for convenience
+	 * Optionally bundles orders of a user together using the same order number for convenience
 	 */
 	
 	int insertOrderInLayout(Order order, LinearLayout layout) {
@@ -227,7 +276,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		int count = 0; 
 		
 		// Never bundle expired or cancelled orders 
-		if (order.status != Order.ORDER_STATUS_CANCELLED && order.status != Order.ORDER_STATUS_TIMEOUT) {
+		if (Constants.bundle && order.status != Order.ORDER_STATUS_CANCELLED && order.status != Order.ORDER_STATUS_TIMEOUT) {
 		
 			// Try to insert the order in a previous order from the same user
 
@@ -241,10 +290,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 						layoutOrder.orderRecipient.userID.equalsIgnoreCase(order.orderRecipient.userID)) {
 					
 					// Found an existing order from the same user. Insert a mini-view of the order
-					LinearLayout miniLayout = (LinearLayout) view.findViewById(R.id.view_order_mini);
-					View miniView = order.getMiniView(mInflater, mContainer);
-					miniView.findViewById(R.id.view_order_button_remove).setOnClickListener(this);
-					miniLayout.addView(miniView);
+					order.addItemsView((LinearLayout) view.findViewById(R.id.view_order_mini), mInflater, mContainer);
 					
 					// Update the view (not the order itself) of the master order total values to include the order just added
 					Float tipAmount = (Float) view.findViewById(R.id.view_order_tip_amount).getTag();
@@ -268,9 +314,6 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		order.view.findViewById(R.id.view_order_button_negative).setOnClickListener(this);
 		order.view.findViewById(R.id.view_order_button_negative).setTag(order);
 		
-		order.view.findViewById(R.id.view_order_button_remove).setOnClickListener(this);
-		order.view.findViewById(R.id.view_order_button_remove).setTag(order);
-
 		order.view.findViewById(R.id.view_order_button_expired).setOnClickListener(this);
 		order.view.findViewById(R.id.view_order_button_expired).setTag(order);
 		
@@ -284,7 +327,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 	/**
 	 * 
 	 * Handle clicks coming from an item in the order list. These change the state of the orders and notify the
-	 * other sides. We bundle orders together by sender and pressing a postivie or negative button processes all
+	 * other sides. We bundle orders together by sender and pressing a positive or negative button processes all
 	 * the orders in the bundle. Individual items in an order can also be rejected by pressing the button on the 
 	 * left of the time.
 	 * 
@@ -296,76 +339,40 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		Log.v(TAG, "onClick()");
 
 		Order order = (Order) v.getTag();
-		ArrayList<Order> orders = mApp.cloneOrders();
-		int status = order.status;
-		String userID = order.orderRecipient.userID;
-
+		ArrayList<Order> orders = null;
+		int status = 0;
+		String userID = null;
+		if (order != null) {
+			orders = mApp.cloneOrders();
+			status = order.status;
+			userID = order.orderRecipient.userID;
+			Log.v(TAG, "---- Master order: " + order.serverId + " from " + userID + " with status " + status);
+		}
+		
 		// Update the order status locally 
 		
-		Log.v(TAG, "---- Master order: " + order.serverID + " from " + userID + " with status " + status);
 
 		switch (v.getId()) {
 		
 		case R.id.view_order_button_positive:
 			
 			// Process all orders for that user that are currently in this state
-
 			Log.v(TAG, "Clicked on order positive button");
-
-			for (Order orderItem : orders) {
-				
-				Log.v(TAG, "Processing child order " + orderItem.serverID + " from " + orderItem.orderRecipient.userID + " with status " + orderItem.status);
-				
-				if (orderItem.status == status && orderItem.orderRecipient.userID.equalsIgnoreCase(userID)) {
-
-					orderItem.nextPositiveState();	
-					Log.v(TAG, "Child matches parent - update status to " + orderItem.status);
-
-//					if (orderItem.status == Order.ORDER_STATUS_COMPLETE) {
-//						Log.v(TAG, "Removing child with status COMPLETE");
-//						orderItem.view = null;
-//						mApp.removeOrder(orderItem);
-//					}
-					// Send updated order status to the remote
-					mApp.update();
-//					((MainActivity) getActivity()).sendOrderStatusChanged(orderItem);
-				}
-			}
-
+			order.nextPositiveState();	
+			Log.v(TAG, "Child matches parent - update status to " + order.status);
+			
+			
+//			mApp.update(); //- this will get called automatically in the next cycle, don't call it now to make UI more snappy
 			break;
 			
 		case R.id.view_order_button_negative:
 			
 			// Process all orders for that user that are currently in this state
-
 			Log.v(TAG, "Clicked on order negative button");
-
-			for (Order orderItem : orders) {
-
-				Log.v(TAG, "Processing order " + orderItem.serverID);
-				
-				if (orderItem.status == status && orderItem.orderRecipient.userID.equalsIgnoreCase(userID)) {
-					orderItem.nextNegativeState("Order rejected by the bartender");	
-//					orderItem.view = null;
-//					mApp.removeOrder(orderItem);
-					// Send updated order status to the remote
-					mApp.update();
-//					((MainActivity) getActivity()).sendOrderStatusChanged(orderItem);
-				}
-			}
-			
+			order.nextNegativeState("Order rejected by the bartender");	
+//			mApp.update();
 			break;
 			
-		case R.id.view_order_button_remove:
-			Log.v(TAG, "Clicked on order remove button");
-			order.nextNegativeState("Individual order rejected by the bartender");
-//			order.view = null;
-//			mApp.removeOrder(order);
-			// Send updated order status to the remote
-			mApp.update();
-//			((MainActivity) getActivity()).sendOrderStatusChanged(order);
-			break;
-
 		case R.id.view_order_button_expired:
 			Log.v(TAG, "Clicked on order expired button");
 			order.view = null;
@@ -376,9 +383,42 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			Log.v(TAG, "Clicked on the customers details button - toggle customer details view");
 			order.showCustomerDetails = !order.showCustomerDetails;
 			break;
+			
+		case R.id.view_order_ready_button:
+			Log.v(TAG, "Clicked on the pickup button");
+			
+			// Create an instance of the dialog fragment and show it
+			CodeDialogFragment dialog = new CodeDialogFragment();
+			dialog.show(getActivity().getSupportFragmentManager(),"Enter customer code");
+			break;
+			
+		case R.id.view_customer_mode_button:
+			Log.v(TAG, "Clicked on the close customer details button");
+			
+			setViewMode(VIEW_MODE_ALL, null);
+			break;
+			
 		default:
 			break;
 		}
+		
+		
+		// If we're in customer mode check to see if we can exit that mode 
+		boolean customerOrderFound = false;
+		if (order!= null && mViewMode == VIEW_MODE_CUSTOMER) {
+			for (Order customerOrder : mApp.cloneOrders()) {
+				if(customerOrder.status == Order.ORDER_STATUS_READY && mViewModeOptions.equals(customerOrder.userSessionCode)) {
+					customerOrderFound = true;
+					break;
+				}
+			}
+			
+			// If no remaining orders found for that user return to all orders viewing mode
+			if (!customerOrderFound) {
+				setViewMode(VIEW_MODE_ALL, null);
+			}
+		}
+		
 		
 		// Update the orders view
 		updateOrdersView();

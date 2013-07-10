@@ -1,17 +1,11 @@
 package com.vendsy.bartsy.venue.model;
 
-import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
-
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,21 +15,19 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.utils.Utilities;
-import com.vendsy.bartsy.venue.utils.WebServices;
+import com.vendsy.bartsy.venue.view.BartenderSectionFragment;
 
 public class Order  {
 
 	static final String TAG = "Order";
 	
 	// Each order has an ID that is unique within a session number
-	public String serverID; 
+	public String serverId; 
 	
-	// Title and description are arbitrary strings
-	public String title, description;
-	public String itemId;
+	// List of items in this order
+	public ArrayList<Item> items = new ArrayList<Item>();
 	
 	// The total price is in the local denomination and is the sum of price * quantity, fee and tax
 	public int quantity = 1;
@@ -58,6 +50,7 @@ public class Order  {
 	public Profile orderRecipient;
 	public String senderId;
 	public String recipientId;
+	public String userSessionCode;
 	
 	// The view displaying this order or null. The view is the display of the order in a list. 
 	// The list could be either on the client or the server and it looks different in both cases
@@ -115,18 +108,34 @@ public class Order  {
 		JSONObject orderData = new JSONObject();
 		
 		try {
-			orderData.put("itemId", itemId);
-			orderData.put("itemName", title);
+			if (items.size() > 1) {
+				JSONArray jsonItems = new JSONArray();
+				for (Item item : items) {
+					JSONObject jsonItem = new JSONObject();
+					jsonItem.put("itemId", item.getItemId());
+					jsonItem.put("itemName", item.getTitle());
+					jsonItem.put("description", item.getDescription());
+					jsonItem.put("basePrice", item.getPrice());
+					jsonItems.put(jsonItem);
+				}
+				orderData.put("itemsList", jsonItems);
+			} else if (items.size() == 1) {
+				orderData.put("itemId", items.get(0).getItemId());
+				orderData.put("itemName", items.get(0).getTitle());
+				orderData.put("description", items.get(0).getDescription());
+			}
+
 			orderData.put("basePrice", String.valueOf(baseAmount));
 			orderData.put("tipPercentage", String.valueOf(tipAmount));
 			orderData.put("totalPrice", String.valueOf(totalAmount));
 			orderData.put("orderStatus", ORDER_STATUS_NEW);
-			orderData.put("description", description);
 			
-			// these fields are not used by the host but give a more details picture of the order
 			orderData.put("status", status);
 			orderData.put("orderTimeout", timeOut);
-			orderData.put("serverId", serverID);
+			orderData.put("serverId", serverId);
+			
+			orderData.put("dateCreated", this.createdDate);
+			orderData.put("dateUpdated", this.updatedDate);
 			
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -144,9 +153,31 @@ public class Order  {
 	public Order(JSONObject json) {
 		
 		try {
-			title = json.getString("itemName");
-			serverID = json.getString("orderId");
+			
+			serverId = json.getString("orderId");
 
+			// Parse old format item
+			if (json.has("title")  || json.has("description") || json.has("itemId")) {
+				Item item = new Item();
+				if (json.has("itemName"))
+					item.setTitle(json.getString("itemName"));
+				if (json.has("description"))
+					item.setDescription(json.getString("description"));
+				if (json.has("basePrice"))
+					item.setPrice(json.getString("basePrice"));
+				if (json.has("itemId"))
+					item.setItemId(json.getString("itemId"));
+				items.add(item);
+			} 
+	
+			// Parse new format item list
+			if (json.has("itemsList")) {
+				JSONArray itemsJSON = json.getJSONArray("itemsList");
+				
+				for (int i=0 ; i < itemsJSON.length() ; i++) {
+					items.add(new Item(itemsJSON.getJSONObject(i)));
+				}
+			}
 			
 			baseAmount = Float.valueOf(json.getString("basePrice"));
 			tipAmount = Float.valueOf(json.getString("tipPercentage"));
@@ -155,8 +186,6 @@ public class Order  {
 			
 			if (json.has("bartsyId"))
 				profileId = json.getString("bartsyId");
-			if (json.has("description"))
-				description = json.getString("description");
 			
 			if (json.has("orderTimeout"))
 				timeOut = json.getInt("orderTimeout");
@@ -219,6 +248,10 @@ public class Order  {
 			
 			if (json.has("lastState"))
 				last_status = Integer.parseInt(json.getString("lastState"));
+			
+			// Set up user session code
+			if (json.has("userSessionCode")) 
+				userSessionCode = json.getString("userSessionCode");
 			
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
@@ -283,14 +316,14 @@ public class Order  {
 			status = ORDER_STATUS_COMPLETE;
 			break;
 		default:
-			Log.v(TAG, "Order " + serverID + " status not changed to next positive because the status was " + status);
+			Log.v(TAG, "Order " + serverId + " status not changed to next positive because the status was " + status);
 			return;
 		}
 		
 		// Mark the time of the state transition in the timetable
 		state_transitions[status] = new Date();
 		
-		Log.v(TAG, "Order " + this.serverID + " moved from state" + last_status + " to state " + status);
+		Log.v(TAG, "Order " + this.serverId + " moved from state" + last_status + " to state " + status);
 	}
 
 	public void setCancelledState(String cancelReason) {
@@ -299,7 +332,7 @@ public class Order  {
 		
 		// Don't change orders that have already this status because their last_status would get lost
 		if (status == ORDER_STATUS_CANCELLED || status == ORDER_STATUS_TIMEOUT) {
-			Log.v(TAG, "Order " + this.serverID + " was already cancelled or timed out (last status: " + last_status + ")");
+			Log.v(TAG, "Order " + this.serverId + " was already cancelled or timed out (last status: " + last_status + ")");
 			return;
 		}
 		
@@ -308,7 +341,7 @@ public class Order  {
 		state_transitions[status] = new Date();
 		errorReason = cancelReason;
 
-		Log.v(TAG, "Order " + this.serverID + " moved from status" + last_status + " to cancelled status " + status + " with reason " + cancelReason);
+		Log.v(TAG, "Order " + this.serverId + " moved from status" + last_status + " to cancelled status " + status + " with reason " + cancelReason);
 	}
 
 	public void setTimeoutState() {
@@ -322,9 +355,9 @@ public class Order  {
 			state_transitions[status] = new Date();
 			errorReason = "Server unreachable. Check your internet connection and notify Bartsy customer support.";
 
-			Log.v(TAG, "Order " + this.serverID + " moved from state " + last_status + " to timeout state " + status);
+			Log.v(TAG, "Order " + this.serverId + " moved from state " + last_status + " to timeout state " + status);
 		} else {
-			Log.v(TAG, "Order " + this.serverID + "with last status " + last_status + " not changed to timeout status because the status was " + status + " with reason " + errorReason);
+			Log.v(TAG, "Order " + this.serverId + "with last status " + last_status + " not changed to timeout status because the status was " + status + " with reason " + errorReason);
 			return;
 		}
 		
@@ -354,12 +387,12 @@ public class Order  {
 			status = ORDER_STATUS_INCOMPLETE;
 			break;
 		default:
-			Log.v(TAG, "Order " + serverID + " status not changed to negative with reason " + errorReason + " because the status was " + status);
+			Log.v(TAG, "Order " + serverId + " status not changed to negative with reason " + errorReason + " because the status was " + status);
 			return;
 		}
 		
 		// Log the state change and update the order with an error reason
-		Log.v(TAG, "Order " + serverID + " changed status from " + oldStatus + " to " + status + " for reason: "  + errorReason);
+		Log.v(TAG, "Order " + serverId + " changed status from " + oldStatus + " to " + status + " for reason: "  + errorReason);
 		this.errorReason = errorReason;
 		
 		// Mark the time of the state transition in the timetable
@@ -373,7 +406,7 @@ public class Order  {
 	public JSONObject statusChangedJSON(){
 		final JSONObject orderData = new JSONObject();
 		try {
-			orderData.put("orderId", serverID);
+			orderData.put("orderId", serverId);
 			orderData.put("orderStatus", status);
 			orderData.put("orderRejectionReason", errorReason);
 			
@@ -388,17 +421,21 @@ public class Order  {
 	 * Updates the order view. Notice the view holds a pointer to the object being displayed through the "tag" field
 	 */
 	
-	public void updateView () {
+	public void updateView (LayoutInflater inflater, ViewGroup container, int options) {
 
+		Log.v(TAG, "updateView()");
+		Log.v(TAG, "Order sender   :" + orderSender);
+		Log.v(TAG, "Order receiver :" + orderRecipient);
+		
+		view = (View) inflater.inflate(R.layout.bartender_order, container, false);
+		
 		if (view == null) return;
 
 		// Set main order parameters
-		((TextView) view.findViewById(R.id.view_order_number)).setText(serverID);
-		((TextView) view.findViewById(R.id.view_order_title)).setText(title);
-		if (description != null && !description.equals(""))
-			((TextView) view.findViewById(R.id.view_order_description)).setText(description);
-		else
-			view.findViewById(R.id.view_order_description).setVisibility(View.GONE);
+		((TextView) view.findViewById(R.id.view_order_number)).setText(userSessionCode);
+		
+		// Add the order list
+		addItemsView((LinearLayout) view.findViewById(R.id.view_order_mini), inflater, container);
 
 		// Set base price
 		((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(baseAmount));
@@ -420,27 +457,24 @@ public class Order  {
 			}			
 		}
 
-		// Update buttons and background
-		
-		String positive="", negative="";
+		// Update buttons 
 		switch (status) {
 		case ORDER_STATUS_NEW:
-			positive = "ACCEPT";
-			negative = "REJECT";
+			((Button) view.findViewById(R.id.view_order_button_positive)).setText("ACCEPT");
+			((Button) view.findViewById(R.id.view_order_button_negative)).setText("REJECT");
 			break;
 		case ORDER_STATUS_IN_PROGRESS:
-			positive = "COMPLETED";
-			negative = "FAILED";
+			((Button) view.findViewById(R.id.view_order_button_positive)).setText("COMPLETED");
+			((Button) view.findViewById(R.id.view_order_button_negative)).setText("FAILED");
 			break;
 		case ORDER_STATUS_READY:
-			positive = "PICKED UP";
-			negative = "NO SHOW";
+			((Button) view.findViewById(R.id.view_order_button_positive)).setText("PICKED UP");
+			((Button) view.findViewById(R.id.view_order_button_negative)).setText("NO SHOW");
+
+			if (options == BartenderSectionFragment.VIEW_MODE_ALL)
+				view.findViewById(R.id.view_order_actions).setVisibility(View.GONE);
 			break;
 		}
-
-		// Set up button text
-		((Button) view.findViewById(R.id.view_order_button_positive)).setText(positive);
-		((Button) view.findViewById(R.id.view_order_button_negative)).setText(negative);
 
 		// Show/hide customer details
 		if (showCustomerDetails) {
@@ -467,10 +501,8 @@ public class Order  {
 		else
 			view.findViewById(R.id.view_order_background).setBackgroundResource(android.R.color.holo_green_light);
 
-
 		// Update timer since the order was placed
 		((TextView) view.findViewById(R.id.view_order_timer)).setText(String.valueOf((int)elapsed_min)+" min");
-
 		
 		// Handle timeout views
 		if (status == ORDER_STATUS_CANCELLED || status == ORDER_STATUS_TIMEOUT) {
@@ -488,10 +520,6 @@ public class Order  {
 			// Set tag to self for clicks
 			view.findViewById(R.id.view_order_button_expired).setTag(this);
 
-			// Hide order item rejection button
-			((Button) view.findViewById(R.id.view_order_button_remove)).setVisibility(View.GONE);
-
-		
 		} else {
 
 			// Update timeout counter		
@@ -503,7 +531,6 @@ public class Order  {
 		
 		// Set a pointer to the object being displayed 
 		view.setTag(this);
-		
 	}
 	
 	/**
@@ -522,19 +549,20 @@ public class Order  {
 		}
 	}
 	
-	public View getMiniView(LayoutInflater inflater, ViewGroup container ) {
+	public View addItemsView(LinearLayout itemsView, LayoutInflater inflater, ViewGroup container ) {
 		
-		LinearLayout view = (LinearLayout) inflater.inflate(R.layout.bartender_order_mini, container, false);
-		
-		((TextView) view.findViewById(R.id.view_order_title)).setText(title);
-		if (description.equals(""))
-			((TextView) view.findViewById(R.id.view_order_description)).setVisibility(View.GONE);
-		else 
-			((TextView) view.findViewById(R.id.view_order_description)).setText(description);
-		((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(baseAmount));
+		for (Item item : items) {
+			LinearLayout view = (LinearLayout) inflater.inflate(R.layout.bartender_order_mini, container, false);
+			((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(Float.parseFloat(item.getPrice())));
+			((TextView) view.findViewById(R.id.view_order_title)).setText(item.getTitle());
+			if (item.getDescription() != null || item.getDescription().equalsIgnoreCase(""))
+				((TextView) view.findViewById(R.id.view_order_description)).setVisibility(View.GONE);
+			else
+				((TextView) view.findViewById(R.id.view_order_description)).setText(item.getDescription());
+			
+			itemsView.addView(view);
+		}
 
-		// Set a pointer to hte object being displayed
-		view.findViewById(R.id.view_order_button_remove).setTag(this);
 
 		return view;
 	}

@@ -8,7 +8,7 @@ public class Constants {
 	public static final int timoutDelay = 2; 
 	
 	// frequency in which to run the background service, in ms
-	public static final long monitorFrequency = 60000 ; 
+	public static final long monitorFrequency = 20000 ; 
 	
 	// This is the url for download the facebook picture
 	public static final String FB_PICTURE = "https://graph.facebook.com/";
@@ -21,4 +21,7 @@ public class Constants {
 
 	// CSV file for spirits and mixers
 	public static final String COCKTAILS_CSV_FILE = "Cocktails.csv";
+	
+	// Bundle orders together?
+	public static final boolean bundle = false;
 }

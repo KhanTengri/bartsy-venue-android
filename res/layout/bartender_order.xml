@@ -88,9 +88,7 @@
                            android:layout_marginLeft="2dp"
                            android:layout_marginRight="2dp"
                            android:background="@android:color/background_light"
-                           android:divider="?android:dividerHorizontal"
-                           android:orientation="vertical"
-                           android:showDividers="beginning" >
+                           android:orientation="vertical" >
 
                            <LinearLayout
                                android:id="@+id/view_order_customer_details"
@@ -196,11 +194,6 @@
                                android:dividerPadding="4dp"
                                android:orientation="vertical"
                                android:showDividers="beginning|end" >
-
-                               <include
-                                   android:layout_width="fill_parent"
-                                   android:layout_height="wrap_content"
-                                   layout="@layout/bartender_order_mini" />
                            </LinearLayout>
 
                            <LinearLayout
@@ -350,7 +343,7 @@
                                        android:layout_marginLeft="4dp"
                                        android:gravity="left|center_vertical"
                                        android:text="Order has expired"
-                                       android:textAppearance="?android:attr/textAppearanceMedium"
+                                       android:textAppearance="?android:attr/textAppearanceSmall"
                                        android:textColor="@android:color/holo_red_dark" />
 
                                    <Button

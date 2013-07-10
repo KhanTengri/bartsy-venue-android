@@ -27,7 +27,7 @@ import com.vendsy.bartsy.venue.BartsyApplication;
 import com.vendsy.bartsy.venue.MainActivity;
 import com.vendsy.bartsy.venue.adapter.ExpandableListAdapter;
 import com.vendsy.bartsy.venue.db.DatabaseManager;
-import com.vendsy.bartsy.venue.model.MenuDrink;
+import com.vendsy.bartsy.venue.model.Item;
 import com.vendsy.bartsy.venue.model.Section;
 import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.WebServices;
@@ -52,9 +52,9 @@ public class DrinksSectionFragment extends Fragment {
 	
 	private class Menu {
 		ArrayList<String> headings;
-		ArrayList<ArrayList<MenuDrink>> items;
+		ArrayList<ArrayList<Item>> items;
 		
-		Menu (ArrayList<String> headings, ArrayList<ArrayList<MenuDrink>> items) {
+		Menu (ArrayList<String> headings, ArrayList<ArrayList<Item>> items) {
 			this.headings = headings;
 			this.items = items;
 		}
@@ -219,7 +219,7 @@ public class DrinksSectionFragment extends Fragment {
 	private Menu extractMenuFromResponse (String response) {
 		
 		ArrayList<String> headings = new ArrayList<String>();
-		ArrayList<ArrayList<MenuDrink>> items = new ArrayList<ArrayList<MenuDrink>>();
+		ArrayList<ArrayList<Item>> items = new ArrayList<ArrayList<Item>>();
 	
 		try {
 		
@@ -261,9 +261,9 @@ public class DrinksSectionFragment extends Fragment {
 
 							// Add the list of items under that heading to the items list
 							JSONArray contents = subSection.getJSONArray("contents");
-							ArrayList<MenuDrink> subsection_contents = new ArrayList<MenuDrink>();
+							ArrayList<Item> subsection_contents = new ArrayList<Item>();
 							for (int k = 0; k < contents.length(); k++) {
-								MenuDrink menuDrink = new MenuDrink(contents.getJSONObject(k));
+								Item menuDrink = new Item(contents.getJSONObject(k));
 
 								subsection_contents.add(menuDrink);
 							}
@@ -319,7 +319,7 @@ public class DrinksSectionFragment extends Fragment {
 		// Display menu from memory into the view
 		
 		ArrayList<String> headings = mMenu.headings;
-		final ArrayList<ArrayList<MenuDrink>> items = mMenu.items;
+		final ArrayList<ArrayList<Item>> items = mMenu.items;
 
 		Log.v(TAG, "Menu is in cache. Displaying " + headings.size() + " headings");
 

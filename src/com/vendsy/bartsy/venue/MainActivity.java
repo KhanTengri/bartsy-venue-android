@@ -1,5 +1,7 @@
 package com.vendsy.bartsy.venue;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Locale;
 
 import org.json.JSONArray;
@@ -39,6 +41,7 @@ import android.widget.Toast;
 
 import com.google.analytics.tracking.android.EasyTracker;
 import com.vendsy.bartsy.venue.dialog.PeopleDialogFragment;
+import com.vendsy.bartsy.venue.dialog.CodeDialogFragment;
 import com.vendsy.bartsy.venue.model.AppObservable;
 import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.model.Profile;
@@ -52,9 +55,8 @@ import com.vendsy.bartsy.venue.view.InventorySectionFragment;
 import com.vendsy.bartsy.venue.view.PastOrdersFragment;
 import com.vendsy.bartsy.venue.view.PeopleSectionFragment;
 
-public class MainActivity extends FragmentActivity implements
-		ActionBar.TabListener, PeopleDialogFragment.UserDialogListener,
-		AppObserver {
+
+public class MainActivity extends FragmentActivity implements ActionBar.TabListener, PeopleDialogFragment.UserDialogListener, AppObserver, CodeDialogFragment.CodeDialogListener {
 
 	/****************
 	 * 
@@ -798,35 +800,44 @@ public class MainActivity extends FragmentActivity implements
 	
 	/*
 	 * 
-	 * TODO - User interaction commands
+	 * TODO - Dialog interaction
 	 */
 
 	@Override
 	public void onUserDialogPositiveClick(DialogFragment dialog) {
 		// User touched the dialog's positive button
 
-		Profile user = ((PeopleDialogFragment) dialog).mUser;
-
-		appendStatus("Sending drink to: " + user.getDisplayName());
-
-		mApp.newLocalUserMessage("<command><opcode>message</opcode>"
-				+ "<argument>" + user.getDisplayName()+ "</argument>"
-				+ "<argument>" + "hi buddy" + "</argument>" + "</command>");
-		appendStatus("Placed drink order");
 	}
 
 	@Override
 	public void onUserDialogNegativeClick(DialogFragment dialog) {
 		// User touched the dialog's positive button
 
-		Profile user = ((PeopleDialogFragment) dialog).mUser;
+	}
 
-		appendStatus("Sending message to: " + user.getDisplayName());
-
-		mApp.newLocalUserMessage("<command><opcode>message</opcode>"
-				+ "<argument>" + user.getDisplayName() + "</argument>"
-				+ "<argument>" + "hi buddy" + "</argument>" + "</command>");
-		appendStatus("Sent message");
+	/**
+	 * Called by the CodeDialogFragment dialog upon entering the user pickup code. Stops the dialog and if there are orders for that user code opens the user orders activity.
+	 * @see com.vendsy.bartsy.venue.dialog.CodeDialogFragment.CodeDialogListener#onCodeComplete(com.vendsy.bartsy.venue.dialog.CodeDialogFragment)
+	 */
+	@Override
+	public void onCodeComplete(CodeDialogFragment dialogFragment) {
+		mApp.makeText(dialogFragment.mCode, Toast.LENGTH_SHORT);
+		dialogFragment.dismiss();
+		
+		// Make sure the code exists in at least one of the open orders
+		boolean codeMatches= false;
+		for (Order order : mApp.cloneOrders()) 
+			if (dialogFragment.mCode.equals(order.userSessionCode))
+				codeMatches = true;
+		if (!codeMatches) {
+			Toast.makeText(this, "Invalid customer code", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
+		// The code matches, put the view in customer-centric mode
+		if (this.mBartenderFragment != null) {
+			mBartenderFragment.setViewMode(BartenderSectionFragment.VIEW_MODE_CUSTOMER, dialogFragment.mCode);
+		}
 	}
 
 }

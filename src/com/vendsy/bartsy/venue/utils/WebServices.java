@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -62,13 +63,13 @@ public class WebServices {
 
 	// Google API project id registered to use GCM.
 //	public static final String SENDER_ID = "227827031375";
-//	public static final String SENDER_ID = "605229245886"; // dev 
-	public static final String SENDER_ID = "560663323691"; // prod
+	public static final String SENDER_ID = "605229245886"; // dev 
+//	public static final String SENDER_ID = "560663323691"; // prod
 	
 	// Server
 //	public static final String DOMAIN_NAME = "http://192.168.0.109:8080/";
-//	public static final String DOMAIN_NAME = "http://54.235.76.180:8080/";		// dev
-	public static final String DOMAIN_NAME = "http://app.bartsy.vendsy.com/"; 	// prod
+	public static final String DOMAIN_NAME = "http://54.235.76.180:8080/";		// dev
+//	public static final String DOMAIN_NAME = "http://app.bartsy.vendsy.com/"; 	// prod
 
 	// Current ApiVersion number
 	public static final String 	API_VERSION="2";
@@ -119,18 +120,18 @@ public class WebServices {
 	 * @return
 	 * @throws Exception
 	 */
-	public static String postRequest(String url, JSONObject postData, BartsyApplication context) throws Exception {
+	public static String postRequest(String url, JSONObject postData, BartsyApplication context) {
 
 		String response = null;
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpPost httppost = new HttpPost(url);
-		// added apiVersion
-		postData.put("apiVersion", API_VERSION);
-		String data = postData.toString();
-		
-		Log.i(TAG,"===> postRequest("+ url  + ", " + data + ")");
 		
 		try {
+			postData.put("apiVersion", API_VERSION);
+			String data = postData.toString();
+
+			Log.i(TAG,"===> postRequest("+ url  + ", " + data + ")");
+
 			boolean status = isNetworkAvailable(context);
 			if (status == true) {
 				try {
@@ -414,6 +415,8 @@ public class WebServices {
 
 		try {
 
+			json.put("apiVersion", API_VERSION);
+
 			// Converting venue profile bitmap image into byte array
 			if (bitmap!=null) {
 				// Image found - converting it to a byte array and adding to syscall
@@ -434,9 +437,6 @@ public class WebServices {
 			// url = url + details;
 
 			// Execute HTTP Post Request
-			
-			json.put("apiVersion", API_VERSION);
-			
 			HttpPost postRequest = new HttpPost(url);
 			HttpClient client = new DefaultHttpClient();
 			ByteArrayBody babFirst = null;
@@ -544,20 +544,40 @@ public class WebServices {
 	 * @param order
 	 * @param context
 	 */
-	public static void orderStatusChanged(final Order order, final BartsyApplication context) {
+	public static void orderStatusChanged(final ArrayList<Order> orders, final BartsyApplication context) {
 		new Thread() {
 
 			@Override
 			public void run() {
-				try {
-					String response;
-					response = postRequest(URL_UPDATE_ORDER_STATUS,
-							order.statusChangedJSON(), context);
-					System.out.println("response :: " + response);
-
-				} catch (Exception e) {
-					e.printStackTrace();
+				
+				// Create json
+				JSONArray statusUpdates = new JSONArray();
+				for (Order order : orders) {
+					try {
+						// Create update structure
+						JSONObject orderData = new JSONObject();
+						orderData.put("orderId", order.serverId);
+						orderData.put("orderStatus", order.status);
+						orderData.put("errorReason", order.errorReason);
+						// Add to array
+						statusUpdates.put(orderData);
+					} catch (JSONException e) {
+						e.printStackTrace();
+						return;
+					}
 				}
+				
+				// complete the format
+				JSONObject json = new JSONObject();
+				try {
+					json.put("orderList", statusUpdates);
+				} catch (JSONException e) {
+					e.printStackTrace();
+					return;
+				}
+				
+				// Send the order updates
+				postRequest(URL_UPDATE_ORDER_STATUS, json, context);
 			}
 		}.start();
 	}
