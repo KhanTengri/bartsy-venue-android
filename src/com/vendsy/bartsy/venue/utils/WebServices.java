@@ -556,8 +556,8 @@ public class WebServices {
 					try {
 						// Create update structure
 						JSONObject orderData = new JSONObject();
-						orderData.put("orderId", order.serverId);
-						orderData.put("orderStatus", order.status);
+						orderData.put("orderId", order.orderId);
+						orderData.put("orderStatus", Integer.toString(order.status));
 						orderData.put("errorReason", order.errorReason);
 						// Add to array
 						statusUpdates.put(orderData);

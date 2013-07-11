@@ -164,10 +164,10 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			// If we're in customer mode check to see if we can exit that mode 
 			if (mViewMode == VIEW_MODE_CUSTOMER && !mViewModeOptions.equals(order.userSessionCode)) {
 
-				Log.v(TAG, "Customer mode - Skipping order " + order.serverId + " with status " + order.status + " and last status " + order.last_status + " to the layout");
+				Log.v(TAG, "Customer mode - Skipping order " + order.orderId + " with status " + order.status + " and last status " + order.last_status + " to the layout");
 			
 			} else {
-				Log.v(TAG, "Adding order " + order.serverId + " with status " + order.status + " and last status " + order.last_status + " to the layout");
+				Log.v(TAG, "Adding order " + order.orderId + " with status " + order.status + " and last status " + order.last_status + " to the layout");
 				
 				// Update the view's main layout 
 				order.updateView(mInflater, mContainer, mViewMode);
@@ -346,7 +346,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			orders = mApp.cloneOrders();
 			status = order.status;
 			userID = order.orderRecipient.userID;
-			Log.v(TAG, "---- Master order: " + order.serverId + " from " + userID + " with status " + status);
+			Log.v(TAG, "---- Master order: " + order.orderId + " from " + userID + " with status " + status);
 		}
 		
 		// Update the order status locally 

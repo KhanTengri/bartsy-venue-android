@@ -24,7 +24,7 @@ public class Order  {
 	static final String TAG = "Order";
 	
 	// Each order has an ID that is unique within a session number
-	public String serverId; 
+	public String orderId; 
 	
 	// List of items in this order
 	public ArrayList<Item> items = new ArrayList<Item>();
@@ -94,7 +94,7 @@ public class Order  {
     
     
 	/**
-	 *  Default constructor
+	 * TODO - Constructors
 	 */
     
 	public Order() {
@@ -102,59 +102,12 @@ public class Order  {
 		df.setMinimumFractionDigits(2);
 	}
 
-	@Override
-	public String toString() {
-		
-		JSONObject orderData = new JSONObject();
-		
-		try {
-			if (items.size() > 1) {
-				JSONArray jsonItems = new JSONArray();
-				for (Item item : items) {
-					JSONObject jsonItem = new JSONObject();
-					jsonItem.put("itemId", item.getItemId());
-					jsonItem.put("itemName", item.getTitle());
-					jsonItem.put("description", item.getDescription());
-					jsonItem.put("basePrice", item.getPrice());
-					jsonItems.put(jsonItem);
-				}
-				orderData.put("itemsList", jsonItems);
-			} else if (items.size() == 1) {
-				orderData.put("itemId", items.get(0).getItemId());
-				orderData.put("itemName", items.get(0).getTitle());
-				orderData.put("description", items.get(0).getDescription());
-			}
-
-			orderData.put("basePrice", String.valueOf(baseAmount));
-			orderData.put("tipPercentage", String.valueOf(tipAmount));
-			orderData.put("totalPrice", String.valueOf(totalAmount));
-			orderData.put("orderStatus", ORDER_STATUS_NEW);
-			
-			orderData.put("status", status);
-			orderData.put("orderTimeout", timeOut);
-			orderData.put("serverId", serverId);
-			
-			orderData.put("dateCreated", this.createdDate);
-			orderData.put("dateUpdated", this.updatedDate);
-			
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return orderData.toString();
-	}
-
-	
-	/**
-	 * Constructor to parse all the information from the JSON
-	 * 
-	 * @param json
-	 */
 	
 	public Order(JSONObject json) {
 		
 		try {
 			
-			serverId = json.getString("orderId");
+			orderId = json.getString("orderId");
 
 			// Parse old format item
 			if (json.has("title")  || json.has("description") || json.has("itemId")) {
@@ -264,7 +217,52 @@ public class Order  {
 		df.setMinimumFractionDigits(2);
 		
 	}
+	
+	/**
+	 * TODO - Utilities
+	 */
+	
+	@Override
+	public String toString() {
 		
+		JSONObject orderData = new JSONObject();
+		
+		try {
+			if (items.size() > 1) {
+				JSONArray jsonItems = new JSONArray();
+				for (Item item : items) {
+					JSONObject jsonItem = new JSONObject();
+					jsonItem.put("itemId", item.getItemId());
+					jsonItem.put("itemName", item.getTitle());
+					jsonItem.put("description", item.getDescription());
+					jsonItem.put("basePrice", item.getPrice());
+					jsonItems.put(jsonItem);
+				}
+				orderData.put("itemsList", jsonItems);
+			} else if (items.size() == 1) {
+				orderData.put("itemId", items.get(0).getItemId());
+				orderData.put("itemName", items.get(0).getTitle());
+				orderData.put("description", items.get(0).getDescription());
+			}
+
+			orderData.put("basePrice", String.valueOf(baseAmount));
+			orderData.put("tipPercentage", String.valueOf(tipAmount));
+			orderData.put("totalPrice", String.valueOf(totalAmount));
+			orderData.put("orderStatus", ORDER_STATUS_NEW);
+			
+			orderData.put("status", status);
+			orderData.put("orderTimeout", timeOut);
+			orderData.put("serverId", orderId);
+			
+			orderData.put("dateCreated", this.createdDate);
+			orderData.put("dateUpdated", this.updatedDate);
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return orderData.toString();
+	}
+
 	Date parseWeirdDate(String date) {
 		Date d = Utilities.getLocalDateFromGTMString(createdDate, "dd MMM yyyy HH:mm:ss 'GMT'");
 		if (d == null)
@@ -292,10 +290,23 @@ public class Order  {
 		return "<unkown>";
 	}
 	
+	public JSONObject statusChangedJSON(){
+		final JSONObject orderData = new JSONObject();
+		try {
+			orderData.put("orderId", orderId);
+			orderData.put("orderStatus", status);
+			orderData.put("orderRejectionReason", errorReason);
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return orderData;
+	}
 
 	
+	
 	/**
-	 * To process next positive state for the order
+	 * TODO - State
 	 */
 	
 	public void nextPositiveState() {
@@ -316,14 +327,14 @@ public class Order  {
 			status = ORDER_STATUS_COMPLETE;
 			break;
 		default:
-			Log.v(TAG, "Order " + serverId + " status not changed to next positive because the status was " + status);
+			Log.v(TAG, "Order " + orderId + " status not changed to next positive because the status was " + status);
 			return;
 		}
 		
 		// Mark the time of the state transition in the timetable
 		state_transitions[status] = new Date();
 		
-		Log.v(TAG, "Order " + this.serverId + " moved from state" + last_status + " to state " + status);
+		Log.v(TAG, "Order " + this.orderId + " moved from state" + last_status + " to state " + status);
 	}
 
 	public void setCancelledState(String cancelReason) {
@@ -332,7 +343,7 @@ public class Order  {
 		
 		// Don't change orders that have already this status because their last_status would get lost
 		if (status == ORDER_STATUS_CANCELLED || status == ORDER_STATUS_TIMEOUT) {
-			Log.v(TAG, "Order " + this.serverId + " was already cancelled or timed out (last status: " + last_status + ")");
+			Log.v(TAG, "Order " + this.orderId + " was already cancelled or timed out (last status: " + last_status + ")");
 			return;
 		}
 		
@@ -341,7 +352,7 @@ public class Order  {
 		state_transitions[status] = new Date();
 		errorReason = cancelReason;
 
-		Log.v(TAG, "Order " + this.serverId + " moved from status" + last_status + " to cancelled status " + status + " with reason " + cancelReason);
+		Log.v(TAG, "Order " + this.orderId + " moved from status" + last_status + " to cancelled status " + status + " with reason " + cancelReason);
 	}
 
 	public void setTimeoutState() {
@@ -355,17 +366,13 @@ public class Order  {
 			state_transitions[status] = new Date();
 			errorReason = "Server unreachable. Check your internet connection and notify Bartsy customer support.";
 
-			Log.v(TAG, "Order " + this.serverId + " moved from state " + last_status + " to timeout state " + status);
+			Log.v(TAG, "Order " + this.orderId + " moved from state " + last_status + " to timeout state " + status);
 		} else {
-			Log.v(TAG, "Order " + this.serverId + "with last status " + last_status + " not changed to timeout status because the status was " + status + " with reason " + errorReason);
+			Log.v(TAG, "Order " + this.orderId + "with last status " + last_status + " not changed to timeout status because the status was " + status + " with reason " + errorReason);
 			return;
 		}
 		
 	}
-	
-	/**
-	 * To process next negative state for the order
-	 */
 	
 	public void nextNegativeState(String errorReason) {
 		
@@ -387,12 +394,12 @@ public class Order  {
 			status = ORDER_STATUS_INCOMPLETE;
 			break;
 		default:
-			Log.v(TAG, "Order " + serverId + " status not changed to negative with reason " + errorReason + " because the status was " + status);
+			Log.v(TAG, "Order " + orderId + " status not changed to negative with reason " + errorReason + " because the status was " + status);
 			return;
 		}
 		
 		// Log the state change and update the order with an error reason
-		Log.v(TAG, "Order " + serverId + " changed status from " + oldStatus + " to " + status + " for reason: "  + errorReason);
+		Log.v(TAG, "Order " + orderId + " changed status from " + oldStatus + " to " + status + " for reason: "  + errorReason);
 		this.errorReason = errorReason;
 		
 		// Mark the time of the state transition in the timetable
@@ -401,26 +408,12 @@ public class Order  {
 	 
 	
 	/**
-	 * It will returns JSON format to update order status
+	 * TODO - Views
 	 */
-	public JSONObject statusChangedJSON(){
-		final JSONObject orderData = new JSONObject();
-		try {
-			orderData.put("orderId", serverId);
-			orderData.put("orderStatus", status);
-			orderData.put("orderRejectionReason", errorReason);
-			
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return orderData;
-	}
-	
 	
 	/**
 	 * Updates the order view. Notice the view holds a pointer to the object being displayed through the "tag" field
 	 */
-	
 	public void updateView (LayoutInflater inflater, ViewGroup container, int options) {
 
 		Log.v(TAG, "updateView()");
@@ -432,7 +425,7 @@ public class Order  {
 		if (view == null) return;
 
 		// Set main order parameters
-		((TextView) view.findViewById(R.id.view_order_number)).setText(userSessionCode);
+		((TextView) view.findViewById(R.id.view_order_number)).setText(orderId);
 		
 		// Add the order list
 		addItemsView((LinearLayout) view.findViewById(R.id.view_order_mini), inflater, container);

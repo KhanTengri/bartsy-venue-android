@@ -423,7 +423,7 @@ public class BartsyApplication extends Application implements AppObservable {
 	
 	Order findMatchingOrder(ArrayList<Order> orders, Order order) {
 		for (Order found : orders) {
-			if (found.serverId.equals(order.serverId))
+			if (found.orderId.equals(order.orderId))
 				return found;
 		}
 		return null;
@@ -457,7 +457,7 @@ public class BartsyApplication extends Application implements AppObservable {
 
 				// This is not an illegal state but can happen right now because the phone may not be dismissing the order. Just don't add these locally (or even change their status - think about it more!) - for now
 				case Order.ORDER_STATUS_CANCELLED:
-					Log.e(TAG, "Skipping cancelled order: " + order.serverId + " with status: " + order.status);
+					Log.e(TAG, "Skipping cancelled order: " + order.orderId + " with status: " + order.status);
 					break;
 					
 				// Illegal state - print message and don't process the order
@@ -469,7 +469,7 @@ public class BartsyApplication extends Application implements AppObservable {
 				case Order.ORDER_STATUS_OFFERED:
 				case Order.ORDER_STATUS_REMOVED:
 				default:
-					Log.e(TAG, "Skipping illegal order: " + order.serverId + " with status: " + order.status);
+					Log.e(TAG, "Skipping illegal order: " + order.orderId + " with status: " + order.status);
 					break;
 				}
 			}
@@ -479,10 +479,10 @@ public class BartsyApplication extends Application implements AppObservable {
 		ArrayList<Order> addedOrders = new ArrayList<Order>();
 		for (Order order : processedOrders) {
 			if (addOrder(order)) {
-				Log.e(TAG, "Adding order: " + order.serverId + " with status: " + order.status);
+				Log.e(TAG, "Adding order: " + order.orderId + " with status: " + order.status);
 				addedOrders.add(order);
 			} else {
-				Log.e(TAG, "Could not add order: " + order.serverId + " with status: " + order.status);
+				Log.e(TAG, "Could not add order: " + order.orderId + " with status: " + order.status);
 			}
 		}
 		
@@ -527,7 +527,7 @@ public class BartsyApplication extends Application implements AppObservable {
 				case Order.ORDER_STATUS_OFFERED:
 				case Order.ORDER_STATUS_OFFER_REJECTED:
 				case Order.ORDER_STATUS_REMOVED:
-					Log.e(TAG, "Illegal order: " + order.serverId + " with status: " + order.status + ". Removing it locally");
+					Log.e(TAG, "Illegal order: " + order.orderId + " with status: " + order.status + ". Removing it locally");
 					removedOrders.add(order);
 					break;
 				default:
@@ -556,7 +556,7 @@ public class BartsyApplication extends Application implements AppObservable {
 			
 			// Handle the case where the timeout of the bartender has changed while we have open orders 
 			if (localOrder != null && localOrder.timeOut != remoteOrder.timeOut) {
-				Log.v(TAG, "Adjusting order timeout for order " + localOrder.serverId + " from " + localOrder.timeOut + " to " + remoteOrder.timeOut);
+				Log.v(TAG, "Adjusting order timeout for order " + localOrder.orderId + " from " + localOrder.timeOut + " to " + remoteOrder.timeOut);
 				localOrder.timeOut = remoteOrder.timeOut;
 			}
 				
@@ -592,7 +592,7 @@ public class BartsyApplication extends Application implements AppObservable {
 				case Order.ORDER_STATUS_NEW:
 				default:
 					localOrder.setTimeoutState();
-					Log.e(TAG, "Skipping illegal order: " + localOrder.serverId + " with status: " + localOrder.status);
+					Log.e(TAG, "Skipping illegal order: " + localOrder.orderId + " with status: " + localOrder.status);
 					break;
 				}
 				
@@ -626,7 +626,7 @@ public class BartsyApplication extends Application implements AppObservable {
 			
 			if (duration <= 0) {
 
-				Log.v(TAG, "Order " + order.serverId + " timed out. Status " + order.status + " (" + order.state_transitions[order.status] + 
+				Log.v(TAG, "Order " + order.orderId + " timed out. Status " + order.status + " (" + order.state_transitions[order.status] + 
 						"), last_status: " + order.last_status + " (" + order.state_transitions[order.last_status] + 
 						"), placed (" + order.state_transitions[Order.ORDER_STATUS_NEW] + ")");
 
@@ -847,7 +847,7 @@ public class BartsyApplication extends Application implements AppObservable {
 		// Decline order if the recipient was not found
 		if (userFound == null) {
 			// User placing the order not in the list of users - decline order and send updated order status to the remote
-			Log.d(TAG, "Error processing order " + order.serverId + ". User not checked in: " + order.profileId);
+			Log.d(TAG, "Error processing order " + order.orderId + ". User not checked in: " + order.profileId);
 			order.nextNegativeState("User not checked in. Please check out and check back in the venue.");
 			order.view = null;
 			ArrayList<Order> orders = new ArrayList<Order>();
@@ -889,7 +889,7 @@ public class BartsyApplication extends Application implements AppObservable {
 						Order order = mOrders.get(j);
 	
 						// Matching order - flag it as expired
-						if (order.serverId.equalsIgnoreCase(orderId)) {
+						if (order.orderId.equalsIgnoreCase(orderId)) {
 							order.setCancelledState(cancelReason);
 							break;
 						}
