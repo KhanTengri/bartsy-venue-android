@@ -46,7 +46,6 @@ import com.vendsy.bartsy.venue.utils.WebServices;
 public class GCMIntentService extends GCMBaseIntentService {
 	public static final String REG_ID = "RegId";
 
-	@SuppressWarnings("hiding")
 	private static final String TAG = "GCMIntentService";
 	// Setup application pointer
 
