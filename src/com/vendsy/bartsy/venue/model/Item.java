@@ -33,7 +33,6 @@ public class Item {
 	
 
 	public Item() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public String getItemId() {
@@ -45,32 +44,31 @@ public class Item {
 	}
 	
 	public Item(JSONObject object) {
-		// TODO Auto-generated constructor stub
 
 		try {
-			if (object.has("name")) {
+			if (object.has("itemName"))
+				this.title = object.getString("itemName");
+			if (object.has("name"))
 				this.title = object.getString("name");
-
-			}
-			if (object.has("description")) {
+			
+			if (object.has("description"))
 				this.description = object.getString("description");
-			}
-			if (object.has("price")) {
+
+			if (object.has("price"))
 				this.price = object.getString("price");
-			}
-			if (object.has("id")) {
+			if (object.has("basePrice"))
+				this.price = object.getString("basePrice");
+			
+			if (object.has("id"))
 				this.itemId = object.getString("id");
-			}
 
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		// For now always use the same image for the drink
-		this.image = Integer.toString(R.drawable.drinks);
-
-	}
+		this.image = Integer.toString(R.drawable.drink);
+	} 
 
 	/**
 	 * @return the venueId
