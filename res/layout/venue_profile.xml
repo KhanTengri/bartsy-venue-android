@@ -92,7 +92,6 @@
                                     android:ems="14"
                                     android:hint="Venue name"
                                     android:inputType="text"
-                                    android:text="Finn McCool&apos;s"
                                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
                             </LinearLayout>
@@ -351,7 +350,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/activity_vertical_margin"
                         android:layout_marginTop="4dp"
-                        android:text="Account manager"
+                        android:text="Manager"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:textStyle="bold" />
 
@@ -381,7 +380,6 @@
                                 android:ems="10"
                                 android:hint="Your name"
                                 android:inputType="textCapWords"
-                                android:text="Tobias Oerum"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
                         </LinearLayout>
@@ -405,7 +403,6 @@
                                 android:ems="10"
                                 android:hint="This will also be your login"
                                 android:inputType="textEmailAddress"
-                                android:text="tobias.oerum@vendsy.com"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
                         </LinearLayout>
@@ -429,7 +426,6 @@
                                 android:ems="10"
                                 android:hint="6 or more characters"
                                 android:inputType="textPassword"
-                                android:text="Vendsy2013!"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
                         </LinearLayout>
@@ -452,7 +448,6 @@
                                 android:ems="10"
                                 android:hint="retype your password"
                                 android:inputType="textPassword"
-                                android:text="Vendsy2013!"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
                         </LinearLayout>
@@ -517,7 +512,6 @@
                                 android:ems="10"
                                 android:hint="Your representative&apos;s name"
                                 android:inputType="textCapWords"
-                                android:text="Tobias Oerum"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
                         </LinearLayout>
@@ -541,7 +535,6 @@
                                 android:ems="10"
                                 android:hint="Your representative&apos;s @Vendsy email"
                                 android:inputType="textEmailAddress"
-                                android:text="tobias.oerum@vendsy.com"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
                         </LinearLayout>
@@ -611,13 +604,15 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:contentDescription="5a0999dda39f9fe07a44"
                                 android:ems="14"
-                                android:hint="49be3dcf7e507f6b4775"
-                                android:text="beec9320f3921035e4d7"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
                         </LinearLayout>
+
+                        <!--  8d084f80fd818d6bcf89 - 31ten -->
+                        <!--  5a0999dda39f9fe07a44 - Chaya Venice -->
+                        <!--  49be3dcf7e507f6b4775 - Joe's restaurant -->
+                        <!--  beec9320f3921035e4d7 - Finn McCool's -->
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -638,7 +633,6 @@
                                 android:layout_weight="1"
                                 android:ems="14"
                                 android:hint="The section name under which the bar selection is listed"
-                                android:text="Bar"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
                         </LinearLayout>
                     </LinearLayout>
@@ -704,7 +698,7 @@
                                 android:ems="3"
                                 android:gravity="right|center_vertical"
                                 android:inputType="numberDecimal"
-                                android:text="9"
+                                android:text="9.5"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
                             <TextView
@@ -807,8 +801,9 @@
                                 android:id="@+id/view_registration_wifi_checkbox"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:checked="true"
+                                android:focusable="false"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
+
                         </LinearLayout>
 
                         <LinearLayout
@@ -837,7 +832,6 @@
                                     android:layout_weight="1"
                                     android:ems="12"
                                     android:hint="Your public WiFi router name for customers"
-                                    android:text="3HTV6"
                                     android:textAppearance="?android:attr/textAppearanceSmall" >
 
                                     <requestFocus />
@@ -865,7 +859,6 @@
                                     android:ems="14"
                                     android:hint="The router password if one exists"
                                     android:inputType="textPassword"
-                                    android:text="94AB542BEF"
                                     android:textAppearance="?android:attr/textAppearanceSmall" />
                             </LinearLayout>
 
