@@ -25,7 +25,7 @@
                 android:id="@+id/view_user_list_image_resource"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:scaleType="fitXY"
+                android:scaleType="centerCrop"
                 android:src="@drawable/location" />
 
         </RelativeLayout>
