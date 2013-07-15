@@ -63,6 +63,12 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 		
 		// Try to get all form elements from the XML
 		venueImage = (ImageView)findViewById(R.id.view_profile_venue_image);
+		
+		// Set Default image for Venue
+		Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+		venueImage.setImageBitmap(bitmap);
+		venueImage.setTag(bitmap);
+		
 		locuId = (EditText) findViewById(R.id.locuId);
 		wifiName = (EditText) findViewById(R.id.wifiName);
 		wifiPassword = (EditText) findViewById(R.id.wifiPassword);
