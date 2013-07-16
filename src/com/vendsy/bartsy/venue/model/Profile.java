@@ -34,6 +34,17 @@ public class Profile {
 	private String aboutMe;
 	private String relationshipStatus;
 	
+	// Ordering statistics
+	private String firstOrderDate;
+	private int orderCount;
+	private int last30DaysOrderCount;
+	
+	// Check in statistics
+	private String firstCheckInDate;
+	private int checkInCount;
+	private int last30DaysCheckInCount;
+	
+	
 	private boolean imageDownloaded;
 
 	ArrayList<Profile> likes = new ArrayList<Profile>();
@@ -57,6 +68,21 @@ public class Profile {
 				name = json.getString("name");
 			if (json.has("userImagePath")) 
 				profileImageUrl = WebServices.DOMAIN_NAME +  json.getString("userImagePath").trim();
+
+			if (json.has("firstOrderDate"))
+				firstOrderDate = json.getString("firstOrderDate");
+			if (json.has("orderCount"))
+				orderCount = json.getInt("orderCount");
+			if (json.has("last30DaysOrderCount"))
+				last30DaysOrderCount = json.getInt("last30DaysOrderCount");
+		
+			if (json.has("firstCheckInDate"))
+				firstCheckInDate = json.getString("firstCheckInDate");
+			if (json.has("checkInCount"))
+				checkInCount = json.getInt("checkInCount");
+			if (json.has("last30DaysCheckInCount"))
+				last30DaysCheckInCount = json.getInt("last30DaysCheckInCount");
+		
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -199,6 +225,54 @@ public class Profile {
 
 	public void setImage(Bitmap image) {
 		this.image = image;
+	}
+
+	public String getFirstOrderDate() {
+		return firstOrderDate;
+	}
+
+	public void setFirstOrderDate(String firstOrderDate) {
+		this.firstOrderDate = firstOrderDate;
+	}
+
+	public int getOrderCount() {
+		return orderCount;
+	}
+
+	public void setOrderCount(int orderCount) {
+		this.orderCount = orderCount;
+	}
+
+	public int getLast30DaysOrderCount() {
+		return last30DaysOrderCount;
+	}
+
+	public void setLast30DaysOrderCount(int last30DaysOrderCount) {
+		this.last30DaysOrderCount = last30DaysOrderCount;
+	}
+
+	public String getFirstCheckInDate() {
+		return firstCheckInDate;
+	}
+
+	public void setFirstCheckInDate(String firstCheckInDate) {
+		this.firstCheckInDate = firstCheckInDate;
+	}
+
+	public int getCheckInCount() {
+		return checkInCount;
+	}
+
+	public void setCheckInCount(int checkInCount) {
+		this.checkInCount = checkInCount;
+	}
+
+	public int getLast30DaysCheckInCount() {
+		return last30DaysCheckInCount;
+	}
+
+	public void setLast30DaysCheckInCount(int last30DaysCheckInCount) {
+		this.last30DaysCheckInCount = last30DaysCheckInCount;
 	}
 	
 }
