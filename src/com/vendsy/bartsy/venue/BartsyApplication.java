@@ -51,7 +51,7 @@ import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
 import com.vendsy.bartsy.venue.view.AppObserver;
-
+ 
 /**
  * The ChatAppliation class serves as the Model (in the sense of the common user
  * interface design pattern known as Model-View-Controller) for the chat
@@ -341,12 +341,11 @@ public class BartsyApplication extends Application implements AppObservable {
 	
 			// Find new orders, existing orders and missing orders.
 			ArrayList<Order> addedOrders = processAddedOrders(mOrders, remoteOrders);
-			ArrayList<Order> removedOrders = processRemovedOrders(mOrders, remoteOrders);
-			ArrayList<Order> updatedOrders = processExistingOrders(mOrders, remoteOrders);
-	
+			processRemovedOrders(mOrders, remoteOrders);
+			processExistingOrders(mOrders, remoteOrders);
 			
 			// Generate notifications
-			if (addedOrders.size() > 0 || removedOrders.size() > 0 || updatedOrders.size() > 0) {
+			if (addedOrders.size() > 0) {
 				String message = "";
 				int count = 0;
 				if (addedOrders.size() > 0) {
@@ -357,25 +356,10 @@ public class BartsyApplication extends Application implements AppObservable {
 					}
 					message += "\n";
 				}	
-				if (updatedOrders.size() > 0) {
-					message += "Updated orders:\n";
-					for (Order order : updatedOrders) {
-						message += "Update order for " + order.getRecipientName(mPeople) + "\n";
-						count++;
-					}
-					message += "\n";
-				}	
-				if (removedOrders.size() > 0) {
-					message += "Removed orders:\n";
-					for (Order order : removedOrders) {
-						message += "Removed order for " + order.getRecipientName(mPeople) + "\n";
-						count++;
-					}
-				}	
 	
 				// Print and generate modifications
 				Log.w(TAG, message);
-				generateNotification("Orders updated", message, count);
+				generateNotification("New orderss", message, count);
 			}		
 	
 			// Print orders after update
