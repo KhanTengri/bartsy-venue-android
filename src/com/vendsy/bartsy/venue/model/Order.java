@@ -50,6 +50,7 @@ public class Order  {
 	public Profile orderRecipient;
 	public String senderId;
 	public String recipientId;
+	public String recipientNickname;
 	public String userSessionCode;
 	
 	// The view displaying this order or null. The view is the display of the order in a list. 
@@ -168,6 +169,8 @@ public class Order  {
 				senderId = json.getString("senderBartsyId");
 			if (json.has("recipientBartsyId"))
 				recipientId = json.getString("recipientBartsyId");
+			if (json.has("recipientNickname"))
+				recipientNickname = json.getString("recipientNickname");
 
 			// Setup last updated date (time the order was updated last)  *** MAKE SURE to have updated status before getting here ***
 			if (json.has("updateTime")) {
@@ -548,7 +551,7 @@ public class Order  {
 			LinearLayout view = (LinearLayout) inflater.inflate(R.layout.bartender_order_mini, container, false);
 			((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(Float.parseFloat(item.getPrice())));
 			((TextView) view.findViewById(R.id.view_order_title)).setText(item.getTitle());
-			if (item.getDescription() != null || item.getDescription().equalsIgnoreCase(""))
+			if (item.getDescription() == null || item.getDescription().equalsIgnoreCase(""))
 				((TextView) view.findViewById(R.id.view_order_description)).setVisibility(View.GONE);
 			else
 				((TextView) view.findViewById(R.id.view_order_description)).setText(item.getDescription());
