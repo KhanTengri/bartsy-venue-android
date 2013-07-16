@@ -48,6 +48,11 @@
 
     </LinearLayout>
 
+    <include
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/orders_past_row" />
+
 	 <ScrollView
         android:id="@+id/scrollView1"
         android:layout_width="match_parent"

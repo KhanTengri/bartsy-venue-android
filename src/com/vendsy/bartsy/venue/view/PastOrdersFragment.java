@@ -26,6 +26,7 @@ import com.vendsy.bartsy.venue.BartsyApplication;
 import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.model.Item;
 import com.vendsy.bartsy.venue.model.Order;
+import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
 
 /**
@@ -117,10 +118,6 @@ public class PastOrdersFragment extends Fragment{
 			JSONArray array = object.getJSONArray("pastOrders");
 			if (array != null) {
 
-				// To add Table headers
-				final View itemView1 = mInflater.inflate(R.layout.orders_past_row, null);
-				ordersTableLayout.addView(itemView1);
-				
 				for (int i = 0; i < array.length(); i++) {
 					JSONObject json = null;
 					json = array.getJSONObject(i);
@@ -144,27 +141,14 @@ public class PastOrdersFragment extends Fragment{
 		
 		
 		// Extract time from UTC field
-		String inputText = order.createdDate.replace("T", " ").replace("Z", ""); // example: 2013-06-27 10:20:15
-        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        inputFormat.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
-        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date;
-        String time = "";
-        try {
-			date = inputFormat.parse(inputText);
-			time = outputFormat.format(date);
-		} catch (ParseException e) {
-			// Bad date format - leave time blank
-			e.printStackTrace();
-			Log.e("PastOrdersFragment", "Bad date format in getPastOrders syscall");
-			return;
-		} 
+        Date date = Utilities.getLocalDateFromGTMString(order.createdDate.replace("T", " ").replace("Z", ""), "yyyy-MM-dd HH:mm:ss");;
+        String time = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault()).format(date);
 		
         // Don't display order placed before beta starts
         SimpleDateFormat betaDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         Date betaDate;
         try {
-			betaDate = betaDateFormat.parse("2013-06-30 20:15:00");
+			betaDate = betaDateFormat.parse("2013-07-15 20:00:00");
 		} catch (ParseException e) {
 			e.printStackTrace();
 			return;
@@ -180,47 +164,60 @@ public class PastOrdersFragment extends Fragment{
 		((TextView) itemView.findViewById(R.id.dateCreated)).setText(time);
 		((TextView) itemView.findViewById(R.id.orderId)).setText(order.orderId);
 		
-		String status = "?";
-		switch(order.last_status) {
+		String statusString = "?";
+		
+		int status = order.status == Order.ORDER_STATUS_REMOVED ? order.last_status : order.status;
+		
+		switch(status) {
 		case Order.ORDER_STATUS_CANCELLED:
-			status = "Timeout";
+			statusString = "Timeout";
 			break;
 		case Order.ORDER_STATUS_COMPLETE:
-			status = "OK";
+			statusString = "Completed";
 			break;
 		case Order.ORDER_STATUS_READY:
-			status = "Ready";
+			statusString = "Ready";
 			break;
 		case Order.ORDER_STATUS_FAILED:
-			status = "Failed";
+			statusString = "Failed";
 			break;
 		case Order.ORDER_STATUS_IN_PROGRESS:
-			status = "In progress";
+			statusString = "In progress";
 			break;
 		case Order.ORDER_STATUS_INCOMPLETE:
-			status = "Unfinished";
+			statusString = "Unfinished";
 			break;
 		case Order.ORDER_STATUS_NEW:
-			status = "New";
+			statusString = "New";
 			break;
 		case Order.ORDER_STATUS_REJECTED:
-			status = "Rejected";
+			statusString = "Rejected";
 			break;
 		}
 		
-		((TextView) itemView.findViewById(R.id.orderStatus)).setText(String.valueOf(status));
+		((TextView) itemView.findViewById(R.id.orderStatus)).setText(String.valueOf(statusString));
 
 		// Set title
 		String title = "";
-		for (Item item : order.items) 
-			title += item.getTitle() + "\n";
+		int size = order.items.size();
+		for (int i=0; i< size ; i++) {
+			Item item = order.items.get(i);
+		    DecimalFormat df = new DecimalFormat();
+			df.setMaximumFractionDigits(0);
+			df.setMinimumFractionDigits(0);
+
+			title += item.getTitle() + "  ($"+ df.format(Float.parseFloat(item.getPrice())) + ")";
+			if (i != size && size > 1)
+				title +="\n";
+		}
 		((TextView) itemView.findViewById(R.id.itemName)).setText(title);
 		
+		// Set up recipient
+		((TextView) itemView.findViewById(R.id.recipient)).setText(order.recipientNickname);
 		
 		// Totals
-		
-		if (order.status == Order.ORDER_STATUS_COMPLETE) {
-		
+		if (status == Order.ORDER_STATUS_COMPLETE) {
+		 
 			totalAmount += order.totalAmount;
 			tipAmount += order.tipAmount;
 			
