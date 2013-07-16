@@ -11,6 +11,7 @@ import com.vendsy.bartsy.venue.BartsyApplication;
 import com.vendsy.bartsy.venue.MainActivity;
 import com.vendsy.bartsy.venue.dialog.CodeDialogFragment;
 import com.vendsy.bartsy.venue.model.Order;
+import com.vendsy.bartsy.venue.model.Profile;
 import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
@@ -24,6 +25,7 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -139,6 +141,8 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		case VIEW_MODE_CUSTOMER:
 			((TextView) mRootView.findViewById(R.id.view_customer_pickup_code)).setText("Customer code: " + mViewModeOptions);
 			mRootView.findViewById(R.id.view_customer_mode).setVisibility(View.VISIBLE);
+			
+			
 			break;
 		}
 		
@@ -159,6 +163,8 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		int acceptedOrdersCount = 0;
 		int completedOrdersCount = 0;
 		
+		Profile customer = null;
+		
 		for (Order order : ordersClone) {
 			
 			// If we're in customer mode check to see if we can exit that mode 
@@ -169,6 +175,9 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			} else {
 				Log.v(TAG, "Adding order " + order.orderId + " with status " + order.status + " and last status " + order.last_status + " to the layout");
 				
+				if (mViewMode== VIEW_MODE_CUSTOMER)
+					customer = order.orderRecipient;
+					
 				// Update the view's main layout 
 				order.updateView(mInflater, mContainer, mViewMode);
 				
@@ -207,6 +216,18 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 
 				}
 			}
+		}
+		
+		// Update customer view if we're in that mode
+		if (customer != null) {
+			ImageView profileImageView = ((ImageView) mRootView.findViewById(R.id.view_customer_mode_picture));
+			profileImageView.setImageBitmap(customer.image);
+
+			String details = "Customer since: " + customer.getFirstCheckInDate() + 
+					"\nFirst Bartsy order: " + customer.getFirstOrderDate() + 
+					"\n" + customer.getOrderCount() + " total, " + customer.getLast30DaysOrderCount() + " recent orders" +
+					"\n" + customer.getCheckInCount() + " recent, " + customer.getLast30DaysCheckInCount() + " total visits";
+			((TextView) mRootView.findViewById(R.id.view_customer_mode_details)).setText(details);
 		}
 		
 		// Get order timeouts
@@ -360,7 +381,6 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			Log.v(TAG, "Clicked on order positive button");
 			order.nextPositiveState();	
 			Log.v(TAG, "Child matches parent - update status to " + order.status);
-			
 			
 //			mApp.update(); //- this will get called automatically in the next cycle, don't call it now to make UI more snappy
 			break;

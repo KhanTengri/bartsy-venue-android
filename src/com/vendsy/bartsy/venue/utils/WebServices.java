@@ -595,6 +595,7 @@ public class WebServices {
 			// To get all checked in profiles and open orders data based on the venue Id
 			JSONObject json = new JSONObject();
 			json.put("venueId", venueId);
+			json.put("getUserDetails", "venue");
 
 			// Sync service call
 			response = postRequest(URL_SYNC_WITH_SERVER, json, context);
