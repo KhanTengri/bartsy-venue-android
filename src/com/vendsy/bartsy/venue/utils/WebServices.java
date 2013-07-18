@@ -72,7 +72,7 @@ public class WebServices {
 //	public static final String DOMAIN_NAME = "http://app.bartsy.vendsy.com/"; 	// prod
 
 	// Current ApiVersion number
-	public static final String 	API_VERSION="2";
+	public static final String 	API_VERSION="3";
 
 	// REST API URL's
 	public static final String PROJECT_NAME = "Bartsy/";
