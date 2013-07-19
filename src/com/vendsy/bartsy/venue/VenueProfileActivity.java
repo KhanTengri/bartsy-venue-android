@@ -2,6 +2,7 @@ package com.vendsy.bartsy.venue;
 
 import java.io.FileNotFoundException;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,11 +23,12 @@ import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
 
@@ -52,6 +54,8 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 	private EditText managerPasswordEditText;
 
 	private EditText confirmPasswordEditText;
+
+	private LinearLayout hoursLayout;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -95,8 +99,29 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 		findViewById(R.id.view_registration_button_submit).setOnClickListener(this);
 		findViewById(R.id.view_registration_button_cancel).setOnClickListener(this);
 		findViewById(R.id.view_registration_wifi_checkbox).setOnClickListener(this);
+		
+		createOpenAndCloseHoursView();
 	}
 	
+	/**
+	 * Create open and closed hours view for all the weeks
+	 */
+	private void createOpenAndCloseHoursView() {
+		
+		hoursLayout = (LinearLayout) findViewById(R.id.hoursLayout);
+		
+		final String[] weeks={"M","T","W","T","F","S","S"}; // week names
+		
+		for(int i=0;i<weeks.length;i++){
+			final View view = getLayoutInflater().inflate(R.layout.hours_item, null);
+			// set title for the row
+			TextView titleView = (TextView) view.findViewById(R.id.rowTitleView);
+			titleView.setText(weeks[i]);
+			
+			hoursLayout.addView(view);
+		}
+	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) { 
 	    super.onActivityResult(requestCode, resultCode, data); 
@@ -265,6 +290,8 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 				else
 					postData.put("wifiPresent", "0");
 				
+				postData.put("open_hours", getHoursDataInJSONArray());
+				
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -294,8 +321,8 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 									if (response != null) {
 										try {
 											processVenueResponse(new JSONObject(response));
-											} catch (JSONException e) {
-											}
+										} catch (JSONException e) {
+										}
 									}
 								}
 						});
@@ -314,6 +341,30 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 					VenueProfileActivity.this);
 		}
 	}
+	private JSONObject getHoursDataInJSONArray() {
+		
+		final String[] weeks={"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"}; // week names
+		
+		// Create JSON Object 
+		JSONObject jsonObject = new JSONObject();
+		// Get the open and closed text values from each row
+		for(int i=0;i<hoursLayout.getChildCount();i++){
+			View view = hoursLayout.getChildAt(i);
+		
+			try {
+				JSONArray hoursArray = new JSONArray();
+				
+				hoursArray.put(((TextView)view.findViewById(R.id.openHourText)).getText() +" - "
+				+ ((TextView)view.findViewById(R.id.closeHourText)).getText());
+				
+				jsonObject.put(weeks[i], hoursArray);
+			} catch (JSONException e) {
+			}
+		}
+		
+		return jsonObject;
+	}
+
 	/**
 	 * To parse venue registration response in JSON format
 	 * 
