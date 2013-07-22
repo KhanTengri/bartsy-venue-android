@@ -67,8 +67,16 @@ public class CSVReader {
         this.quotechar = quotechar;
         this.skipLines = line;
     }
+    
+    public char getSeparator() {
+		return separator;
+	}
 
-    /**
+	public void setSeparator(char separator) {
+		this.separator = separator;
+	}
+
+	/**
      * Reads the next line from the buffer and converts to a string array.
      *
      * @return a string array with each comma-separated element as a separate
