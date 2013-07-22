@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Bartsy Venue Alpha</string>
+    <string name="app_name">Bartsy Venue Beta</string>
+    <string name="app_version">Beta</string>
     
     <!-- Venue Registration -->
     <string name="paypal_id_label">Paypal ID</string>
@@ -56,49 +57,7 @@
     <string name="btn_send">Send</string>
     <string name="txt_hint">Type Message</string>
     <string name="wifidirect_port">Type Message</string>
-    
-    <!--  Contacts -->
-    
-    <string name="get_contacts">Get Contacts List</string>
-    <string name="update_contacts">Update Contacts List</string>
-    <string name="label_name">Name</string>
-    <string name="label_phone_numbers">Phone Number(s)</string>
-    <string name="label_email_addresses">Email Address(es)</string>
-    <string name="contact_name">unknown</string>
-    <string name="contact_phone_number">unknown</string>
-    <string name="contact_email">unknow</string>
-    <string name="contact_dialog_title">Contact Details:</string>
-    <string-array name="phone_types">
-    	<item>Custom</item>
-    	<item>Home</item>
-    	<item>Mobile</item>
-    	<item>Work</item>
-    	<item>Fax Work</item>
-    	<item>Fax Home</item>
-    	<item>Pager</item>
-    	<item>Other</item>
-    	<item>CallBack</item>
-    	<item>Car</item>
-    	<item>Company Main</item>
-    	<item>ISDN</item>
-    	<item>Main</item>
-    	<item>Other Fax</item>
-    	<item>Radio</item>
-    	<item>Telex</item>
-    	<item>TTY/TTD</item>
-    	<item>Work Mobile</item>
-    	<item>Work Pager</item>
-    	<item>Assistant</item>
-    	<item>MMS</item>
-    </string-array>
-    <string-array name="email_types">
-    	<item>Custom</item>
-    	<item>Home</item>
-    	<item>Work</item>
-    	<item>Other</item>
-    	<item>Mobile</item>
-    </string-array>
-    <string name="hello">This is a AllJoyn service that provides access to this devices contact information for an AllJoyn Client.</string>
+
     
      <!--GCM  -->
     <string name="error_config">Please set the %1$s constant and recompile the app.</string>
@@ -118,5 +77,8 @@
     <string name="options_unregister">Unregister</string>
     <string name="options_clear">Clear</string>
     <string name="options_exit">Exit</string>
+    
+    <!-- Order view -->
+    <string name="customer_details_picture_cd">Customer picture</string>
     
 </resources>

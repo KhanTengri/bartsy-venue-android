@@ -11,7 +11,7 @@
     <include
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        layout="@layout/customer_details" />
+        layout="@layout/customer_view" />
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -181,13 +181,23 @@
                             android:textColor="@android:color/holo_red_dark" />
 
                         <TextView
-                            android:id="@+id/TextView03"
+                            android:id="@+id/TextView01"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="2"
                             android:gravity="bottom|right"
                             android:padding="4dp"
-                            android:text="Version: Alpha"
+                            android:text="Version:"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="@android:color/holo_red_dark" />
+
+                        <TextView
+                            android:id="@+id/TextView03"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="bottom|right"
+                            android:padding="4dp"
+                            android:text="@string/app_version"
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:textColor="@android:color/holo_red_dark" />
                     </LinearLayout>
