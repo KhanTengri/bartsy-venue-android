@@ -47,6 +47,8 @@ public class Cocktail {
 			json.put("category", category);
 			json.put("glass", glassType);
 			json.put("alcohol", alcohol);
+			json.put("ingredients", ingredients);
+			json.put("instructions", instructions);
 			
 		} catch (JSONException e) {	}
 		
