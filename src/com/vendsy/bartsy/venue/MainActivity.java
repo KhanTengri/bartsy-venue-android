@@ -110,35 +110,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	private static final int HANDLE_PEOPLE_UPDATED_EVENT = 5;
 	private static final int HANDLE_INVENTORY_UPDATED_EVENT = 6;
 	
-	/**************************************
-	 * 
-	 * 
-	 * TODO - Save/restore state
-	 * 
-	 * 
-	 */
-	/*
-	 * static final String STATE_SCORE = "playerScore"; static final String
-	 * STATE_LEVEL = "playerLevel"; ...
-	 * 
-	 * @Override public void onSaveInstanceState(Bundle savedInstanceState) { //
-	 * Save the user's current game state savedInstanceState.putInt(STATE_SCORE,
-	 * mCurrentScore); savedInstanceState.putInt(STATE_LEVEL, mCurrentLevel);
-	 * savedInstanceState.
-	 * 
-	 * // Always call the superclass so it can save the view hierarchy state
-	 * super.onSaveInstanceState(savedInstanceState); }
-	 * 
-	 * 
-	 * public void onRestoreInstanceState(Bundle savedInstanceState) { // Always
-	 * call the superclass so it can restore the view hierarchy
-	 * super.onRestoreInstanceState(savedInstanceState);
-	 * 
-	 * // Restore state members from saved instance mCurrentScore =
-	 * savedInstanceState.getInt(STATE_SCORE); mCurrentLevel =
-	 * savedInstanceState.getInt(STATE_LEVEL); }
-	 */
-
 	/**********************
 	 * 
 	 * 
@@ -209,74 +180,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	
 		// Update people and orders
 		mApp.update();
-		
-		
-		
-		
-/*
-		if (!Constants.USE_ALLJOYN && (mApp.getOrderCount()==0 || mApp.mPeople.size()==0) ) {
-			// Start progress dialog from here
-			handler.post(new Runnable() {
-				
-				@Override
-				public void run() {
-					progressDialog = Utilities.progressDialog(MainActivity.this,"Loading..");
-					progressDialog.show();
-				}
-			});
-			
-			
-			// Call web service in the background
-			new Thread() {
-				@Override
-				public void run() {
-					try {
-						// Web service call to get lost local data from server
-						JSONObject json = WebServices.syncWithServer(
-								mApp.venueProfileID, MainActivity.this);
-						// Error Handling
-						if(json==null){
-							return;
-						}
-						// To parse checked in users
-						if(json.has("checkedInUsers") && mApp.mPeople.size()==0){
-							JSONArray users = json.getJSONArray("checkedInUsers");
-							
-							for(int i=0; i<users.length() ; i++){
-								mApp.mPeople.add(new Profile(users.getJSONObject(i)));
-							}
-						}
-						// To parse orders from JSON object
-						if(json.has("orders") && mApp.getOrderCount()==0){
-							JSONArray orders = json.getJSONArray("orders");
-							
-							
-							for(int j=0; j<orders.length();j++){
-								
-								JSONObject orderJSON = orders.getJSONObject(j);
-
-								// If the server is incorrectly sending the order timeout as a venue-wide variable, insert it in the order JSON
-								if (!orderJSON.has("orderTimeout") && json.has("orderTimeout"))
-									orderJSON.put("orderTimeout", json.getInt("orderTimeout"));
-								
-								Order order = new Order(orderJSON);
-																
-								mApp.addOrderWithOutNotify(order);
-							}
-						}
-						
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
-					// To update list items in People and orders tab
-					updateListViews();
-					
-				}
-			}.start();
-
-		}
-		*/
-		
 	}
 	
 	
@@ -344,32 +247,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		
 		// Set adapter to the spinner
 		venueStatusSpinner.setAdapter(adapterForVenueStatuses);		
-	}
-	/**
-	 * To update list views of people and orders
-	 */
-	protected void updateListViews() {
-		handler.post(new Runnable() {
-			
-			@Override
-			public void run() {
-				// To close progress dialog
-				if(progressDialog!=null){
-					progressDialog.dismiss();
-				}
-				
-				// To update peoples list view
-				if (mPeopleFragment != null) {
-					mPeopleFragment.updatePeopleView();
-					updatePeopleCount();
-				}
-				// To update orders list view
-				if (mBartenderFragment != null) {
-					mBartenderFragment.updateOrdersView();
-					updateOrdersCount();
-				}
-			}
-		});
 	}
 
 	private void initializeFragments() {
