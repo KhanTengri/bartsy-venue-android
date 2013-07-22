@@ -94,48 +94,7 @@
                                android:id="@+id/view_order_customer_details"
                                android:layout_width="fill_parent"
                                android:layout_height="wrap_content"
-                               android:visibility="gone" >
-
-                               <ImageView
-                                   android:id="@+id/view_order_profile_picture"
-                                   android:layout_width="80dp"
-                                   android:layout_height="80dp"
-                                   android:scaleType="fitCenter"
-                                   android:src="@drawable/profile" />
-
-                               <LinearLayout
-                                   android:layout_width="fill_parent"
-                                   android:layout_height="wrap_content"
-                                   android:layout_gravity="center_vertical"
-                                   android:orientation="vertical" >
-
-                                   <TextView
-                                       android:id="@+id/textView1"
-                                       android:layout_width="wrap_content"
-                                       android:layout_height="wrap_content"
-                                       android:text="Customer since: 4/15/2013" />
-
-                                   <TextView
-                                       android:id="@+id/textView2"
-                                       android:layout_width="wrap_content"
-                                       android:layout_height="wrap_content"
-                                       android:text="Status: Platinum"
-                                       android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                                   <TextView
-                                       android:id="@+id/textView3"
-                                       android:layout_width="wrap_content"
-                                       android:layout_height="wrap_content"
-                                       android:text="Total orders: 23"
-                                       android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                                   <TextView
-                                       android:id="@+id/textView4"
-                                       android:layout_width="wrap_content"
-                                       android:layout_height="wrap_content"
-                                       android:text="Orders today: 2"
-                                       android:textAppearance="?android:attr/textAppearanceSmall" />
-                               </LinearLayout>
+                               android:orientation="vertical" >
                            </LinearLayout>
 
                            <LinearLayout

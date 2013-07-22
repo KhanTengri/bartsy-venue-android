@@ -12,7 +12,7 @@
     <include
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        layout="@layout/customer_details" />
+        layout="@layout/customer_view" />
 
     <LinearLayout
         android:layout_width="fill_parent"

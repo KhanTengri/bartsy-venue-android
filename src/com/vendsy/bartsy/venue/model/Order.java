@@ -267,9 +267,9 @@ public class Order  {
 	}
 
 	Date parseWeirdDate(String date) {
-		Date d = Utilities.getLocalDateFromGTMString(createdDate, "dd MMM yyyy HH:mm:ss 'GMT'");
+		Date d = Utilities.getLocalDateFromGMTString(createdDate, "dd MMM yyyy HH:mm:ss 'GMT'");
 		if (d == null)
-			d = Utilities.getLocalDateFromGTMString(createdDate, "d MMM yyyy HH:mm:ss 'GMT'");
+			d = Utilities.getLocalDateFromGMTString(createdDate, "d MMM yyyy HH:mm:ss 'GMT'");
 		return d;
 	}
 	
@@ -415,45 +415,65 @@ public class Order  {
 	 */
 	
 	/**
-	 * Updates the order view. Notice the view holds a pointer to the object being displayed through the "tag" field
+	 * Creates the order view. Notice the view holds a pointer to the object being displayed through the "tag" field
 	 */
-	public void updateView (LayoutInflater inflater, ViewGroup container, int options) {
+	public void updateView(LayoutInflater inflater, ViewGroup container, int options) {
 
-		Log.v(TAG, "updateView()");
+		Log.v(TAG, "createView()");
 		Log.v(TAG, "Order sender   :" + orderSender);
 		Log.v(TAG, "Order receiver :" + orderRecipient);
 		
-		view = (View) inflater.inflate(R.layout.bartender_order, container, false);
-		
-		if (view == null) return;
+		// Inflate the view only if we haven't already
+		if (view == null) {
+			view = (View) inflater.inflate(R.layout.bartender_order, container, false);;
 
-		// Set main order parameters
-		((TextView) view.findViewById(R.id.view_order_number)).setText(orderId);
-		
-		// Add the order list
-		addItemsView((LinearLayout) view.findViewById(R.id.view_order_mini), inflater, container);
+			// Set main order parameters
+			((TextView) view.findViewById(R.id.view_order_number)).setText(orderId);
+			
+			// Add the order list
+			addItemsView((LinearLayout) view.findViewById(R.id.view_order_mini), inflater, container);
+	
+			// Set base price
+			((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(baseAmount));
+			
+			// Set the totals (we'll update again if we have more mini orders...)
+			updateTipTaxTotalView(tipAmount, taxAmount, totalAmount);
+			
+		}
 
-		// Set base price
-		((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(baseAmount));
-		
-		// Set the totals (we'll update again if we have more mini orders...)
-		updateTipTaxTotalView(tipAmount, taxAmount, totalAmount);
-		
+		// Update customer view
 		if (orderRecipient != null) {
-
+			
 			// Update customer visible name
 			((TextView) view.findViewById(R.id.view_order_profile_name)).setText(orderRecipient.getName());
 
 			// Update sender profile section if the details view is showing
+			LinearLayout expandedView = (LinearLayout) view.findViewById(R.id.view_order_customer_details);
 			if (showCustomerDetails ) {
-				ImageView profileImageView = ((ImageView)view.findViewById(R.id.view_order_profile_picture));
-				
-				// Set the saved image to the imageView
-				profileImageView.setImageBitmap(orderRecipient.image);
-			}			
+				expandedView.setVisibility(View.VISIBLE);
+				if (expandedView.getChildCount() == 0) {
+					View customerView = (View) inflater.inflate(R.layout.customer_details, expandedView, true);
+					orderRecipient.updateView(customerView);
+				}
+				((ImageButton) view.findViewById(R.id.view_order_button_customer_details)).setImageResource(R.drawable.arrowexpanded);
+			} else {
+				expandedView.setVisibility(View.GONE);
+				((ImageButton) view.findViewById(R.id.view_order_button_customer_details)).setImageResource(R.drawable.arrowexpand);
+			}
 		}
 
+		
 		// Update buttons 
+		updateViewStatus(options);
+
+		// Update timers
+		updateViewTimers();
+		
+		// Set a pointer to the object being displayed 
+		view.setTag(this);
+	}
+	
+	private void updateViewStatus(int options) {
 		switch (status) {
 		case ORDER_STATUS_NEW:
 			((Button) view.findViewById(R.id.view_order_button_positive)).setText("ACCEPT");
@@ -469,17 +489,13 @@ public class Order  {
 
 			if (options == BartenderSectionFragment.VIEW_MODE_ALL)
 				view.findViewById(R.id.view_order_actions).setVisibility(View.GONE);
+			else 
+				view.findViewById(R.id.view_order_actions).setVisibility(View.VISIBLE);
 			break;
 		}
-
-		// Show/hide customer details
-		if (showCustomerDetails) {
-			view.findViewById(R.id.view_order_customer_details).setVisibility(View.VISIBLE);
-			((ImageButton) view.findViewById(R.id.view_order_button_customer_details)).setImageResource(R.drawable.arrowexpanded);
-		} else {
-			view.findViewById(R.id.view_order_customer_details).setVisibility(View.GONE);
-			((ImageButton) view.findViewById(R.id.view_order_button_customer_details)).setImageResource(R.drawable.arrowexpand);
-		}
+	}
+	
+	private void updateViewTimers() {
 		
 		// Compute timers. Placed shows the time since the order was placed. Expires shows the time left in the current state until timeout.
 		double current_ms	= System.currentTimeMillis() ;
@@ -524,9 +540,6 @@ public class Order  {
 			else
 				((TextView) view.findViewById(R.id.view_order_timeout)).setText("About to expire");
 		}
-		
-		// Set a pointer to the object being displayed 
-		view.setTag(this);
 	}
 	
 	/**

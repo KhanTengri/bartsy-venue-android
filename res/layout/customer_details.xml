@@ -1,64 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_horizontal"
-    android:background="@android:color/background_dark"
-    android:divider="@drawable/div_light_grey_vertical"
     android:gravity="center_horizontal"
-    android:orientation="vertical" >
+    android:orientation="horizontal" >
 
-    <LinearLayout
-        android:id="@+id/view_customer_mode"
-        android:layout_width="fill_parent"
+    <ImageView
+        android:id="@+id/view_customer_details_picture"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:contentDescription="@string/customer_details_picture_cd"
+        android:scaleType="fitCenter"
+        android:src="@drawable/profile" />
+
+    <TextView
+        android:id="@+id/view_customer_details_info"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@android:color/background_light"
-        android:orientation="horizontal" >
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <ImageView
-            android:id="@+id/view_customer_mode_picture"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/profile" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:orientation="vertical" >
-
-            <TextView
-                android:id="@+id/view_customer_mode_details"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_weight="2"
-            android:orientation="vertical" >
-
-            <TextView
-                android:id="@+id/view_customer_pickup_code"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|center_horizontal"
-                android:text="Pickup code: 328"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/view_customer_mode_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="Close customer view" />
-    </LinearLayout>
 </LinearLayout>

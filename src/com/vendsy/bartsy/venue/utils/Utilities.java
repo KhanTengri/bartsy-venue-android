@@ -29,6 +29,7 @@ import java.util.TimeZone;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.vendsy.bartsy.venue.db.DatabaseManager;
@@ -212,7 +213,7 @@ public final class Utilities {
 	 * @param format
 	 * @return
 	 */
-	public static Date getLocalDateFromGTMString(String input, String format) {
+	public static Date getLocalDateFromGMTString(String input, String format) {
 		
         SimpleDateFormat inputFormat = new SimpleDateFormat(format, Locale.getDefault());
         inputFormat.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
@@ -229,5 +230,24 @@ public final class Utilities {
 			return null;
 		}
 		return output; 
+	}
+	
+	/**
+	 * Returns the date in string in "time ago format"
+	 * 
+	 * @param input
+	 * @param format
+	 * @return
+	 */
+	public static String getFriendlyDate(String input, String format){
+
+		// Parse date using the provided format
+		Date date = getLocalDateFromGMTString(input, format);
+
+		// Make sure the date is valid, if not simply return the input string
+		if(date==null){
+			return input;
+		}
+		return (String) DateUtils.getRelativeTimeSpanString(date.getTime(), System.currentTimeMillis(),DateUtils.SECOND_IN_MILLIS,DateUtils.FORMAT_ABBREV_RELATIVE);
 	}
 }

@@ -141,14 +141,14 @@ public class PastOrdersFragment extends Fragment{
 		
 		
 		// Extract time from UTC field
-        Date date = Utilities.getLocalDateFromGTMString(order.createdDate.replace("T", " ").replace("Z", ""), "yyyy-MM-dd HH:mm:ss");;
+        Date date = Utilities.getLocalDateFromGMTString(order.createdDate.replace("T", " ").replace("Z", ""), "yyyy-MM-dd HH:mm:ss");;
         String time = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault()).format(date);
 		
         // Don't display order placed before beta starts
         SimpleDateFormat betaDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         Date betaDate;
         try {
-			betaDate = betaDateFormat.parse("2013-07-15 20:00:00");
+			betaDate = betaDateFormat.parse("2013-07-15 10:15:00");
 		} catch (ParseException e) {
 			e.printStackTrace();
 			return;

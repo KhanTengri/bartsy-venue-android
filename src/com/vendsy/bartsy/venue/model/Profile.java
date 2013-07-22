@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.utils.Constants;
+import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
 
 public class Profile {
@@ -88,6 +89,21 @@ public class Profile {
 		}
 	}
 
+	public View updateView(View mRootView) {
+
+		ImageView profileImageView = ((ImageView) mRootView.findViewById(R.id.view_customer_details_picture));
+		profileImageView.setImageBitmap(image);
+
+		String details = "Customer since: " + Utilities.getFriendlyDate(getFirstCheckInDate(), "d MMM yyyy HH:mm:ss 'GMT'") + 
+				"\nFirst Bartsy order: " + Utilities.getFriendlyDate(getFirstOrderDate(), "d MMM yyyy HH:mm:ss 'GMT'") + 
+				"\n" + getOrderCount() + " total, " + getLast30DaysOrderCount() + " recent orders" +
+				"\n" + getCheckInCount() + " recent, " + getLast30DaysCheckInCount() + " total visits";
+		((TextView) mRootView.findViewById(R.id.view_customer_details_info)).setText(details);
+		
+		return view;
+	}
+	
+	
 	public String getDisplayName() {
 		return displayName;
 	}

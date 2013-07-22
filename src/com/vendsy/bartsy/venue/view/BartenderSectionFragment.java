@@ -124,14 +124,16 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		
 		Log.v(TAG, "updateOrdersView()");
 		
+		// Defensive programming - this should not really happen
 		if (mRootView == null) return;
-		
-		mNewOrdersView = (LinearLayout) mRootView.findViewById(R.id.view_new_order_list);
-		mAcceptedOrdersView = (LinearLayout) mRootView.findViewById(R.id.view_accepted_order_list);
-		mCompletedOrdersView = (LinearLayout) mRootView.findViewById(R.id.view_completed_order_list);
-		
 		if (mNewOrdersView == null || mAcceptedOrdersView == null || mCompletedOrdersView == null)
 			return;
+		
+//		mNewOrdersView = (LinearLayout) mRootView.findViewById(R.id.view_new_order_list);
+//		mAcceptedOrdersView = (LinearLayout) mRootView.findViewById(R.id.view_accepted_order_list);
+//		mCompletedOrdersView = (LinearLayout) mRootView.findViewById(R.id.view_completed_order_list);
+		
+
 		
 		// Setup view options
 		switch (mViewMode) {
@@ -219,16 +221,8 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		}
 		
 		// Update customer view if we're in that mode
-		if (customer != null) {
-			ImageView profileImageView = ((ImageView) mRootView.findViewById(R.id.view_customer_mode_picture));
-			profileImageView.setImageBitmap(customer.image);
-
-			String details = "Customer since: " + customer.getFirstCheckInDate() + 
-					"\nFirst Bartsy order: " + customer.getFirstOrderDate() + 
-					"\n" + customer.getOrderCount() + " total, " + customer.getLast30DaysOrderCount() + " recent orders" +
-					"\n" + customer.getCheckInCount() + " recent, " + customer.getLast30DaysCheckInCount() + " total visits";
-			((TextView) mRootView.findViewById(R.id.view_customer_mode_details)).setText(details);
-		}
+		if (customer != null)			
+			customer.updateView(mRootView);
 		
 		// Get order timeouts
 		int minTimeout = 0;
