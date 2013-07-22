@@ -418,6 +418,14 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 				startActivity(intent);
 				finish();
 				
+				// Upload ingredients data to server in background
+				if(mApp.isIngredientsSaved){
+					new Thread(){
+						public void run() {
+							mApp.uploadDataToServerInBackground();
+						}
+					}.start();
+				}
 			}
 		} catch (NumberFormatException e) {
 			e.printStackTrace();

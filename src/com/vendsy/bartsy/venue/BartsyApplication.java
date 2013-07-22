@@ -187,6 +187,8 @@ public class BartsyApplication extends Application implements AppObservable {
 		});
 	}
 	
+	// Ingredients
+	public boolean isIngredientsSaved;
 	
 	/**
 	 *  To load csv file in background
@@ -200,13 +202,39 @@ public class BartsyApplication extends Application implements AppObservable {
 				// To read cocktails data from CSV file and save in the DB 
 				Utilities.saveCocktailsFromCSVFile(BartsyApplication.this);
 				
+				isIngredientsSaved = true;
+				
 				notifyObservers(INVENTORY_UPDATED);
+				
+				if(venueProfileID!=null){
+					// Upload the data to server
+					uploadDataToServerInBackground();
+				}
+				
 			}
 		}.start();
 		
 		
 	}
 
+	/**
+	 * Upload Ingredients and cocktails to the server in background
+	 */
+	public synchronized void uploadDataToServerInBackground() {
+		// Get spirits categories from the database and upload to server
+		List<Category> categories = DatabaseManager.getInstance().getCategories(Category.SPIRITS_TYPE);
+	    for(Category category:categories){
+	    	WebServices.saveIngredients(category, DatabaseManager.getInstance().getIngredients(category), venueProfileID, this);
+	    }
+	    
+	    // Get mixer categories from the database and upload to server
+	 	List<Category> mixercategories = DatabaseManager.getInstance().getCategories(Category.MIXER_TYPE);
+	 	for(Category category:mixercategories){
+	 	    WebServices.saveIngredients(category, DatabaseManager.getInstance().getIngredients(category), venueProfileID, this);
+	 	}
+	 	
+	 	
+	}
 
 	/**
 	 * TODO - Synchronize orders

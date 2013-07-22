@@ -179,6 +179,7 @@ public final class Utilities {
         	// Initialize the CSVReader object with CSV file by using InputStream
             CSVReader reader = new CSVReader(new InputStreamReader(context.getAssets().open(Constants.COCKTAILS_CSV_FILE)));
             // To skip excel sheet headings
+            reader.setSeparator('|');
             data = reader.readNext();
             
             //Loop until the end of the line
