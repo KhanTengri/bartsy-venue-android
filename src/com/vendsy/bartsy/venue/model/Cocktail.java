@@ -26,6 +26,8 @@ public class Cocktail {
 	@DatabaseField
 	private String instructions;
 	@DatabaseField
+	private String shopping;
+	@DatabaseField
 	private int price;
 	@DatabaseField
 	private boolean availability;
@@ -49,6 +51,7 @@ public class Cocktail {
 			json.put("alcohol", alcohol);
 			json.put("ingredients", ingredients);
 			json.put("instructions", instructions);
+			json.put("shopping", shopping);
 			
 		} catch (JSONException e) {	}
 		
@@ -162,6 +165,14 @@ public class Cocktail {
 
 	public void setAlcohol(String alcohol) {
 		this.alcohol = alcohol;
+	}
+
+	public String getShopping() {
+		return shopping;
+	}
+
+	public void setShopping(String shopping) {
+		this.shopping = shopping;
 	}
 	
 }
