@@ -43,6 +43,7 @@ import com.google.android.gcm.GCMRegistrar;
 import com.vendsy.bartsy.venue.db.DatabaseManager;
 import com.vendsy.bartsy.venue.model.AppObservable;
 import com.vendsy.bartsy.venue.model.Category;
+import com.vendsy.bartsy.venue.model.Cocktail;
 import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.model.Profile;
 import com.vendsy.bartsy.venue.service.ConnectionCheckingService;
@@ -233,6 +234,9 @@ public class BartsyApplication extends Application implements AppObservable {
 	 	    WebServices.saveIngredients(category, DatabaseManager.getInstance().getIngredients(category), venueProfileID, this);
 	 	}
 	 	
+	 	// Get cocktails from the db and upload to server
+	 	List<Cocktail> cocktails = DatabaseManager.getInstance().getCocktails();
+	 	WebServices.saveCocktails(cocktails, venueProfileID, this);
 	 	
 	}
 
