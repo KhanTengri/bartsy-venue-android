@@ -444,6 +444,11 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		super.onDestroyView();
 
 		Log.v(TAG, "onDestroyView()");
+		
+		// Make sure the list views are all empty
+		mNewOrdersView.removeAllViews();
+		mAcceptedOrdersView.removeAllViews();
+		mCompletedOrdersView.removeAllViews();
 	}
 	
 	
