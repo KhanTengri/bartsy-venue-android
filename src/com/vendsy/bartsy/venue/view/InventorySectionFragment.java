@@ -517,6 +517,19 @@ public class InventorySectionFragment extends Fragment {
 		    TextView itemTextView = (TextView) itemView.findViewById(R.id.ingredientItemText);
 		    itemTextView.setText(cocktail.getName());
 		    
+		    ToggleButton availableButton = (ToggleButton)itemView.findViewById(R.id.availableButton);
+		    availableButton.setChecked(cocktail.isAvailability());
+		    
+		    final Cocktail cocktailObj = cocktail;
+		    
+		    // Add checked changed listener to the toggle button
+		    availableButton.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					cocktailObj.setAvailability(isChecked);
+				}
+			});
+		    
 //		    // To set more information in the view
 //		    LinearLayout moreLayout = (LinearLayout)itemView.findViewById(R.id.moreInfoLayout);
 //		    moreLayout.setVisibility(View.VISIBLE);
