@@ -222,22 +222,25 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * Upload Ingredients and cocktails to the server in background
 	 */
 	public synchronized void uploadDataToServerInBackground() {
-		// Get spirits categories from the database and upload to server
-		List<Category> categories = DatabaseManager.getInstance().getCategories(Category.SPIRITS_TYPE);
-	    for(Category category:categories){
-	    	WebServices.saveIngredients(category, DatabaseManager.getInstance().getIngredients(category), venueProfileID, this);
-	    }
-	    
-	    // Get mixer categories from the database and upload to server
-	 	List<Category> mixercategories = DatabaseManager.getInstance().getCategories(Category.MIXER_TYPE);
-	 	for(Category category:mixercategories){
-	 	    WebServices.saveIngredients(category, DatabaseManager.getInstance().getIngredients(category), venueProfileID, this);
-	 	}
-	 	
-	 	// Get cocktails from the db and upload to server
-	 	List<Cocktail> cocktails = DatabaseManager.getInstance().getCocktails();
-	 	WebServices.saveCocktails(cocktails, venueProfileID, this);
-	 	
+		new Thread(){
+			public void run() {
+				// Get spirits categories from the database and upload to server
+				List<Category> categories = DatabaseManager.getInstance().getCategories(Category.SPIRITS_TYPE);
+			    for(Category category:categories){
+			    	WebServices.saveIngredients(category, DatabaseManager.getInstance().getIngredients(category), venueProfileID, BartsyApplication.this);
+			    }
+			    
+			    // Get mixer categories from the database and upload to server
+			 	List<Category> mixercategories = DatabaseManager.getInstance().getCategories(Category.MIXER_TYPE);
+			 	for(Category category:mixercategories){
+			 	    WebServices.saveIngredients(category, DatabaseManager.getInstance().getIngredients(category), venueProfileID, BartsyApplication.this);
+			 	}
+			 	
+			 	// Get cocktails from the db and upload to server
+			 	List<Cocktail> cocktails = DatabaseManager.getInstance().getCocktails();
+			 	WebServices.saveCocktails(cocktails, venueProfileID, BartsyApplication.this);
+			}
+		}.start();
 	}
 
 	/**
