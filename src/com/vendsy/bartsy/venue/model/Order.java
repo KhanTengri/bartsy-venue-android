@@ -444,9 +444,6 @@ public class Order  {
 		// Update customer view
 		if (orderRecipient != null) {
 			
-			// Update customer visible name
-			((TextView) view.findViewById(R.id.view_order_profile_name)).setText(orderRecipient.getName());
-
 			// Update sender profile section if the details view is showing
 			LinearLayout expandedView = (LinearLayout) view.findViewById(R.id.view_order_customer_details);
 			if (showCustomerDetails ) {
@@ -455,10 +452,8 @@ public class Order  {
 					View customerView = (View) inflater.inflate(R.layout.customer_details, expandedView, true);
 					orderRecipient.updateView(customerView);
 				}
-				((ImageButton) view.findViewById(R.id.view_order_button_customer_details)).setImageResource(R.drawable.arrowexpanded);
 			} else {
 				expandedView.setVisibility(View.GONE);
-				((ImageButton) view.findViewById(R.id.view_order_button_customer_details)).setImageResource(R.drawable.arrowexpand);
 			}
 		}
 

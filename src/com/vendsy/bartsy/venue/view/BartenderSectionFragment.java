@@ -332,8 +332,8 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		order.view.findViewById(R.id.view_order_button_expired).setOnClickListener(this);
 		order.view.findViewById(R.id.view_order_button_expired).setTag(order);
 		
-		order.view.findViewById(R.id.view_order_button_customer_details).setOnClickListener(this);
-		order.view.findViewById(R.id.view_order_button_customer_details).setTag(order);
+		order.view.findViewById(R.id.view_order_button_customer_dets).setOnClickListener(this);
+		order.view.findViewById(R.id.view_order_button_customer_dets).setTag(order);
 		
 		return count;
 	}
@@ -376,7 +376,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			order.nextPositiveState();	
 			Log.v(TAG, "Child matches parent - update status to " + order.status);
 			
-//			mApp.update(); //- this will get called automatically in the next cycle, don't call it now to make UI more snappy
+			mApp.update(); //- this will get called automatically in the next cycle, don't call it now to make UI more snappy
 			break;
 			
 		case R.id.view_order_button_negative:
@@ -384,7 +384,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			// Process all orders for that user that are currently in this state
 			Log.v(TAG, "Clicked on order negative button");
 			order.nextNegativeState("Order rejected by the bartender");	
-//			mApp.update();
+			mApp.update();
 			break;
 			
 		case R.id.view_order_button_expired:
@@ -393,7 +393,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			mApp.removeOrder(order);
 			break;
 
-		case R.id.view_order_button_customer_details:
+		case R.id.view_order_button_customer_dets:
 			Log.v(TAG, "Clicked on the customers details button - toggle customer details view");
 			order.showCustomerDetails = !order.showCustomerDetails;
 			break;

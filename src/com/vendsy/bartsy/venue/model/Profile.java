@@ -89,16 +89,20 @@ public class Profile {
 		}
 	}
 
-	public View updateView(View mRootView) {
+	public View updateView(View view) {
 
-		ImageView profileImageView = ((ImageView) mRootView.findViewById(R.id.view_customer_details_picture));
+		ImageView profileImageView = ((ImageView) view.findViewById(R.id.view_customer_details_picture));
 		profileImageView.setImageBitmap(image);
 
+		// Update customer visible name
+		((TextView) view.findViewById(R.id.view_customer_details_name)).setText(getName());
+
+		// Update customer details
 		String details = "Customer since: " + Utilities.getFriendlyDate(getFirstCheckInDate(), "d MMM yyyy HH:mm:ss 'GMT'") + 
 				"\nFirst Bartsy order: " + Utilities.getFriendlyDate(getFirstOrderDate(), "d MMM yyyy HH:mm:ss 'GMT'") + 
 				"\n" + getOrderCount() + " total, " + getLast30DaysOrderCount() + " recent orders" +
 				"\n" + getCheckInCount() + " recent, " + getLast30DaysCheckInCount() + " total visits";
-		((TextView) mRootView.findViewById(R.id.view_customer_details_info)).setText(details);
+		((TextView) view.findViewById(R.id.view_customer_details_info)).setText(details);
 		
 		return view;
 	}
