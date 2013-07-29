@@ -16,6 +16,7 @@
 
 package com.vendsy.bartsy.venue;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -198,11 +199,18 @@ public class BartsyApplication extends Application implements AppObservable {
 		new Thread(){
 			public void run() {
 				// To read spirits and mixers data from CSV file and save in the DB 
-				Utilities.saveIngredientsFromCSVFile(BartsyApplication.this);
+				try {
+					Utilities.saveIngredientsFromCSVFile(BartsyApplication.this, getAssets().open(Constants.INGREDIENTS_CSV_FILE));
+				} catch (Exception e) {
+					Log.e(TAG, "Utilities.saveIngredientsFromCSVFile ::"+e.getMessage());
+				}
 				
-				// To read cocktails data from CSV file and save in the DB 
-				Utilities.saveCocktailsFromCSVFile(BartsyApplication.this);
-				
+				// To read cocktails data from CSV file and save in the DB
+				try {
+					Utilities.saveCocktailsFromCSVFile(BartsyApplication.this, getAssets().open(Constants.COCKTAILS_CSV_FILE));
+				} catch (Exception e) {
+					Log.e(TAG, "Utilities.saveCocktailsFromCSVFile ::"+e.getMessage());
+				}
 				isIngredientsSaved = true;
 				
 				notifyObservers(INVENTORY_UPDATED);
@@ -224,23 +232,35 @@ public class BartsyApplication extends Application implements AppObservable {
 	public synchronized void uploadDataToServerInBackground() {
 		new Thread(){
 			public void run() {
-				// Get spirits categories from the database and upload to server
-				List<Category> categories = DatabaseManager.getInstance().getCategories(Category.SPIRITS_TYPE);
-			    for(Category category:categories){
-			    	WebServices.saveIngredients(category, DatabaseManager.getInstance().getIngredients(category), venueProfileID, BartsyApplication.this);
-			    }
-			    
-			    // Get mixer categories from the database and upload to server
-			 	List<Category> mixercategories = DatabaseManager.getInstance().getCategories(Category.MIXER_TYPE);
-			 	for(Category category:mixercategories){
-			 	    WebServices.saveIngredients(category, DatabaseManager.getInstance().getIngredients(category), venueProfileID, BartsyApplication.this);
-			 	}
+				
+				uploadIngredientsDataToServer();
 			 	
-			 	// Get cocktails from the db and upload to server
-			 	List<Cocktail> cocktails = DatabaseManager.getInstance().getCocktails();
-			 	WebServices.saveCocktails(cocktails, venueProfileID, BartsyApplication.this);
+			 	uploadCocktailsDataToServer();
 			}
 		}.start();
+	}
+	
+	public void uploadIngredientsDataToServer(){
+		// Get spirits categories from the database and upload to server
+		List<Category> categories = DatabaseManager.getInstance().getCategories(Category.SPIRITS_TYPE);
+	    for(Category category:categories){
+	    	WebServices.saveIngredients(category, DatabaseManager.getInstance().getIngredients(category), venueProfileID, BartsyApplication.this);
+	    }
+	    
+	    // Get mixer categories from the database and upload to server
+	 	List<Category> mixercategories = DatabaseManager.getInstance().getCategories(Category.MIXER_TYPE);
+	 	for(Category category:mixercategories){
+	 	    WebServices.saveIngredients(category, DatabaseManager.getInstance().getIngredients(category), venueProfileID, BartsyApplication.this);
+	 	}
+	}
+	
+	/**
+	 *  Get cocktails from the db and upload to server
+	 */
+	public void uploadCocktailsDataToServer() {
+		
+	 	List<Cocktail> cocktails = DatabaseManager.getInstance().getCocktails();
+	 	WebServices.saveCocktails(cocktails, venueProfileID, BartsyApplication.this);
 	}
 
 	/**

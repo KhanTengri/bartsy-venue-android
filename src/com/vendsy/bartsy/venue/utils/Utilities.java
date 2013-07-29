@@ -16,6 +16,7 @@
 package com.vendsy.bartsy.venue.utils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.Format;
 import java.text.ParseException;
@@ -103,12 +104,12 @@ public final class Utilities {
 	 * 
 	 * @param context
 	 */
-	public static void saveIngredientsFromCSVFile(Context context){
+	public static void saveIngredientsFromCSVFile(Context context, InputStream is){
 		String data[] = null;
         // Try to read ingredients data from CSV file 
         try {
         	// Initialize the CSVReader object with CSV file by using InputStream
-            CSVReader reader = new CSVReader(new InputStreamReader(context.getAssets().open(Constants.INGREDIENTS_CSV_FILE)));
+            CSVReader reader = new CSVReader(new InputStreamReader(is));
             data = reader.readNext();
             
             ArrayList<Category> categories = new ArrayList<Category>();
@@ -172,12 +173,12 @@ public final class Utilities {
 	 * 
 	 * @param context
 	 */
-	public static void saveCocktailsFromCSVFile(Context context){
+	public static void saveCocktailsFromCSVFile(Context context, InputStream is){
 		String data[] = null;
         // Try to read ingredients data from CSV file 
         try {
         	// Initialize the CSVReader object with CSV file by using InputStream
-            CSVReader reader = new CSVReader(new InputStreamReader(context.getAssets().open(Constants.COCKTAILS_CSV_FILE)));
+            CSVReader reader = new CSVReader(new InputStreamReader(is));
             // To skip excel sheet headings
             reader.setSeparator('|');
             data = reader.readNext();

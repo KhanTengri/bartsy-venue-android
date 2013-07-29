@@ -1,5 +1,10 @@
 package com.vendsy.bartsy.venue;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
@@ -13,10 +18,13 @@ import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -40,6 +48,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.analytics.tracking.android.EasyTracker;
+import com.vendsy.bartsy.venue.db.DatabaseManager;
+import com.vendsy.bartsy.venue.dialog.CSVOptionsDialogFragment;
+import com.vendsy.bartsy.venue.dialog.InventoryDialogFragment;
 import com.vendsy.bartsy.venue.dialog.PeopleDialogFragment;
 import com.vendsy.bartsy.venue.dialog.CodeDialogFragment;
 import com.vendsy.bartsy.venue.model.AppObservable;
@@ -180,9 +191,65 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	
 		// Update people and orders
 		mApp.update();
+		
+	}
+		
+	private void checkCSVIntentData() {
+		Intent i = getIntent();
+        if(i == null) return;
+        Uri u = i.getData();
+        
+        if(u == null) return;
+        
+        Log.d(TAG, "URI :: "+u);
+        // Initiate Csv options dialog
+		CSVOptionsDialogFragment dialog = new CSVOptionsDialogFragment(){
+			@Override
+			protected void saveCSVFile(final InputStream is, final boolean autoUpload,
+					final int type) {
+				// Background thread
+				new Thread(){
+					public void run() {
+						// Cocktails selected
+						if(type==0){ 
+							// Clear existing data
+							DatabaseManager.getInstance().deleteAllCocktails();
+							// Save new data from CSV file 
+							Utilities.saveCocktailsFromCSVFile(getActivity(), is);
+							
+							if(autoUpload){
+								mApp.uploadCocktailsDataToServer();
+							}
+						}
+						else{ // Ingredients selected
+							
+							// Clear existing data
+							DatabaseManager.getInstance().deleteAllIngredients();
+							Utilities.saveIngredientsFromCSVFile(getActivity(), is);
+							
+							if(autoUpload){
+								mApp.uploadIngredientsDataToServer();
+							}
+						}
+					}
+				}.start();
+			}
+		};
+		dialog.setUri(u);
+		dialog.show(getSupportFragmentManager(),"CSV Options");
 	}
 	
-	
+	@Override
+	protected void onResume() {
+		Log.d(TAG, "on Resume");
+		
+		// Read CSV intent data - This CSV data is getting from any where(email, SDcard and HTTP URL)
+		checkCSVIntentData();
+		
+		super.onResume();
+	}
+
+
 	/**
 	 * This Method is used to add Bar status to spinner of action bar
 	 */

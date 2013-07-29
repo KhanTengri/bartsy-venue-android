@@ -8,6 +8,7 @@ import android.content.Context;
 
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.table.TableUtils;
 import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Cocktail;
 import com.vendsy.bartsy.venue.model.Ingredient;
@@ -146,6 +147,29 @@ public class DatabaseManager {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	/**
+	 *  Delete all the records of the Ingredient table
+	 */
+	public void deleteAllIngredients(){
+		try {
+			TableUtils.clearTable(dbHelper.getConnectionSource(),
+					Ingredient.class);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 *  Delete all the records of the Cocktails table
+	 */
+	public void deleteAllCocktails(){
+		try {
+			TableUtils.clearTable(dbHelper.getConnectionSource(),
+					Cocktail.class);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
