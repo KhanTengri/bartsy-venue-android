@@ -319,6 +319,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		}
 		
 		// No previous order was found, insert the order at the top level
+		if (order.view.getParent() != null) ((LinearLayout) order.view.getParent()).removeView(order.view);
 		layout.addView(order.view);
 		count++;
 		
