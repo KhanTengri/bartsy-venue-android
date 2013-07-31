@@ -158,7 +158,11 @@ public class Order  {
 			if (json.has("orderTime")) {
 				// User server provided creation date in the following format: 27 Jun 2013 12:03:04 GMT
 				createdDate = json.getString("orderTime");
-				state_transitions[ORDER_STATUS_NEW] = parseWeirdDate(createdDate);
+				if (json.has("currentTime")) {
+					state_transitions[ORDER_STATUS_NEW] = adjustDate(json.getString("currentTime"), createdDate);
+				} else {
+					state_transitions[ORDER_STATUS_NEW] = Utilities.getLocalDateFromGMTString(createdDate, "dd MMM yyyy HH:mm:ss 'GMT'");
+				}
 			} else {
 				// If no created date use current date for the creation state
 				state_transitions[ORDER_STATUS_NEW] = new Date();
@@ -176,17 +180,14 @@ public class Order  {
 			if (json.has("updateTime")) {
 				// User server provided creation date in the following format: 27 Jun 2013 12:03:04 GMT
 				updatedDate = json.getString("updateTime");
-				state_transitions[status] = parseWeirdDate(json.getString("updateTime"));
+				if (json.has("currentTime")) {
+					state_transitions[status] = adjustDate(json.getString("currentTime"), updatedDate);
+				} else {
+					state_transitions[status] = Utilities.getLocalDateFromGMTString(updatedDate, "dd MMM yyyy HH:mm:ss 'GMT'");
+				}
 			} else {
 				// If no created date use current date for the update time
 				state_transitions[status] = new Date();
-			}
-			
-			// For now, since we are not receiving the last status time, set it to the update time to avoid expiring the order locally before the server had a chance. 
-			// The bartender may not be warned with enough notice and the order may expire prematurely
-			if (status == ORDER_STATUS_READY) {
-				// HACK for now - need to add value is syscalls
-				state_transitions[ORDER_STATUS_IN_PROGRESS] = state_transitions[status];
 			}
 			
 			// Set up last status based on current status
@@ -195,7 +196,7 @@ public class Order  {
 				last_status = status;
 				break;
 			case ORDER_STATUS_IN_PROGRESS:
-				last_status = ORDER_STATUS_READY;
+				last_status = ORDER_STATUS_NEW;
 				break;
 			case ORDER_STATUS_READY:
 				last_status = ORDER_STATUS_IN_PROGRESS;
@@ -266,11 +267,11 @@ public class Order  {
 		return orderData.toString();
 	}
 
-	Date parseWeirdDate(String date) {
-		Date d = Utilities.getLocalDateFromGMTString(createdDate, "dd MMM yyyy HH:mm:ss 'GMT'");
-		if (d == null)
-			d = Utilities.getLocalDateFromGMTString(createdDate, "d MMM yyyy HH:mm:ss 'GMT'");
-		return d;
+	Date adjustDate(String serverDate, String orderDate) {
+		Date server = Utilities.getLocalDateFromGMTString(serverDate, "dd MMM yyyy HH:mm:ss 'GMT'");
+		Date order = Utilities.getLocalDateFromGMTString(orderDate, "dd MMM yyyy HH:mm:ss 'GMT'");
+		order.setTime(order.getTime() + (new Date().getTime() - server.getTime()));
+		return order;
 	}
 	
 	
