@@ -234,63 +234,69 @@
                                android:orientation="vertical"
                                android:showDividers="beginning" >
 
-                               <LinearLayout
-                                   android:id="@+id/view_order_actions"
-                                   android:layout_width="match_parent"
+                               <TextView
+                                   android:id="@+id/view_order_state_description"
+                                   android:layout_width="fill_parent"
                                    android:layout_height="fill_parent"
-                                   android:layout_gravity="center_vertical"
-                                   android:gravity="center_vertical" >
+                                   android:layout_marginLeft="4dp"
+                                   android:gravity="left|center_vertical"
+                                   android:text="Order has expired"
+                                   android:textAppearance="?android:attr/textAppearanceSmall"
+                                   android:textColor="@android:color/holo_red_dark" />
+
+                               <LinearLayout
+                                   android:layout_width="fill_parent"
+                                   android:layout_height="match_parent"
+                                   android:orientation="horizontal" >
 
                                    <Button
                                        android:id="@+id/view_order_button_customer_dets"
                                        android:layout_width="wrap_content"
                                        android:layout_height="wrap_content"
-                                       android:layout_weight="20"
-                                       android:text="Info" />
+                                       android:text="Details" />
 
-                                   <Button
-                                       android:id="@+id/view_order_button_negative"
-                                       android:layout_width="wrap_content"
-                                       android:layout_height="wrap_content"
-                                       android:layout_weight="20"
-                                       android:text="Reject" />
-
-                                   <Button
-                                       android:id="@+id/view_order_button_positive"
-                                       android:layout_width="wrap_content"
-                                       android:layout_height="wrap_content"
-                                       android:layout_weight="80"
-                                       android:text="Accept" />
-                               </LinearLayout>
-
-                               <LinearLayout
-                                   android:id="@+id/view_order_expired"
-                                   android:layout_width="match_parent"
-                                   android:layout_height="wrap_content"
-                                   android:divider="?android:dividerHorizontal"
-                                   android:orientation="vertical"
-                                   android:showDividers="beginning"
-                                   android:visibility="gone" >
-
-                                   <TextView
-                                       android:id="@+id/view_order_state_description"
-                                       android:layout_width="fill_parent"
+                                   <LinearLayout
+                                       android:id="@+id/view_order_actions"
+                                       android:layout_width="match_parent"
                                        android:layout_height="fill_parent"
-                                       android:layout_marginLeft="4dp"
-                                       android:gravity="left|center_vertical"
-                                       android:text="Order has expired"
-                                       android:textAppearance="?android:attr/textAppearanceSmall"
-                                       android:textColor="@android:color/holo_red_dark" />
+                                       android:gravity="center_vertical" >
 
-                                   <Button
-                                       android:id="@+id/view_order_button_expired"
-                                       style="?android:attr/buttonStyle"
-                                       android:layout_width="fill_parent"
+                                       <Button
+                                           android:id="@+id/view_order_button_negative"
+                                           android:layout_width="wrap_content"
+                                           android:layout_height="wrap_content"
+                                           android:layout_weight="20"
+                                           android:text="Reject" />
+
+                                       <Button
+                                           android:id="@+id/view_order_button_positive"
+                                           android:layout_width="wrap_content"
+                                           android:layout_height="wrap_content"
+                                           android:layout_weight="80"
+                                           android:text="Accept" />
+                                   </LinearLayout>
+
+                                   <LinearLayout
+                                       android:id="@+id/view_order_expired"
+                                       android:layout_width="0dp"
                                        android:layout_height="wrap_content"
-                                       android:text="OK"
-                                       android:textAppearance="?android:attr/textAppearanceMedium"
-                                       android:textStyle="bold" />
+                                       android:layout_weight="20"
+                                       android:divider="?android:dividerHorizontal"
+                                       android:orientation="horizontal"
+                                       android:showDividers="beginning"
+                                       android:visibility="gone" >
+
+                                       <Button
+                                           android:id="@+id/view_order_button_expired"
+                                           style="?android:attr/buttonStyle"
+                                           android:layout_width="fill_parent"
+                                           android:layout_height="wrap_content"
+                                           android:text="OK"
+                                           android:textAppearance="?android:attr/textAppearanceMedium"
+                                           android:textStyle="bold" />
+                                   </LinearLayout>
                                </LinearLayout>
+
                            </LinearLayout>
 
                        </LinearLayout>

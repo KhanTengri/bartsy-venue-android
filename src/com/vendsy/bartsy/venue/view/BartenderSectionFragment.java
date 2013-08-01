@@ -221,8 +221,10 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 		}
 		
 		// Update customer view if we're in that mode
-		if (customer != null)			
+		if (mViewMode == VIEW_MODE_CUSTOMER && customer != null) {	
+			Log.v(TAG, "Updating customer view for: " + customer);
 			customer.updateView(mRootView);
+		}
 		
 		// Get order timeouts
 		int minTimeout = 0;

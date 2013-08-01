@@ -267,9 +267,9 @@ public class Order  {
 		return orderData.toString();
 	}
 
-	Date adjustDate(String serverDate, String orderDate) {
+	Date adjustDate(String serverDate, String date) {
 		Date server = Utilities.getLocalDateFromGMTString(serverDate, "dd MMM yyyy HH:mm:ss 'GMT'");
-		Date order = Utilities.getLocalDateFromGMTString(orderDate, "dd MMM yyyy HH:mm:ss 'GMT'");
+		Date order = Utilities.getLocalDateFromGMTString(date, "dd MMM yyyy HH:mm:ss 'GMT'");
 		order.setTime(order.getTime() + (new Date().getTime() - server.getTime()));
 		return order;
 	}
@@ -520,6 +520,7 @@ public class Order  {
 			view.findViewById(R.id.view_order_background).setBackgroundResource(android.R.color.holo_red_light);
 			
 			// Set text based on reason
+			view.findViewById(R.id.view_order_state_description).setVisibility(View.VISIBLE);
 			((TextView) view.findViewById(R.id.view_order_state_description)).setText(errorReason);
 
 			// Update timeout counter to always be expired even if there is some left (due to clock inconsistencies between local and server)
@@ -530,6 +531,8 @@ public class Order  {
 
 		} else {
 
+			view.findViewById(R.id.view_order_state_description).setVisibility(View.GONE);
+			
 			// Update timeout counter		
 			if (left_min > 0) 
 				((TextView) view.findViewById(R.id.view_order_timeout)).setText("Expires in < " + String.valueOf((int)left_min)+" min");

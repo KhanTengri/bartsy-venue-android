@@ -88,6 +88,29 @@ public class Profile {
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+	public String toString() {
+		
+		JSONObject json = new JSONObject();
+		
+		try {
+			json.put("bartsyId", userID);
+			json.put("gender", gender);
+			json.put("name", name);
+			json.put("userImagePath", profileImageUrl);
+			json.put("firstOrderDate", firstOrderDate);
+			json.put("orderCount", orderCount);
+			json.put("last30DaysOrderCount", last30DaysOrderCount);
+			json.put("firstCheckInDate", firstCheckInDate);
+			json.put("checkInCount", checkInCount);
+			json.put("last30DaysCheckInCount", last30DaysCheckInCount);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		return json.toString();
+	}
 
 	public View updateView(View view) {
 
