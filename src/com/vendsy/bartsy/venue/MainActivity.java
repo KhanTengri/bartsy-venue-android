@@ -1,16 +1,8 @@
 package com.vendsy.bartsy.venue;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Locale;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.ActionBar;
@@ -18,11 +10,9 @@ import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.AssetFileDescriptor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -50,13 +40,10 @@ import android.widget.Toast;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.vendsy.bartsy.venue.db.DatabaseManager;
 import com.vendsy.bartsy.venue.dialog.CSVOptionsDialogFragment;
-import com.vendsy.bartsy.venue.dialog.InventoryDialogFragment;
-import com.vendsy.bartsy.venue.dialog.PeopleDialogFragment;
 import com.vendsy.bartsy.venue.dialog.CodeDialogFragment;
+import com.vendsy.bartsy.venue.dialog.PeopleDialogFragment;
 import com.vendsy.bartsy.venue.model.AppObservable;
 import com.vendsy.bartsy.venue.model.Order;
-import com.vendsy.bartsy.venue.model.Profile;
-import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
 import com.vendsy.bartsy.venue.view.AppObserver;
@@ -86,6 +73,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	private ProgressDialog progressDialog;
 	// Handler 
 	private Handler handler = new Handler();
+	
+	private boolean csvDownloaded = false;
 	
 	public void appendStatus(String status) {
 		Log.d(TAG, status);
@@ -202,7 +191,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         if(u == null) return;
         
         Log.d(TAG, "URI :: "+u);
+        csvDownloaded = true;
         // Initiate Csv options dialog
+        
 		CSVOptionsDialogFragment dialog = new CSVOptionsDialogFragment(){
 			@Override
 			protected void saveCSVFile(final InputStream is, final boolean autoUpload,
@@ -244,7 +235,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		Log.d(TAG, "on Resume");
 		
 		// Read CSV intent data - This CSV data is getting from any where(email, SDcard and HTTP URL)
-		checkCSVIntentData();
+		if(!csvDownloaded){
+			checkCSVIntentData();
+		}
 		
 		super.onResume();
 	}
