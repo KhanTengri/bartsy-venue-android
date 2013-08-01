@@ -121,8 +121,12 @@ public class Profile {
 		((TextView) view.findViewById(R.id.view_customer_details_name)).setText(getName());
 
 		// Update customer details
-		String details = "Customer since: " + Utilities.getFriendlyDate(getFirstCheckInDate(), "d MMM yyyy HH:mm:ss 'GMT'") + 
-				"\nFirst Bartsy order: " + Utilities.getFriendlyDate(getFirstOrderDate(), "d MMM yyyy HH:mm:ss 'GMT'") + 
+		
+		String checkin = getFirstCheckInDate() == null ? "-" : Utilities.getFriendlyDate(getFirstCheckInDate(), "d MMM yyyy HH:mm:ss 'GMT'");
+		String order   = getFirstOrderDate() == null ? "-" : Utilities.getFriendlyDate(getFirstOrderDate(), "d MMM yyyy HH:mm:ss 'GMT'");
+		
+		String details = "Customer since: " + checkin + 
+				"\nFirst Bartsy order: " + order + 
 				"\n" + getOrderCount() + " total, " + getLast30DaysOrderCount() + " recent orders" +
 				"\n" + getCheckInCount() + " recent, " + getLast30DaysCheckInCount() + " total visits";
 		((TextView) view.findViewById(R.id.view_customer_details_info)).setText(details);
