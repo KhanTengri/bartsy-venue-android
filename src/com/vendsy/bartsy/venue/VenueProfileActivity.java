@@ -285,8 +285,15 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 				postData.put("address", ((EditText) findViewById(R.id.addressEditText)).getText().toString());
 				postData.put("phone", ((EditText) findViewById(R.id.phoneEditText)).getText().toString());
 				
-				if (((CheckBox) findViewById(R.id.view_registration_wifi_checkbox)).isChecked())
+				if (((CheckBox) findViewById(R.id.view_registration_wifi_checkbox)).isChecked()){
 					postData.put("wifiPresent", "1");
+					
+					if (((RadioButton) findViewById(R.id.wpaNetWorkRadio)).isChecked()){
+						postData.put("wifiNetworkType", "WPA");
+					}else{
+						postData.put("wifiNetworkType", "WEP");
+					}
+				}
 				else
 					postData.put("wifiPresent", "0");
 				
