@@ -38,6 +38,7 @@ public class CSVOptionsDialogFragment extends DialogFragment  {
 	private Spinner categoriesSpinner;
 	private Uri uri;
 	private CheckBox uploadCheckBox;
+	private int position;
 	
 	private static final String TAG = "CSVOptionsDialogFragment";
 	
@@ -53,6 +54,14 @@ public class CSVOptionsDialogFragment extends DialogFragment  {
 
 	public void setUri(Uri uri) {
 		this.uri = uri;
+		
+		String filePath = uri.getEncodedPath();
+		// Try to identify the type based on filename
+		if(filePath.contains("cocktails")){
+			position = 0;
+		}else{
+			position = 1;
+		}
 	}
 
 	@Override
@@ -138,7 +147,6 @@ public class CSVOptionsDialogFragment extends DialogFragment  {
 	 */
 	public void updateCategoriesSpinner(){
 		
-		int position=0;
 		
 		ArrayList<String> categoryNames = new ArrayList<String>();
 
