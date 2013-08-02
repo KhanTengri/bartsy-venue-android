@@ -36,7 +36,7 @@ import com.vendsy.bartsy.venue.utils.WebServices;
  * @author peterkellis
  * 
  */
-public class DrinksSectionFragment extends Fragment {
+public class MenuSectionFragment extends Fragment {
 	private View mRootView = null;
 	private ExpandableListView mDrinksListView = null;
 	public BartsyApplication mApp = null;

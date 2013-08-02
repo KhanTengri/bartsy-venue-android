@@ -278,6 +278,10 @@ public class Profile {
 		return firstOrderDate;
 	}
 
+	public boolean hasFirstOrderDate() {
+		return firstOrderDate == null || firstOrderDate.equals("");
+	}
+	
 	public void setFirstOrderDate(String firstOrderDate) {
 		this.firstOrderDate = firstOrderDate;
 	}
@@ -298,6 +302,10 @@ public class Profile {
 		this.last30DaysOrderCount = last30DaysOrderCount;
 	}
 
+	public boolean hasFirstCheckInDate() {
+		return firstCheckInDate == null || firstCheckInDate.equals("");
+	}
+	
 	public String getFirstCheckInDate() {
 		return firstCheckInDate;
 	}

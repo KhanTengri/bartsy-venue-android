@@ -48,7 +48,7 @@ import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
 import com.vendsy.bartsy.venue.view.AppObserver;
 import com.vendsy.bartsy.venue.view.BartenderSectionFragment;
-import com.vendsy.bartsy.venue.view.DrinksSectionFragment;
+import com.vendsy.bartsy.venue.view.MenuSectionFragment;
 import com.vendsy.bartsy.venue.view.InventorySectionFragment;
 import com.vendsy.bartsy.venue.view.PastOrdersFragment;
 import com.vendsy.bartsy.venue.view.PeopleSectionFragment;
@@ -67,7 +67,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	public BartenderSectionFragment mBartenderFragment = null; 	// make sure the set this to null when fragment is destroyed
 	public PeopleSectionFragment mPeopleFragment = null;		// make sure the set this to null when fragment is destroyed
 	public InventorySectionFragment mInventoryFragment = null;	// make sure the set this to null when fragment is destroyed
-	public DrinksSectionFragment mDrinksFragment = null;	// make sure the set this to null when fragment is destroyed
+	public MenuSectionFragment mDrinksFragment = null;	// make sure the set this to null when fragment is destroyed
 
 	// Progress dialog
 	private ProgressDialog progressDialog;
@@ -348,9 +348,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		
 		if (mDrinksFragment == null) {
 			Log.v(TAG, "People fragment not found. Creating one.");
-			mDrinksFragment = new DrinksSectionFragment();
+			mDrinksFragment = new MenuSectionFragment();
 		} else {
-			DrinksSectionFragment drinksFragment = (DrinksSectionFragment) getSupportFragmentManager().findFragmentById(R.string.title_menu);
+			MenuSectionFragment drinksFragment = (MenuSectionFragment) getSupportFragmentManager().findFragmentById(R.string.title_menu);
 			Log.v(TAG, "People fragment found.");
 			mDrinksFragment = drinksFragment;
 		}

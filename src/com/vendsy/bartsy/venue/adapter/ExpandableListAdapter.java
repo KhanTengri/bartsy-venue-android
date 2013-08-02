@@ -60,8 +60,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 			textView.setText( c.getTitle() );
 		
 		textView = (TextView)view.findViewById( R.id.view_drink_description );
-		if( textView != null )
-			textView.setText( c.getDescription() );
+		if( textView != null && c.has(c.getOptionsDescription()))
+			textView.setText( c.getOptionsDescription() );
 
 		TextView rgb = (TextView)view.findViewById( R.id.view_drink_price );
 		if( rgb != null )

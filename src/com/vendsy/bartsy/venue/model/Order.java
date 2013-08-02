@@ -110,21 +110,6 @@ public class Order  {
 			
 			orderId = json.getString("orderId");
 
-			// Parse old format item
-			if (json.has("title")  || json.has("description") || json.has("itemId")) {
-				Item item = new Item();
-				if (json.has("itemName"))
-					item.setTitle(json.getString("itemName"));
-				if (json.has("description"))
-					item.setDescription(json.getString("description"));
-				if (json.has("basePrice"))
-					item.setPrice(json.getString("basePrice"));
-				if (json.has("itemId"))
-					item.setItemId(json.getString("itemId"));
-				items.add(item);
-			} 
-	
-			// Parse new format item list
 			if (json.has("itemsList")) {
 				JSONArray itemsJSON = json.getJSONArray("itemsList");
 				
@@ -563,10 +548,10 @@ public class Order  {
 			LinearLayout view = (LinearLayout) inflater.inflate(R.layout.bartender_order_mini, container, false);
 			((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(Float.parseFloat(item.getPrice())));
 			((TextView) view.findViewById(R.id.view_order_title)).setText(item.getTitle());
-			if (item.getDescription() == null || item.getDescription().equalsIgnoreCase(""))
+			if (item.has(item.getOptionsDescription()))
 				((TextView) view.findViewById(R.id.view_order_description)).setVisibility(View.GONE);
 			else
-				((TextView) view.findViewById(R.id.view_order_description)).setText(item.getDescription());
+				((TextView) view.findViewById(R.id.view_order_description)).setText(item.getOptionsDescription());
 			
 			itemsView.addView(view);
 		}
