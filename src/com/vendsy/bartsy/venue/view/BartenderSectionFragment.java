@@ -307,7 +307,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 						layoutOrder.orderRecipient.userID.equalsIgnoreCase(order.orderRecipient.userID)) {
 					
 					// Found an existing order from the same user. Insert a mini-view of the order
-					order.addItemsView((LinearLayout) view.findViewById(R.id.view_order_mini), mInflater, mContainer);
+					order.addItemsView((LinearLayout) view.findViewById(R.id.view_order_mini), mInflater);
 					
 					// Update the view (not the order itself) of the master order total values to include the order just added
 					Float tipAmount = (Float) view.findViewById(R.id.view_order_tip_amount).getTag();

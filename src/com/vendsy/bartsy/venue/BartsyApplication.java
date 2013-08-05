@@ -17,6 +17,9 @@
 package com.vendsy.bartsy.venue;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -414,7 +417,7 @@ public class BartsyApplication extends Application implements AppObservable {
 	
 				// Print and generate modifications
 				Log.w(TAG, message);
-				generateNotification("New orderss", message, count);
+				generateNotification("New orders", message, count);
 			}		
 	
 			// Print orders after update
@@ -423,6 +426,10 @@ public class BartsyApplication extends Application implements AppObservable {
 				ordersString += order + "\n";
 			}
 			Log.w(TAG, ">>> Open orders after update:\n" + ordersString);
+			
+			//printOrders(addedOrders);
+			
+			
 		}
 		
 		// Update timers and notify observers of status changes
@@ -431,6 +438,32 @@ public class BartsyApplication extends Application implements AppObservable {
 		
 		return null;
 	}
+	
+	
+	public void printOrders(ArrayList<Order> addedOrders) {
+		try 
+	    {
+		    Socket sock = new Socket("192.168.1.4", 9100);
+		    PrintWriter oStream = new PrintWriter(sock.getOutputStream());
+			for (Order order : addedOrders) {
+				order.println(oStream);
+			}
+	        oStream.print("\n\n\n");
+	        oStream.close();
+	        sock.close(); 
+	    }
+	    catch (UnknownHostException e) 
+	    {
+	        e.printStackTrace();
+	        Log.e(TAG, "Unknown host");
+	    } 
+	    catch (IOException e) 
+	    { 
+	        e.printStackTrace();
+	        Log.e(TAG, "I/O error");
+	    } 
+	}
+	
 	
 	ArrayList<Order> extractOrders(JSONObject json) {
 		

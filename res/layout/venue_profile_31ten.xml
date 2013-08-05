@@ -130,11 +130,216 @@
                                     android:layout_marginBottom="@dimen/activity_vertical_margin"
                                     android:text="Hours:" />
 
-                                <LinearLayout android:id="@+id/hoursLayout"
+                                <GridLayout
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:orientation="vertical">
-                                </LinearLayout>
+                                    android:columnCount="3" >
+
+                                    <LinearLayout
+                                        android:layout_gravity="fill_horizontal"
+                                        android:layout_marginRight="@dimen/activity_horizontal_margin" >
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="M " />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="--:--" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text=" to " />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="--:--" />
+
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_gravity="fill_horizontal"
+                                        android:layout_marginRight="@dimen/activity_horizontal_margin" >
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="T " />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="--:--" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text=" to " />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="--:--" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_gravity="fill_horizontal"
+                                        android:layout_marginRight="@dimen/activity_horizontal_margin" >
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="W" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="--:--" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text=" to " />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="--:--" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_gravity="fill_horizontal"
+                                        android:layout_marginRight="@dimen/activity_horizontal_margin" >
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="T " />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="--:--" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text=" to " />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="--:--" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_gravity="fill_horizontal"
+                                        android:layout_marginRight="@dimen/activity_horizontal_margin" >
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="F " />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="--:--" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text=" to " />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="--:--" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_gravity="fill_horizontal"
+                                        android:layout_marginRight="@dimen/activity_horizontal_margin" >
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="S " />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="--:--" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text=" to " />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="--:--" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_gravity="fill_horizontal"
+                                        android:layout_marginRight="@dimen/activity_horizontal_margin" >
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="S " />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="--:--" />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text=" to " />
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginBottom="@dimen/activity_vertical_margin"
+                                            android:text="--:--" />
+                                    </LinearLayout>
+
+                                </GridLayout>
                             </LinearLayout>
                             
                         </LinearLayout>
@@ -431,7 +636,7 @@
                                 android:layout_weight="1"
                                 android:ems="14"
                                 android:inputType="textPassword"
-                                android:text="31tenlounge"
+                                android:text="13tenlounge"
                                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
                         </LinearLayout>
@@ -790,7 +995,7 @@
                                         android:textColor="#000000" />
                                 </RadioGroup>
                             </LinearLayout>
-                        </LinearLayout>
+                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
 

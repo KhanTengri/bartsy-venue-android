@@ -1,5 +1,6 @@
 package com.vendsy.bartsy.venue.model;
 
+import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -208,7 +209,7 @@ public class Order  {
 	}
 	
 	/**
-	 * TODO - Utilities
+	 * TODO - Serializers
 	 */
 	
 	@Override
@@ -252,6 +253,25 @@ public class Order  {
 		return orderData.toString();
 	}
 
+	public void println(PrintWriter out) {
+		
+		out.println("Bartsy Order #" + orderId + "\r");
+		out.println(new Date() + "\r");
+		out.println(recipientNickname + "\r");
+		out.println();
+		out.println();
+		for (Item item : items) {
+			out.println("\r" + item.getTitle() + "...    $" + item.getPrice());
+		}
+		out.println("\r__________________________");
+		out.println("\rTotal:             $" + totalAmount + "\n");
+	}
+	
+	
+	/**
+	 * TODO - Utilities
+	 */
+	
 	Date adjustDate(String serverDate, String date) {
 		Date server = Utilities.getLocalDateFromGMTString(serverDate, "dd MMM yyyy HH:mm:ss 'GMT'");
 		Date order = Utilities.getLocalDateFromGMTString(date, "dd MMM yyyy HH:mm:ss 'GMT'");
@@ -417,7 +437,7 @@ public class Order  {
 			((TextView) view.findViewById(R.id.view_order_number)).setText(orderId);
 			
 			// Add the order list
-			addItemsView((LinearLayout) view.findViewById(R.id.view_order_mini), inflater, container);
+			addItemsView((LinearLayout) view.findViewById(R.id.view_order_mini), inflater);
 	
 			// Set base price
 			((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(baseAmount));
@@ -542,22 +562,10 @@ public class Order  {
 		}
 	}
 	
-	public View addItemsView(LinearLayout itemsView, LayoutInflater inflater, ViewGroup container ) {
+	public void addItemsView(LinearLayout itemsView, LayoutInflater inflater) {
 		
-		for (Item item : items) {
-			LinearLayout view = (LinearLayout) inflater.inflate(R.layout.bartender_order_mini, container, false);
-			((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(Float.parseFloat(item.getPrice())));
-			((TextView) view.findViewById(R.id.view_order_title)).setText(item.getTitle());
-			if (item.has(item.getOptionsDescription()))
-				((TextView) view.findViewById(R.id.view_order_description)).setVisibility(View.GONE);
-			else
-				((TextView) view.findViewById(R.id.view_order_description)).setText(item.getOptionsDescription());
-			
-			itemsView.addView(view);
-		}
-
-
-		return view;
+		for (Item item : items) 
+			itemsView.addView(item.orderView(inflater));
 	}
 
 }
