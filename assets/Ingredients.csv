@@ -1,34 +1,1 @@
-Ingredient,Type,Category,Price,Availability
-Well Vodka,Spirit,Vodka,7,Yes
-Absolut Vodka,Spirit,Vodka,9,Yes
-Grey Goose Vodka,Spirit,Vodka,10,Yes
-Well Gin,Spirit,Gin,7,Yes
-Bombay Saphire Gin,Spirit,Gin,8,Yes
-Well Rum,Spirit,Rum,7,Yes
-Bacardi Rum,Spirit,Rum,9,Yes
-Well Tequila,Spirit,Tequila,7,Yes
-Patron Tequila,Spirit,Tequila,10,Yes
-Jose Cuervo Tequila,Spirit,Tequila,9,Yes
-Well Bourbon,Spirit,Bourbon,7,Yes
-Bulleit Bourbon,Spirit,Bourbon,9,Yes
-Jack Daniels Bourbon,Spirit,Bourbon,9,Yes
-Well Irish Whiskey,Spirit,Irish Whiskey,7,Yes
-Jameson Irish Whiskey,Spirit,Irish Whiskey,9,Yes
-Well Scoth,Spirit,Scotch,7,Yes
-Johnny Walker Black Scotch,Spirit,Scotch,10,Yes
-Sambuca,Spirit,Liqueur,10,Yes
-Soda,Mixer,Add-ons,0,Yes
-Tonic,Mixer,Add-ons,0,Yes
-Cranberry,Mixer,Add-ons,0,Yes
-O.J.,Mixer,Add-ons,0,Yes
-Sprite,Mixer,Add-ons,0,Yes
-Coke,Mixer,Add-ons,0,Yes
-Diet Coke,Mixer,Add-ons,0,Yes
-Red Bull,Mixer,Add-ons,2,Yes
-Diet Red Bull,Mixer,Add-ons,2,No
-Double,Mixer,Add-ons,3,Yes
-As a martini,Mixer,Modifications,3,Yes
-On the rocks,Mixer,Modifications,2,Yes
-No ice,Mixer,Modifications,0,Yes
-Light ice,Mixer,Modifications,0,Yes
-Extra ice,Mixer,Modifications,0,Yes
+Ingredient,Type,Category,Price,AvailabilitySoda,Mixer,Add-ons,0,YesTonic,Mixer,Add-ons,0,YesCranberry,Mixer,Add-ons,0,YesO.J.,Mixer,Add-ons,0,YesSprite,Mixer,Add-ons,0,YesCoke,Mixer,Add-ons,0,YesDiet Coke,Mixer,Add-ons,0,YesRed Bull,Mixer,Add-ons,3,YesDiet Red Bull,Mixer,Add-ons,3,NoDouble,Mixer,Add-ons,7.45,YesCourvoisier Cognac,Spirit,Cognac,13,YesSt Martin Cognac,Spirit,Cognac,10,NoKappa Cognac,Spirit,Cognac,10,YesBombay Saphire Gin,Spirit,Gin,12,YesTanqueray Gin,Spirit,Gin,11,YesSambuca,Spirit,Cordials,10,YesSouthern Comfort,Spirit,Cordials,11,YesAperol,Spirit,Cordials,10,YesChambord,Spirit,Cordials,10,YesPatron Orange Cordials,Spirit,Cordials,10,YesCointreau,Spirit,Cordials,10,YesDisaronno Amaretto,Spirit,Cordials,10,YesFernet-Branca,Spirit,Cordials,10,YesFrangelico,Spirit,Cordials,10,YesGalliano,Spirit,Cordials,10,YesGrand Marnier,Spirit,Cordials,10,YesKahlua,Spirit,Cordials,10,YesLucid Absinth,Spirit,Cordials,10,YesSt-Germain,Spirit,Cordials,10,YesBols Blue Curacao,Spirit,Cordials,10,YesBols Amaretto,Spirit,Cordials,10,YesBols Peach Schnapps,Spirit,Cordials,10,YesBols Sour Apple Schnapps,Spirit,Cordials,10,YesBols Melon,Spirit,Cordials,10,YesBols Triple Sec,Spirit,Cordials,10,YesAs a martini,Mixer,Modifications,2,YesOn the rocks,Mixer,Modifications,2,YesNo ice,Mixer,Modifications,0,YesLight ice,Mixer,Modifications,0,YesExtra ice,Mixer,Modifications,0,YesRum Captain Morgan Original Spiced,Spirit,Rum,11,YesMyers's Original Dark Rum,Spirit,Rum,11,YesMalibu Coconut Rum,Spirit,Rum,11,YesTequila Avion Silver,Spirit,Tequila,10,YesTequila Avion Reposado,Spirit,Tequila,10,YesTequila Avion Anejo,Spirit,Tequila,10,YesTequila Don Julio 1942,Spirit,Tequila,32,YesTequila Don Julio Anejo,Spirit,Tequila,15,YesTequila Don Julio Silver,Spirit,Tequila,13,YesTequila Don Juilo Reposado,Spirit,Tequila,14,YesTequila Jose Cuervo,Spirit,Tequila,10,NoTequila Patron Silver,Spirit,Tequila,13,YesTequila Patron Reposado,Spirit,Tequila,14,YesTequila Patron Anejo,Spirit,Tequila,15,YesAbsolut Vodka,Spirit,Vodka,11,YesAbsolut Pears Vodka,Spirit,Vodka,11,YesAbsolut Rasberri Vodka,Spirit,Vodka,11,YesAbsolut Vanilla Vodka,Spirit,Vodka,11,YesAmerican Harvest Vodka,Spirit,Vodka,10,YesBelvedere Vodka,Spirit,Vodka,13,YesChopin Potato Vodka,Spirit,Vodka,14,YesCiroc Vodka,Spirit,Vodka,13,YesCiroc Peach Vodka,Spirit,Vodka,13,YesCiroc Coconut Vodka,Spirit,Vodka,13,YesCouble Cross Vodka,Spirit,Vodka,10,YesGrey Goose Vodka,Spirit,Vodka,13,YesKetel One Vodka,Spirit,Vodka,13,YesStolichnaya Vodka,Spirit,Vodka,12,YesChivas Regal Whiskey,Spirit,Whiskey,14,YesDewar's Whilte Label Whiskey,Spirit,Whiskey,13,YesGlenfiddich 12 Whiskey,Spirit,Whiskey,14,YesGlnlivet 12 Whiskey,Spirit,Whiskey,12,YesJohnny Walker Black Label Whiskey,Spirit,Whiskey,13,YesJohnny Walker Blue Label Whiskey,Spirit,Whiskey,42,YesJohnny Walker Red Label Whiskey,Spirit,Whiskey,11,YesLagavulin 16 Whiskey,Spirit,Whiskey,20,YesMacallan 12 Whiskey,Spirit,Whiskey,14,YesBushmills Whilsky,Spirit,Whiskey,10,NoWoodford Reserve Whiskey,Spirit,Whiskey,13,YesJameson Whiskey,Spirit,Whiskey,12,YesMaker's Mark Whiskey,Spirit,Whiskey,13,YesSeagram's Seven Crown,Spirit,Whiskey,11,YesJack Daniels,Spirit,Whiskey,11,YesHennessy Cognac,Spirit,Cognac,13,Yes
