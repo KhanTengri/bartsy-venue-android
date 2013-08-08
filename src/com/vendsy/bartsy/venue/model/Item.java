@@ -111,7 +111,7 @@ public class Item {
 		df.setMinimumFractionDigits(0);
 
 		LinearLayout view = (LinearLayout) inflater.inflate(R.layout.item_order, null);
-		((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(Float.parseFloat(getPrice())));
+		((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(Double.parseDouble(getPrice())));
 		((TextView) view.findViewById(R.id.view_order_title)).setText(getTitle());
 		
 		if (has(getOptionsDescription()))
