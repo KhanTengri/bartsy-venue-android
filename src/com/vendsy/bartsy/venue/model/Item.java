@@ -75,6 +75,8 @@ public class Item {
 		
 		if (json.has("price"))
 			this.price = json.getString("price");
+		if (json.has("basePrice"))
+			this.price = json.getString("basePrice");
 		if (json.has("order_price"))
 			this.price = json.getString("order_price");
 		
@@ -111,7 +113,8 @@ public class Item {
 		df.setMinimumFractionDigits(0);
 
 		LinearLayout view = (LinearLayout) inflater.inflate(R.layout.item_order, null);
-		((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(Double.parseDouble(getPrice())));
+		if (has(price))
+			((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(Double.parseDouble(getPrice())));
 		((TextView) view.findViewById(R.id.view_order_title)).setText(getTitle());
 		
 		if (has(getOptionsDescription()))

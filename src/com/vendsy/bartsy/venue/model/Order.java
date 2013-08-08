@@ -2,8 +2,12 @@ package com.vendsy.bartsy.venue.model;
 
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -563,6 +567,103 @@ public class Order  {
 		
 		for (Item item : items) 
 			itemsView.addView(item.orderView(inflater));
+	}
+	
+	
+	/**
+	 * Return past orders view
+	 * 
+	 * @param order
+	 * @return 
+	 */
+	public View pastOrdersView(LayoutInflater inflater) {
+		
+		// Extract time from UTC field
+        Date date = Utilities.getLocalDateFromGMTString(createdDate.replace("T", " ").replace("Z", ""), "yyyy-MM-dd HH:mm:ss");;
+        String time = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault()).format(date);
+		
+        // Don't display order placed before beta starts
+/*        SimpleDateFormat betaDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Date betaDate;
+		betaDate = betaDateFormat.parse("2013-07-15 10:15:00");
+        if (date.before(betaDate)) {
+        	// Don't show rows before the beta start date
+        	throw new Exception("");
+        }
+ */       
+		final View view = inflater.inflate(R.layout.orders_past_row, null);
+
+
+		((TextView) view.findViewById(R.id.dateCreated)).setText(time);
+		((TextView) view.findViewById(R.id.orderId)).setText(orderId);
+		
+		String statusString = "?";
+		
+		int status = this.status == Order.ORDER_STATUS_REMOVED ? last_status : this.status;
+		
+		switch(status) {
+		case Order.ORDER_STATUS_CANCELLED:
+			statusString = "Timeout";
+			break;
+		case Order.ORDER_STATUS_COMPLETE:
+			statusString = "Completed";
+			break;
+		case Order.ORDER_STATUS_READY:
+			statusString = "Ready";
+			break;
+		case Order.ORDER_STATUS_FAILED:
+			statusString = "Failed";
+			break;
+		case Order.ORDER_STATUS_IN_PROGRESS:
+			statusString = "In progress";
+			break;
+		case Order.ORDER_STATUS_INCOMPLETE:
+			statusString = "Unfinished";
+			break;
+		case Order.ORDER_STATUS_NEW:
+			statusString = "New";
+			break;
+		case Order.ORDER_STATUS_REJECTED:
+			statusString = "Rejected";
+			break;
+		}
+		
+		((TextView) view.findViewById(R.id.orderStatus)).setText(String.valueOf(statusString));
+
+		// Set title
+		String title = "";
+		int size = items.size();
+		for (int i=0; i< size ; i++) {
+			Item item = items.get(i);
+		    DecimalFormat df = new DecimalFormat();
+			df.setMaximumFractionDigits(0);
+			df.setMinimumFractionDigits(0);
+
+			String price = "";
+			if (item.has(item.getPrice()))
+				price = "  ($"+ df.format(Float.parseFloat(item.getPrice())) + ")";
+			title += item.getTitle();
+			if (item.has(item.getOptionsDescription()))
+				title += ": " + item.getOptionsDescription();
+			title += price;
+			if (i != size-1 && size > 1)
+				title +="\n";
+		}
+		((TextView) view.findViewById(R.id.itemName)).setText(title);
+		
+		// Set up recipient
+		((TextView) view.findViewById(R.id.recipient)).setText(recipientNickname);
+		
+		// Totals
+		if (status == Order.ORDER_STATUS_COMPLETE) {
+			((TextView) view.findViewById(R.id.tipAmount)).setText("$ " + df.format(tipAmount));
+			((TextView) view.findViewById(R.id.totalPrice)).setText("$ " + df.format(totalAmount));
+		} else {
+			((TextView) view.findViewById(R.id.tipAmount)).setText("-");
+			((TextView) view.findViewById(R.id.totalPrice)).setText("-");
+		}
+		
+		return view;
 	}
 
 }
