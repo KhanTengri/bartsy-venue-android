@@ -225,7 +225,7 @@ public class Order  {
 					jsonItem.put("itemId", item.getItemId());
 					jsonItem.put("itemName", item.getTitle());
 					jsonItem.put("description", item.getDescription());
-					jsonItem.put("basePrice", item.getPrice());
+					jsonItem.put("price", item.getPrice());
 					jsonItems.put(jsonItem);
 				}
 				orderData.put("itemsList", jsonItems);
@@ -439,9 +439,6 @@ public class Order  {
 			// Add the order list
 			addItemsView((LinearLayout) view.findViewById(R.id.view_order_mini), inflater);
 	
-			// Set base price
-			((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(baseAmount));
-			
 			// Set the totals (we'll update again if we have more mini orders...)
 			updateTipTaxTotalView(tipAmount, taxAmount, totalAmount);
 			
