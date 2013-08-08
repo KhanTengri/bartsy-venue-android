@@ -485,8 +485,8 @@ public class Order  {
 			((Button) view.findViewById(R.id.view_order_button_negative)).setText("FAILED");
 			break;
 		case ORDER_STATUS_READY:
-			((Button) view.findViewById(R.id.view_order_button_positive)).setText("PICKED UP");
-			((Button) view.findViewById(R.id.view_order_button_negative)).setText("NO SHOW");
+			((Button) view.findViewById(R.id.view_order_button_positive)).setText("CHARGE");
+			((Button) view.findViewById(R.id.view_order_button_negative)).setText("VOID");
 
 			if (options == BartenderSectionFragment.VIEW_MODE_ALL)
 				view.findViewById(R.id.view_order_actions).setVisibility(View.GONE);
