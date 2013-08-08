@@ -75,8 +75,8 @@ public class Item {
 		
 		if (json.has("price"))
 			this.price = json.getString("price");
-		if (json.has("basePrice"))
-			this.price = json.getString("basePrice");
+		if (json.has("order_price"))
+			this.price = json.getString("order_price");
 		
 		if (json.has("id"))
 			this.itemId = json.getString("id");
