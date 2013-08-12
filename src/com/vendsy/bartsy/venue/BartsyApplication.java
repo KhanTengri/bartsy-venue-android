@@ -45,6 +45,8 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.Toast;
 import com.google.android.gcm.GCMRegistrar;
@@ -174,24 +176,39 @@ public class BartsyApplication extends Application implements AppObservable {
 			public void run() {
 				
 				int icon = R.drawable.ic_launcher;
-				long when = System.currentTimeMillis();
-				NotificationManager notificationManager = (NotificationManager) BartsyApplication.this
-						.getSystemService(Context.NOTIFICATION_SERVICE);
-				Notification notification = new Notification(icon, body, when);
-		
-				Intent notificationIntent = new Intent(BartsyApplication.this, MainActivity.class);
-				// set intent so it does not start a new activity
-				notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-						| Intent.FLAG_ACTIVITY_SINGLE_TOP);
-				PendingIntent intent = PendingIntent.getActivity(BartsyApplication.this, 0,
-						notificationIntent, 0);
-				notification.setLatestEventInfo(BartsyApplication.this, title, body, intent);
-				notification.flags |= Notification.FLAG_AUTO_CANCEL;
-				notification.number = count;
+				   
+				NotificationCompat.Builder mBuilder =
+				            new NotificationCompat.Builder(getApplicationContext())
+				            .setSmallIcon(icon)
+				            .setContentTitle(title)
+				            .setContentText(body);
+				    // Creates an explicit intent for an Activity in your app
+				    Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
 
-				// // Play default notification sound
-				notification.defaults = Notification.DEFAULT_SOUND;
-				notificationManager.notify(0, notification);
+				    // The stack builder object will contain an artificial back stack for the
+				    // started Activity.
+				    // This ensures that navigating backward from the Activity leads out of
+				    // your application to the Home screen.
+				    TaskStackBuilder stackBuilder = TaskStackBuilder.create(getApplicationContext());
+				    // Adds the back stack for the Intent (but not the Intent itself)
+				    stackBuilder.addParentStack(MainActivity.class);
+				    // Adds the Intent that starts the Activity to the top of the stack
+				    stackBuilder.addNextIntent(resultIntent);
+				    PendingIntent resultPendingIntent =
+				            stackBuilder.getPendingIntent(
+				                0,
+				                PendingIntent.FLAG_UPDATE_CURRENT
+				            );
+				    mBuilder.setContentIntent(resultPendingIntent);
+				    mBuilder.setNumber(count);
+				    NotificationManager mNotificationManager =
+				        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+				    
+				    // Play default notification sound
+					mBuilder.setDefaults(Notification.DEFAULT_SOUND);
+				    // mId allows you to update the notification later on.
+				    mNotificationManager.notify(0, mBuilder.build());
+				
 			}
 		});
 	}
