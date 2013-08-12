@@ -6,6 +6,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.ActionBar;
+import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -18,8 +20,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -29,11 +33,13 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vendsy.bartsy.venue.dialog.LoginDialog;
+import com.vendsy.bartsy.venue.dialog.LoginDialog.LoginDialogListener;
 import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
 
-public class VenueProfileActivity extends Activity implements OnClickListener {
+public class VenueProfileActivity extends Activity implements OnClickListener,  LoginDialogListener{
 
 	private static final String TAG = "VenueRegistrationActivity";
 	
@@ -51,17 +57,37 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 	private ImageView venueImage;
 
 	private EditText managerUsernameEditText;
-
 	private EditText managerPasswordEditText;
-
 	private EditText confirmPasswordEditText;
 
 	private LinearLayout hoursLayout;
+	
+	
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.venue_profile);
+		
+		// Setup Action bar
+		ActionBar actionBar = getActionBar();
+		// Enable the custom view to add login button
+		actionBar.setDisplayShowCustomEnabled(true);
+		// Inflate the view and set as custom view for action bar
+		LayoutInflater inflator = (LayoutInflater) this .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View customView = inflator.inflate(R.layout.login_actionbar, null);
+		// Set login button click listener
+		Button login = (Button) customView.findViewById(R.id.loginButton);
+		login.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				new LoginDialog(VenueProfileActivity.this).show();
+			}
+		});
+
+		LayoutParams layout = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+		actionBar.setCustomView(customView, layout);
 		
 		// Set up pointers
 		mApp = (BartsyApplication) getApplication();
@@ -264,6 +290,54 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 		}
 		
 		return valid;
+	}
+	/**
+	 * Try to login with bartsy user name and password  
+	 * 
+	 * @param username
+	 * @param password
+	 */
+	public void proceedBartsyLoginSysCall(final String username, final String password){
+		// Start progress dialog from here
+		progressDialog = Utilities.progressDialog(this, "Loading..");
+		progressDialog.show();
+			
+		// Call web service in the background
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					JSONObject json = new JSONObject();
+					json.put("venueLogin", username);
+					json.put("venuePassword", password);
+					
+					// Post username and password to the server
+					final String response = WebServices.postRequest(WebServices.URL_BARTSY_LOGIN, json, mApp);
+
+					Log.d("Bartsy", "response :: " + response);
+											
+					// Handler to access UI thread
+					handler.post(new Runnable() {
+
+							@Override
+							public void run() {
+									progressDialog.dismiss();
+									// To check response received from the server or not - Error Handling
+									if (response != null) {
+										try {
+											processVenueResponse(new JSONObject(response));
+										} catch (JSONException e) {
+										}
+									}
+								}
+					});
+
+					} catch (Exception e) {
+						Log.d("Venue Reg", "Exception :: " + e);
+					}
+			}
+		}.start();
+				
 	}
 
 	/**
@@ -472,6 +546,16 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 			e.printStackTrace();
 		}
 		
+	}
+
+	@Override
+	public void onDialogPositiveClick(LoginDialog dialog) {
+		proceedBartsyLoginSysCall(dialog.username, dialog.password);
+	}
+
+	@Override
+	public void onDialogNegativeClick(LoginDialog dialog) {
+		dialog.dismiss();
 	}
 	
 }
