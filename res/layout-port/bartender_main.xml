@@ -86,10 +86,12 @@
             android:orientation="vertical" >
 
             <LinearLayout
+                android:id="@+id/accepted_orders"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:orientation="vertical" >
+                android:orientation="vertical"
+                android:visibility="gone" >
 
                 <Button
                     android:id="@+id/view_order_in_progress_button"
@@ -107,7 +109,7 @@
                     <ImageView
                         android:id="@+id/ImageView03"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="fill_parent"
                         android:scaleType="fitXY"
                         android:src="@drawable/arrow_up" />
 
@@ -156,8 +158,8 @@
                     <ImageView
                         android:id="@+id/ImageView04"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:scaleType="fitXY"
+                        android:layout_height="fill_parent"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/arrow_up" />
 
                     <LinearLayout

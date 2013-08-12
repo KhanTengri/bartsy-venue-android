@@ -30,9 +30,12 @@ import java.util.TimeZone;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.db.DatabaseManager;
 import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Cocktail;
@@ -250,5 +253,94 @@ public final class Utilities {
 			return input;
 		}
 		return (String) DateUtils.getRelativeTimeSpanString(date.getTime(), System.currentTimeMillis(),DateUtils.SECOND_IN_MILLIS,DateUtils.FORMAT_ABBREV_RELATIVE);
+	}
+	
+	
+	/**
+	 * TODO - Prefs
+	 * 
+	 * Some shortcuts for saving and retrieving string preferences
+	 * 
+	 */
+
+	public static void savePref(Context context, String key, String value) {
+
+		SharedPreferences sharedPref = context.getSharedPreferences(
+				context.getResources().getString(R.string.config_shared_preferences_name), Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = sharedPref.edit();
+		editor.putString(key, value);
+		editor.commit();
+	}
+	
+	public static void savePref(Context context, int key, String value) {
+
+		SharedPreferences sharedPref = context.getSharedPreferences(
+				context.getResources().getString(R.string.config_shared_preferences_name), Context.MODE_PRIVATE);
+		Resources r = context.getResources();
+		SharedPreferences.Editor editor = sharedPref.edit();
+		editor.putString(r.getString(key), value);
+		editor.commit();
+	}
+	
+	public static void savePref(Context context, int key, int value) {
+
+		SharedPreferences sharedPref = context.getSharedPreferences(context.getResources().getString(R.string.config_shared_preferences_name), Context.MODE_PRIVATE);
+		Resources r = context.getResources();
+		SharedPreferences.Editor editor = sharedPref.edit();
+		editor.putInt(r.getString(key), value);
+		editor.commit();
+	}
+	
+	public static String loadPref(Context context, String key, String defaultValue) {
+		SharedPreferences sharedPref = context.getSharedPreferences(context.getResources()
+				.getString(R.string.config_shared_preferences_name), Context.MODE_PRIVATE);
+		return sharedPref.getString(key, defaultValue);
+	}
+	
+	public static String loadPref(Context context, int key, String defaultValue) {
+		SharedPreferences sharedPref = context.getSharedPreferences(context.getResources()
+				.getString(R.string.config_shared_preferences_name), Context.MODE_PRIVATE);
+		Resources r = context.getResources();
+		return sharedPref.getString(r.getString(key), defaultValue);
+	}
+	
+	public static int loadPref(Context context, int key, int defaultValue) {
+		SharedPreferences sharedPref = context.getSharedPreferences(context.getResources()
+				.getString(R.string.config_shared_preferences_name), Context.MODE_PRIVATE);
+		Resources r = context.getResources();
+		return sharedPref.getInt(r.getString(key), defaultValue);
+	}
+
+	public static void removePref(Context context, int key) {
+		SharedPreferences sharedPref = context.getSharedPreferences(context.getResources()
+				.getString(R.string.config_shared_preferences_name), Context.MODE_PRIVATE);
+		Resources r = context.getResources();
+		SharedPreferences.Editor editor = sharedPref.edit();
+		editor.remove(r.getString(key));
+		editor.commit();	
+	}
+	
+	
+	
+	/**
+	 * 
+	 * TODO Getters and setters
+	 * 
+	 */
+
+	public static boolean has(String field) {
+		return !(field == null || field.equals(""));
+	}
+	
+	public boolean has(double field) {
+		return field != 0;
+	}
+
+	public boolean has(boolean field) {
+		return field;
+	}
+	
+	public boolean has(Object field) {
+		return field != null;
 	}
 }

@@ -259,7 +259,7 @@ public class Order  {
 
 	public void println(PrintWriter out) {
 		
-		out.println("Bartsy Order #" + orderId + "\r");
+		out.println("\rBartsy Order #" + orderId + "\r");
 		out.println(new Date() + "\r");
 		out.println(recipientNickname + "\r");
 		out.println();
@@ -319,7 +319,7 @@ public class Order  {
 	
 	
 	/**
-	 * TODO - State
+	 * TODO - States
 	 */
 	
 	public void nextPositiveState() {
@@ -329,7 +329,7 @@ public class Order  {
 		switch (status) {
 		case ORDER_STATUS_NEW:
 			last_status = status;
-			status = ORDER_STATUS_IN_PROGRESS;
+			status = ORDER_STATUS_READY;
 			break;
 		case ORDER_STATUS_IN_PROGRESS:
 			last_status = status;

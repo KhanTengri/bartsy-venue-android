@@ -27,7 +27,7 @@
 
     <TextView
         android:id="@+id/recipient"
-        android:layout_width="130dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:text="Recipient" />

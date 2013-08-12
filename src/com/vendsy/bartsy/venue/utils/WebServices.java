@@ -76,12 +76,7 @@ public class WebServices {
 
 	// REST API URL's
 	public static final String PROJECT_NAME = "Bartsy/";
-	public static final String URL_GET_BAR_LIST = DOMAIN_NAME + PROJECT_NAME + "venue/getMenu";
-	public static final String URL_POST_PROFILE_DATA = DOMAIN_NAME + PROJECT_NAME + "user/saveUserProfile";
-	public static final String URL_PLACE_ORDER = DOMAIN_NAME + PROJECT_NAME + "order/placeOrder";
-	public static final String URL_GET_VENU_LIST = DOMAIN_NAME + PROJECT_NAME + "venue/getVenueList";
-	public static final String URL_USER_CHECK_IN = DOMAIN_NAME + PROJECT_NAME + "user/userCheckIn";
-	public static final String URL_USER_CHECK_OUT = DOMAIN_NAME + PROJECT_NAME + "user/userCheckOut";
+	public static final String URL_GET_MENU = DOMAIN_NAME + PROJECT_NAME + "venue/getMenu";
 	public static final String URL_SAVE_VENUEDETAILS = DOMAIN_NAME + PROJECT_NAME + "venue/saveVenueDetails";
 	public static final String URL_UPDATE_ORDER_STATUS = DOMAIN_NAME + PROJECT_NAME + "order/updateOrderStatus";
 	public static final String URL_SYNC_WITH_SERVER = DOMAIN_NAME + PROJECT_NAME + "data/syncBartenderApp";
@@ -182,7 +177,7 @@ public class WebServices {
 		JSONObject json = new JSONObject();
 		try {
 			json.put("venueId", venueID);
-			response = postRequest(URL_GET_BAR_LIST, json, context);
+			response = postRequest(URL_GET_MENU, json, context);
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}

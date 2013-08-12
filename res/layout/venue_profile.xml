@@ -558,6 +558,76 @@
                                 android:layout_height="wrap_content"
                                 android:text="%" />
                         </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:orientation="horizontal" >
+
+                            <TextView
+                                android:id="@+id/TextView21"
+                                android:layout_width="120dp"
+                                android:layout_height="wrap_content"
+                                android:text="Printer IP address:" />
+
+                            <EditText
+                                android:id="@+id/printer_ip_address"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:ems="14"
+                                android:hint="192.168.1.4"
+                                android:text="192.168.1.4"
+                                android:textAppearance="?android:attr/textAppearanceSmall" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/order_options"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" >
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal" >
+
+                                <TextView
+                                    android:id="@+id/TextView23"
+                                    android:layout_width="120dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="Display options:" />
+
+                                <CheckBox
+                                    android:id="@+id/show_orders_in_progress"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Show &quot;in progress&quot; column"
+                                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal" >
+
+                                <TextView
+                                    android:id="@+id/TextView22"
+                                    android:layout_width="120dp"
+                                    android:layout_height="wrap_content" />
+
+                                <CheckBox
+                                    android:id="@+id/require_pickup_code"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Require pickup code"
+                                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
                     </LinearLayout>
 
                     <TextView
@@ -626,7 +696,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/activity_vertical_margin"
                         android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:text="WiFi"
+                        android:text="Customer WiFi"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:textStyle="bold" />
 
@@ -646,7 +716,7 @@
                                 android:id="@+id/TextView08"
                                 android:layout_width="120dp"
                                 android:layout_height="wrap_content"
-                                android:text="Wifi Present" />
+                                android:text="Wifi available" />
 
                             <CheckBox
                                 android:id="@+id/view_registration_wifi_checkbox"

@@ -76,7 +76,7 @@ public class ConnectionCheckingService extends Service {
 				try {
 					
 					// The main synchronization function that runs periodically
-					mApp.update();
+					mApp.update(Constants.shortUpdateDelay);
 					
 					// The less interesting hearteat syscall
 					if (WebServices .isNetworkAvailable(ConnectionCheckingService.this)) {	

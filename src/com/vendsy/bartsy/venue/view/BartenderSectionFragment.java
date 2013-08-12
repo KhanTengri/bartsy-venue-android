@@ -233,6 +233,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			minTimeout = Math.min(order.timeOut, minTimeout);
 			maxTimeout = Math.max(order.timeOut, maxTimeout);
 		}
+		
 		String timeoutString;
 		if (minTimeout == 0 && maxTimeout == 0)
 			timeoutString = "";
@@ -244,41 +245,21 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			timeoutString = "(" + minTimeout + "-" + maxTimeout + " min timeout)";
 		
 		// Set title for new orders layout
-		String title = "";
-		switch (newOrdersCount) {
-		case 0:
-			title = "No new orders";
-			break;
-		case 1:
-			title = "1 new order " + timeoutString;
-			break;
-		default:
-			title = newOrdersCount	+ " new orders " + timeoutString;
-		}
+		String title = "New orders";
+		if (newOrdersCount > 0)
+			title += " (" + newOrdersCount + ")";
 		((Button) mRootView.findViewById(R.id.view_order_new_button)).setText(title);
 		
 		// Set title for accepted orders layout
-		switch (acceptedOrdersCount) {
-		case 0:
-			title = "No orders in progress";
-			break;
-		case 1:
-			title = "1 order in progress " + timeoutString;
-			break;
-		default:
-			title = newOrdersCount	+ " orders in progress " + timeoutString;
-		}
+		title = "Orders in progress";
+		if (acceptedOrdersCount > 0)
+			title += " (" + acceptedOrdersCount + ")";
 		((Button) mRootView.findViewById(R.id.view_order_in_progress_button)).setText(title);
 		
 		// Set title for completed orders layout
-		switch (completedOrdersCount) {
-		case 0:
-			title = "No completed orders";
-			break;
-		default:
-			title = "Click to enter pickup code" ;
-			break;
-		}
+		title = "Completed orders";
+		if (completedOrdersCount > 0) 
+			title += " (" + completedOrdersCount + ")";
 		((Button) mRootView.findViewById(R.id.view_order_ready_button)).setText(title);
 	}
 
@@ -379,7 +360,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			order.nextPositiveState();	
 			Log.v(TAG, "Child matches parent - update status to " + order.status);
 			
-			mApp.update(); //- this will get called automatically in the next cycle, don't call it now to make UI more snappy
+			mApp.update(Constants.defaultUpdateDelay); //- this will get called automatically in the next cycle, don't call it now to make UI more snappy
 			break;
 			
 		case R.id.view_order_button_negative:
@@ -387,7 +368,7 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			// Process all orders for that user that are currently in this state
 			Log.v(TAG, "Clicked on order negative button");
 			order.nextNegativeState("Order rejected by the bartender");	
-			mApp.update();
+			mApp.update(Constants.defaultUpdateDelay);
 			break;
 			
 		case R.id.view_order_button_expired:

@@ -13,7 +13,10 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -44,6 +47,7 @@ import com.vendsy.bartsy.venue.dialog.CodeDialogFragment;
 import com.vendsy.bartsy.venue.dialog.PeopleDialogFragment;
 import com.vendsy.bartsy.venue.model.AppObservable;
 import com.vendsy.bartsy.venue.model.Order;
+import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
 import com.vendsy.bartsy.venue.view.AppObserver;
@@ -137,7 +141,14 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		actionBar.setDisplayShowHomeEnabled(true);
-
+		
+		// Set venue icon
+		Bitmap venueImage = mApp.loadVenueProfileImage();
+		if (venueImage != null) {
+			BitmapDrawable drawable = new BitmapDrawable(venueImage);
+			actionBar.setIcon(drawable);
+		}
+		
 		// Create the adapter that will return a fragment for each of the
 		// primary sections of the app.
 		mSectionsPagerAdapter = new SectionsPagerAdapter(
@@ -179,7 +190,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		mApp.addObserver(this);
 	
 		// Update people and orders
-		mApp.update();
+		mApp.update(Constants.shortUpdateDelay);
 		
 	}
 		

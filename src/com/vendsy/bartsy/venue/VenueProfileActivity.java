@@ -29,6 +29,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
 
@@ -68,8 +69,12 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 		// Try to get all form elements from the XML
 		venueImage = (ImageView)findViewById(R.id.view_profile_venue_image);
 		
-		// Set Default image for Venue
-		Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+		// Set image for Venue from preferences if it exists
+		Bitmap bitmap = mApp.loadVenueProfileImage();
+		if (bitmap == null) {
+			// No image, use the default one
+			bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+		}
 		venueImage.setImageBitmap(bitmap);
 		venueImage.setTag(bitmap);
 		
@@ -145,6 +150,7 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 				// Display the image and set the tag to the bitmap, indicating it's a valid profile picture.
 				venueImage.setImageBitmap(bitmap);
 				venueImage.setTag(bitmap);
+				mApp.saveVenueProfileImage(bitmap);
 	        }
 	        break;
 	    }
@@ -218,25 +224,46 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 	 * @return valid or not
 	 */
 	private boolean validateVenueInformation() {
+		
+		boolean valid = true;
+		
 		if(managerUsernameEditText.getText().toString().trim().equals("")){
 			managerUsernameEditText.setError("Please enter username/email");
-			return false;
-			
-		}else if(managerPasswordEditText.getText().toString().trim().equals("")){
-			managerPasswordEditText.setError("Please enter password");
-			return false;
-			
-		}else if(confirmPasswordEditText.getText().toString().trim().equals("")){
-			confirmPasswordEditText.setError("Please retype your password");
-			return false;
-			
-		}else if(!confirmPasswordEditText.getText().toString().equals(managerPasswordEditText.getText().toString())){
-			confirmPasswordEditText.setError("Password does not match");
-			return false;
+			valid = false;
 			
 		}
 		
-		return true;
+		if(managerPasswordEditText.getText().toString().trim().equals("")){
+			managerPasswordEditText.setError("Please enter password");
+			valid = false;
+			
+		}
+		
+		if(confirmPasswordEditText.getText().toString().trim().equals("")){
+			confirmPasswordEditText.setError("Please retype your password");
+			valid = false;
+			
+		}
+		
+		if(!confirmPasswordEditText.getText().toString().equals(managerPasswordEditText.getText().toString())){
+			confirmPasswordEditText.setError("Password does not match");
+			valid = false;
+			
+		}
+		
+		// Make sure wifi fields are completed if the wifi button is checked
+		if (((CheckBox) findViewById(R.id.view_registration_wifi_checkbox)).isChecked()) {
+			if(((TextView) findViewById(R.id.wifiName)).getText().toString().trim().equals("")) {
+				((TextView) findViewById(R.id.wifiName)).setError("Please enter the wifi name");
+				valid = false;
+			}
+			if(((TextView) findViewById(R.id.wifiPassword)).getText().toString().trim().equals("")) {
+				((TextView) findViewById(R.id.wifiPassword)).setError("Please enter the wifi password");
+				valid = false;
+			}
+		}
+		
+		return valid;
 	}
 
 	/**
@@ -284,6 +311,13 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 				postData.put("venueName", ((EditText) findViewById(R.id.venueNameEditText)).getText().toString());
 				postData.put("address", ((EditText) findViewById(R.id.addressEditText)).getText().toString());
 				postData.put("phone", ((EditText) findViewById(R.id.phoneEditText)).getText().toString());
+				
+				// Save printer IP address if present
+				String printerIp = ((EditText) findViewById(R.id.printer_ip_address)).getText().toString();
+				if (Utilities.has(printerIp))
+					Utilities.savePref(this, R.string.config_printer_ip, printerIp);
+				else
+					Utilities.removePref(this, R.string.config_printer_ip);
 				
 				if (((CheckBox) findViewById(R.id.view_registration_wifi_checkbox)).isChecked()){
 					postData.put("wifiPresent", "1");
@@ -400,17 +434,13 @@ public class VenueProfileActivity extends Activity implements OnClickListener {
 				venueId = venueId == null ? json.getString("venueId") : venueId;
 				venueName = venueName == null ? json.getString("venueName") : venueName;
 				// To save venue details in the shared preference
-				SharedPreferences sharedPref = getSharedPreferences(getResources().getString(R.string.config_shared_preferences_name), Context.MODE_PRIVATE);
-				SharedPreferences.Editor editor = sharedPref.edit();
-				editor.putString("RegisteredVenueId", venueId);
-				editor.putString("RegisteredVenueName", venueName);				
-				editor.commit();
+				Utilities.savePref(this, "RegisteredVenueId", venueId);
+				Utilities.savePref(this, "RegisteredVenueName", venueName);				
 				
 				// Start a new venue
 				mApp.venueProfileID = venueId;
 				mApp.venueProfileName = venueName;
-				mApp.update();
-				
+				mApp.update(Constants.shortUpdateDelay);
 				
 				// Remove progress dialog
 				if(progressDialog!=null){

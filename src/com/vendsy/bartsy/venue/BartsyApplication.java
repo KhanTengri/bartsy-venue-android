@@ -16,6 +16,8 @@
 
 package com.vendsy.bartsy.venue;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -38,6 +40,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
@@ -308,7 +312,30 @@ public class BartsyApplication extends Application implements AppObservable {
 		return accessOrders(ACCESS_ORDERS_VIEW);
 	}
 	
-	synchronized public void update()  {
+	/* 
+	 * Simple scheduler for the update function 
+	 */
+	
+	Runnable runUpdate = new Runnable() {
+		@Override
+		public void run() {
+			update();
+		}
+	};
+
+	synchronized public void update(long delay) {
+
+		// Debug log
+		Log.e(TAG, "Scheduling update in " + delay + " ms");
+		
+		// First reset any scheduled updates
+        mHandler.removeCallbacks(runUpdate);
+        
+        // Schedule an update after the specified delay
+		mHandler.postDelayed(runUpdate, delay);
+	}
+	
+	synchronized private void update()  {
 	
 		if (Looper.myLooper() == Looper.getMainLooper()) {
 			// We're in the main thread - execute the update in the background with a new asynchronous task
@@ -427,7 +454,7 @@ public class BartsyApplication extends Application implements AppObservable {
 			}
 			Log.w(TAG, ">>> Open orders after update:\n" + ordersString);
 			
-			//printOrders(addedOrders);
+			printOrders(addedOrders);
 			
 			
 		}
@@ -441,9 +468,17 @@ public class BartsyApplication extends Application implements AppObservable {
 	
 	
 	public void printOrders(ArrayList<Order> addedOrders) {
+		
+		String ip = Utilities.loadPref(this, R.string.config_printer_ip, null);
+		
+		if (ip == null) {
+			Log.e(TAG, "Printer IP address not configured");
+			return;
+		}
+		
 		try 
 	    {
-		    Socket sock = new Socket("192.168.1.4", 9100);
+		    Socket sock = new Socket(ip, 9100);
 		    PrintWriter oStream = new PrintWriter(sock.getOutputStream());
 			for (Order order : addedOrders) {
 				order.println(oStream);
@@ -708,7 +743,48 @@ public class BartsyApplication extends Application implements AppObservable {
 		}
 	}
 	
+	/**
+	 * 
+	 * TODO - Profile
+	 * 
+	 */
+	
+	public void saveVenueProfileImage(Bitmap bitmap) {
+		// Save bitmap to file
+		String file = getFilesDir()  + File.separator + getResources().getString(R.string.config_venue_profile_picture);
+		Log.w(TAG, ">>> Saving venue profile image to " + file);
 
+		try {
+			FileOutputStream out = new FileOutputStream(file);
+			bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.e(TAG, "Error saving venue profile image");
+		}
+	}
+	
+	Bitmap loadVenueProfileImage() {
+		String file = getFilesDir()  + File.separator + getResources().getString(R.string.config_venue_profile_picture);
+		Log.w(TAG, ">>> Loading venue profile from " + file);
+		Bitmap image = null;
+		try {
+			image = BitmapFactory.decodeFile(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.d(TAG, "Could not load venue profile image");
+		}
+		return image;
+	}
+	
+	void eraseVenueProfileImage() {
+		
+		Log.w(TAG, ">>> Erase venue profile image"); 
+		
+		File file = new File(getFilesDir()  + File.separator + getResources().getString(R.string.config_venue_profile_picture));
+		file.delete();
+	}
+	
+	
 	/**
 	 * 
 	 * TODO - Synchronize people

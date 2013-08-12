@@ -7,6 +7,10 @@ public class Constants {
 	// how many more minutes to delay a local timeout from the server timeout
 	public static final int timoutDelay = 2; 
 	
+	// Default update scheduler delay (in milliseconds)
+	public static final long defaultUpdateDelay = 3000;
+	public static final long shortUpdateDelay = 200;
+	
 	// frequency in which to run the background service, in ms
 	public static final long monitorFrequency = 20000 ; 
 	

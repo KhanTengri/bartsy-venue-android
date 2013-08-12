@@ -105,7 +105,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 //					app.addOrder(order);
 //					notificationMessage = "New order: " + order.title + " for " + order.receiverId + " from " + order.senderId;
 	
-					app.update();
+					app.update(Constants.shortUpdateDelay);
 					
 				} else if (json.getString("messageType").equals("userCheckIn")) {
 					
@@ -133,7 +133,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 //						Log.e(TAG, notificationMessage);
 //					}
 					
-					app.update();
+					app.update(Constants.shortUpdateDelay);
 				}
 
 				else if (json.getString("messageType").equals("userCheckOut")) {
