@@ -191,7 +191,7 @@ public final class Utilities {
                 data = reader.readNext();
                 
                 // To ignore empty categories and empty types
-                if(data != null && data.length>=7 && !data[1].trim().equals("") && !data[3].trim().equals("")) {
+                if(data != null && data.length>=9 && !data[1].trim().equals("") && !data[3].trim().equals("")) {
                 	// To set the properties for Ingredient model
                 	Cocktail cocktail = new Cocktail();
                 	cocktail.setName(data[0]);
@@ -202,6 +202,8 @@ public final class Utilities {
                 	cocktail.setIngredients(data[4]);
                 	cocktail.setInstructions(data[5]);
                 	cocktail.setShopping(data[6]);
+                	cocktail.setPrice(Integer.parseInt(data[7]));
+                	cocktail.setAvailability("Yes".equals(data[8]));
                 	// Here saving in the DB
                 	DatabaseManager.getInstance().saveCocktail(cocktail);
                 } 
