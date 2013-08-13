@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -53,7 +54,7 @@ public class InventorySectionFragment extends Fragment {
 	private Button spiritsTab;
 	private LinearLayout categoriesList;
 	private LayoutInflater inflater;
-	private TableLayout itemsLayout;
+	private GridLayout itemsLayout;
 	private ArrayList<ImageView> categoriesArrowViews = new ArrayList<ImageView>();
 	private Button mixersTab;
 	private Button cocktailsTab;
@@ -85,7 +86,7 @@ public class InventorySectionFragment extends Fragment {
 		mApp = (BartsyApplication) getActivity().getApplication();
 		
 		// Try to get the components from the xml layout
-		itemsLayout = (TableLayout) mRootView.findViewById(R.id.itemsLayout);
+		itemsLayout = (GridLayout) mRootView.findViewById(R.id.itemsLayout);
 		categoriesList = (LinearLayout) mRootView.findViewById(R.id.categoryLayout);
 		categoryScrollView = (ScrollView) mRootView.findViewById(R.id.categoryScrollView);
 		saveButton = (Button) mRootView.findViewById(R.id.saveButton);
@@ -279,7 +280,7 @@ public class InventorySectionFragment extends Fragment {
 		cocktailsTab.setBackgroundResource(R.drawable.tab_over);
 		
 		// Hide categories view
-		categoryScrollView.setVisibility(View.GONE);
+		categoryScrollView.setVisibility(View.INVISIBLE);
 		
 		updateCocktailView();
 	}
@@ -359,22 +360,12 @@ public class InventorySectionFragment extends Fragment {
 		
 		// Make sure the list views are all empty
 		itemsLayout.removeAllViews();
-		
+
 		// Add Ingredients in the layout, one by onerow
 		Log.v("InventorySectionFragment", "Ingredients list size = " + ingredients.size());
-		int column = 2;
-		TableRow row = null;
 		
 		for (Ingredient ingredient : ingredients) {
-			// To make 3 columns for the table layout  
-			if(column==2){
-				row = new TableRow(getActivity());
-				itemsLayout.addView(row);
-				column=0;
-			}
-			else{
-				column++;
-			}
+
 			// To create ingredient view
 			final View itemView = inflater.inflate(R.layout.ingredient_item, null);
 //			itemView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.MATCH_PARENT));
@@ -405,9 +396,9 @@ public class InventorySectionFragment extends Fragment {
 		   
 		    // To add Price layout to the item view
 		    LinearLayout priceLayout = (LinearLayout) itemView.findViewById(R.id.priceLayout);
-		    priceLayout.addView(getPriceLayout(String.valueOf(ingredient.getPrice()), ingredient));
+		    getPriceLayout(priceLayout, String.valueOf(ingredient.getPrice()), ingredient);
 		    
-		    row.addView(itemView);
+		    itemsLayout.addView(itemView);
 		    
 		}
 	}
@@ -416,15 +407,15 @@ public class InventorySectionFragment extends Fragment {
 	 * 
 	 * @return
 	 */
-	private View getPriceLayout(String price, final Object model){
-		// Inflate the number stepper xml layout 
-		final View priceView = inflater.inflate(R.layout.number_stepper, null);
+	private void getPriceLayout(View priceView, String price, final Object model){
+
 		// Try to get all the UI elements from the layout
 		final TextView priceValue = (TextView) priceView.findViewById(R.id.tvStepperValue);
 		Button decrementButton = (Button) priceView.findViewById(R.id.btnDecrement);
 		Button incrementButton = (Button) priceView.findViewById(R.id.btnIncrement);
 		
 		priceValue.setText(price);
+		
 		// To add listeners to the increase and decrease buttons
 		decrementButton.setOnClickListener(new OnClickListener() {
 			
@@ -460,7 +451,6 @@ public class InventorySectionFragment extends Fragment {
 			}
 		});
 		
-		return priceView;
 	}
 	
 	/**
@@ -500,19 +490,8 @@ public class InventorySectionFragment extends Fragment {
 		// Add Cocktail in the layout, one by one
 		Log.v("InventorySectionFragment", "Cocktail list size = " + cocktails.size());
 		
-		int column = 2;
-		TableRow row = null;
-		
 		for (Cocktail cocktail : cocktails) {
-			// To make 3 columns for the table layout  
-			if(column==2){
-				row = new TableRow(getActivity());
-				itemsLayout.addView(row);
-				column=0;
-			}
-			else{
-				column++;
-			}
+
 			final View itemView = inflater.inflate(R.layout.ingredient_item, null);
 		    TextView itemTextView = (TextView) itemView.findViewById(R.id.ingredientItemText);
 		    itemTextView.setText(cocktail.getName());
@@ -542,9 +521,9 @@ public class InventorySectionFragment extends Fragment {
 		    
 		    // To add Price layout to the item view
 		    LinearLayout priceLayout = (LinearLayout) itemView.findViewById(R.id.priceLayout);
-		    priceLayout.addView(getPriceLayout(String.valueOf(cocktail.getPrice()),cocktail));
+		    getPriceLayout(priceLayout, String.valueOf(cocktail.getPrice()),cocktail);
 		    
-		    row.addView(itemView);
+		    itemsLayout.addView(itemView);
 		}
 	}
 	/**

@@ -226,7 +226,7 @@ public class MenuSectionFragment extends Fragment {
 			JSONObject result = new JSONObject(response);
 			String errorCode = result.getString("errorCode");
 			String errorMessage = result.getString("errorMessage");
-			String menus = result.getString("menu");
+			String menus = result.getString("menus");
 	
 			JSONArray sections = new JSONArray(menus);
 			Log.v(TAG, "Menus length " + sections.length());

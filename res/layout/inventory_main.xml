@@ -66,42 +66,58 @@
             </LinearLayout>
         </ScrollView>
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-            <LinearLayout android:layout_width="match_parent"
-		        android:layout_height="match_parent"
-		        android:orientation="vertical" >
-		        
-			    <LinearLayout android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"  
-		            android:layout_gravity="right">
-			    <Button
-		            android:id="@+id/addButton"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:text="Add New"
-		            android:textColor="#000000"
-		            android:textSize="16dp"
-		            android:textStyle="bold" />
-				<Button
-		            android:id="@+id/saveButton"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:text="Upload to server"
-		            android:textColor="#000000"
-		            android:textSize="16dp"
-		            android:textStyle="bold" />
-				</LinearLayout>
-            <TableLayout
-                android:id="@+id/itemsLayout"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:shrinkColumns="*"
-                android:stretchColumns="*" >
-            </TableLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:gravity="right" >
+
+                <Button
+                    android:id="@+id/addButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add New"
+                    android:textColor="#000000"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/saveButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Upload to server"
+                    android:textColor="#000000"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
             </LinearLayout>
-        </ScrollView>
+
+            <ScrollView
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent" >
+
+                <GridLayout
+                    android:id="@+id/itemsLayout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"
+                    android:alignmentMode="alignBounds"
+                    android:columnCount="2"
+                    android:orientation="horizontal"
+                    android:rowOrderPreserved="true"
+                    android:useDefaultMargins="true" >
+
+                </GridLayout>
+
+            </ScrollView>
+
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>
