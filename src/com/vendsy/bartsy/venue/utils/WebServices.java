@@ -1,13 +1,10 @@
 package com.vendsy.bartsy.venue.utils;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -15,7 +12,6 @@ import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
@@ -67,7 +63,7 @@ public class WebServices {
 //	public static final String SENDER_ID = "560663323691"; // prod
 	
 	// Server
-//	public static final String DOMAIN_NAME = "http://192.168.0.109:8080/";
+//	public static final String DOMAIN_NAME = "http://192.168.0.172:8080/";
 	public static final String DOMAIN_NAME = "http://54.235.76.180:8080/";		// dev
 //	public static final String DOMAIN_NAME = "http://app.bartsy.vendsy.com/"; 	// prod
 
@@ -80,13 +76,13 @@ public class WebServices {
 	public static final String URL_SAVE_VENUEDETAILS = DOMAIN_NAME + PROJECT_NAME + "venue/saveVenueDetails";
 	public static final String URL_UPDATE_ORDER_STATUS = DOMAIN_NAME + PROJECT_NAME + "order/updateOrderStatus";
 	public static final String URL_SYNC_WITH_SERVER = DOMAIN_NAME + PROJECT_NAME + "data/syncBartenderApp";
-	public static final String URL_HEART_BEAT_VENUE = DOMAIN_NAME +PROJECT_NAME + "venue/heartBeatVenue";
-	public static final String URL_SAVE_INGREDIENTS = DOMAIN_NAME +PROJECT_NAME + "inventory/saveIngredients";
-	public static final String URL_DELETE_INGREDIENTS = DOMAIN_NAME +PROJECT_NAME + "inventory/deleteIngredient";
-	public static final String URL_SAVE_COCKTAILS = DOMAIN_NAME +PROJECT_NAME + "inventory/saveCocktails";
+	public static final String URL_HEART_BEAT_VENUE = DOMAIN_NAME + PROJECT_NAME + "venue/heartBeatVenue";
+	public static final String URL_SAVE_INGREDIENTS = DOMAIN_NAME + PROJECT_NAME + "inventory/saveIngredients";
+	public static final String URL_DELETE_INGREDIENTS = DOMAIN_NAME + PROJECT_NAME + "inventory/deleteIngredient";
+	public static final String URL_SAVE_COCKTAILS = DOMAIN_NAME + PROJECT_NAME + "inventory/saveCocktails";
 	public static final String URL_SET_VENUE_STATUS = DOMAIN_NAME + PROJECT_NAME + "venue/setVenueStatus";
 	public static final String URL_GET_PAST_ORDERS = DOMAIN_NAME + PROJECT_NAME + "order/getPastOrders";
-
+	public static final String URL_BARTSY_LOGIN = DOMAIN_NAME + PROJECT_NAME + "venue/venueLogin";
 	
 	
 	/**
