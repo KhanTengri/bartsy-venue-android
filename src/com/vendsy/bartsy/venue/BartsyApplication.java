@@ -175,11 +175,11 @@ public class BartsyApplication extends Application implements AppObservable {
 		mHandler.post(new Runnable() {
 			public void run() {
 				
-				int icon = R.drawable.ic_launcher;
-				   
+				Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+				
 				NotificationCompat.Builder mBuilder =
 				            new NotificationCompat.Builder(getApplicationContext())
-				            .setSmallIcon(icon)
+				            .setLargeIcon(largeIcon)
 				            .setContentTitle(title)
 				            .setContentText(body);
 				    // Creates an explicit intent for an Activity in your app
