@@ -114,7 +114,7 @@ public class Item {
 
 		LinearLayout view = (LinearLayout) inflater.inflate(R.layout.item_order, null);
 		if (has(price))
-			((TextView) view.findViewById(R.id.view_order_mini_base_amount)).setText(df.format(Double.parseDouble(getPrice())));
+			((TextView) view.findViewById(R.id.view_order_mini_price)).setText(df.format(Double.parseDouble(getPrice())));
 		((TextView) view.findViewById(R.id.view_order_title)).setText(getTitle());
 		
 		if (has(getOptionsDescription()))
