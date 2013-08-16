@@ -82,4 +82,7 @@
     <!-- Order view -->
     <string name="customer_details_picture_cd">Customer picture</string>
     
+    <!--  Validation of input parameters for activities called with inputs -->
+    <string name="VenueProfileActivity_input_status">VenueProfileActivity_input_status</string>
+    
 </resources>
