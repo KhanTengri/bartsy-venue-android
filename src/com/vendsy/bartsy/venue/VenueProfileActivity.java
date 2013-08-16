@@ -35,6 +35,7 @@ import android.widget.Toast;
 
 import com.vendsy.bartsy.venue.dialog.LoginDialog;
 import com.vendsy.bartsy.venue.dialog.LoginDialog.LoginDialogListener;
+import com.vendsy.bartsy.venue.model.Venue;
 import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
@@ -61,8 +62,12 @@ public class VenueProfileActivity extends Activity implements OnClickListener,  
 	private EditText confirmPasswordEditText;
 
 	private LinearLayout hoursLayout;
+
+	private Venue venue;
 	
-	
+	// Used to check the validity of this activity's input
+	private static final int ACTIVITY_INPUT_VALID	= 0;
+	private static final int ACTIVITY_INPUT_INVALID = 1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -85,6 +90,17 @@ public class VenueProfileActivity extends Activity implements OnClickListener,  
 				new LoginDialog(VenueProfileActivity.this).show();
 			}
 		});
+		
+//		// Get the activity input 
+		try {
+			venue = loadInput(mApp);
+		} catch (Exception e) {
+			// Invalid input
+			e.printStackTrace();
+			Log.e(TAG, "Invalid input");
+//			finish();
+			return;
+		}
 
 		LayoutParams layout = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 		actionBar.setCustomView(customView, layout);
@@ -132,6 +148,57 @@ public class VenueProfileActivity extends Activity implements OnClickListener,  
 		findViewById(R.id.view_registration_wifi_checkbox).setOnClickListener(this);
 		
 		createOpenAndCloseHoursView();
+		
+		setValues();
+	}
+	
+	/**
+	 * Pre-populate fields if there is a venue object already 
+	 */
+	private void setValues(){
+		if(venue==null){
+			return;
+		}
+		
+//		locuId.setText("");
+		wifiName.setText(venue.getWifiName());
+		wifiPassword.setText(venue.getWifiPassword());
+		
+		orderTimeOut.setText(venue.getCancelOrderTime());
+		
+		((EditText) findViewById(R.id.taxRateEdit)).setText(venue.getTotalTaxRate());
+		
+		((EditText) findViewById(R.id.accountNumberEditText)).setText("");
+		((EditText) findViewById(R.id.managerNameEditText)).setText("");
+		((EditText) findViewById(R.id.managerUserNameEditText)).setText("");
+		((EditText) findViewById(R.id.managerPasswordEditText)).setText("");
+		((EditText) findViewById(R.id.vendsyRepNameEditText)).setText("");
+		((EditText) findViewById(R.id.vendsyRepEmailEditText)).setText("");
+		((EditText) findViewById(R.id.vendsyRepPhoneEditText)).setText("");
+		((EditText) findViewById(R.id.locuSectionEditText)).setText("");
+		((EditText) findViewById(R.id.venueNameEditText)).setText("");
+		((EditText) findViewById(R.id.addressEditText)).setText("");
+		((EditText) findViewById(R.id.phoneEditText)).setText("");
+	}
+	
+	/**
+	 * Sets the input of this activity and makes it valid
+	 */
+	public static final void setInput(BartsyApplication context, Venue venue) {
+		Utilities.savePref(context, R.string.VenueProfileActivity_input_status, ACTIVITY_INPUT_VALID);
+		context.mVenueProfileActivityInput = venue;
+	}
+	
+	private Venue loadInput(BartsyApplication context) throws Exception {
+
+		// Make sure the input is valid
+		if (Utilities.loadPref(this, R.string.VenueProfileActivity_input_status, ACTIVITY_INPUT_VALID) != ACTIVITY_INPUT_VALID) {		
+			Log.e(TAG, "Invalid activity input - exiting...");
+			Utilities.removePref(this, R.string.VenueProfileActivity_input_status);
+			throw new Exception();
+		}
+		
+		return mApp.mVenueProfileActivityInput;
 	}
 	
 	/**

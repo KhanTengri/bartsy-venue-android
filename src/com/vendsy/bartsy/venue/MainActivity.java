@@ -89,7 +89,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	// that this observe changes and observes
 
 	public BartsyApplication mApp = null;
-
+	
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
 	 * fragments for each of the sections. We use a
@@ -463,10 +463,13 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		switch (item.getItemId()) {
 
 		case R.id.action_profile:
-			Intent intent = new Intent().setClass(this,
-					VenueProfileActivity.class);
+			
+			VenueProfileActivity.setInput(mApp, mApp.venueProfile);
+			
+			Intent intent = new Intent().setClass(this,	VenueProfileActivity.class);
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
+			this.startActivity(intent);
 			break;
 			
 		case R.id.action_settings:
