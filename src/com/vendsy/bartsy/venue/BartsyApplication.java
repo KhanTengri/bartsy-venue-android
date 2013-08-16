@@ -56,6 +56,7 @@ import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Cocktail;
 import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.model.Profile;
+import com.vendsy.bartsy.venue.model.Venue;
 import com.vendsy.bartsy.venue.service.ConnectionCheckingService;
 import com.vendsy.bartsy.venue.service.ConnectivityService;
 import com.vendsy.bartsy.venue.utils.Constants;
@@ -155,6 +156,8 @@ public class BartsyApplication extends Application implements AppObservable {
 		}
 	}
 	
+	public Venue mVenueProfileActivityInput;
+	
 	
 	/**
 	 * Convenience functions to generate notifications and Toasts 
@@ -170,45 +173,43 @@ public class BartsyApplication extends Application implements AppObservable {
 			}
 		});
 	}
+	public int NOTIFICATION_IMAGE_SIZE = 120;
 	
 	private void generateNotification(final String title, final String body, final int count) {
 		mHandler.post(new Runnable() {
 			public void run() {
-				
+				// Get app icon bitmap and scale to fit in notification
 				Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+				largeIcon = Bitmap.createScaledBitmap(largeIcon, NOTIFICATION_IMAGE_SIZE, NOTIFICATION_IMAGE_SIZE, true);
 				
-				NotificationCompat.Builder mBuilder =
-				            new NotificationCompat.Builder(getApplicationContext())
+				NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext())
 				            .setLargeIcon(largeIcon)
+				            .setSmallIcon(R.drawable.ic_launcher)
 				            .setContentTitle(title)
 				            .setContentText(body);
-				    // Creates an explicit intent for an Activity in your app
-				    Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
+				
+				// Creates an explicit intent for an Activity in your app
+				Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
 
-				    // The stack builder object will contain an artificial back stack for the
-				    // started Activity.
-				    // This ensures that navigating backward from the Activity leads out of
-				    // your application to the Home screen.
-				    TaskStackBuilder stackBuilder = TaskStackBuilder.create(getApplicationContext());
-				    // Adds the back stack for the Intent (but not the Intent itself)
-				    stackBuilder.addParentStack(MainActivity.class);
-				    // Adds the Intent that starts the Activity to the top of the stack
-				    stackBuilder.addNextIntent(resultIntent);
-				    PendingIntent resultPendingIntent =
-				            stackBuilder.getPendingIntent(
-				                0,
-				                PendingIntent.FLAG_UPDATE_CURRENT
-				            );
+				// The stack builder object will contain an artificial back stack for the
+				// started Activity.
+				// This ensures that navigating backward from the Activity leads out of
+				// your application to the Home screen.
+				TaskStackBuilder stackBuilder = TaskStackBuilder.create(getApplicationContext());
+				// Adds the back stack for the Intent (but not the Intent itself)
+				stackBuilder.addParentStack(MainActivity.class);
+				// Adds the Intent that starts the Activity to the top of the stack
+				stackBuilder.addNextIntent(resultIntent);
+				PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 				    mBuilder.setContentIntent(resultPendingIntent);
 				    mBuilder.setNumber(count);
-				    NotificationManager mNotificationManager =
+				NotificationManager mNotificationManager =
 				        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 				    
-				    // Play default notification sound
-					mBuilder.setDefaults(Notification.DEFAULT_SOUND);
-				    // mId allows you to update the notification later on.
-				    mNotificationManager.notify(0, mBuilder.build());
-				
+				// Play default notification sound
+				mBuilder.setDefaults(Notification.DEFAULT_SOUND);
+				// mId allows you to update the notification later on.
+				mNotificationManager.notify(0, mBuilder.build());
 			}
 		});
 	}
@@ -437,6 +438,9 @@ public class BartsyApplication extends Application implements AppObservable {
 	
 			// Synchronize people 
 			updatePeople(json);
+			
+			// Get venue details
+			updateVenueDetails(json);
 			
 			// Get remote orders list
 			ArrayList<Order> remoteOrders = extractOrders(json);
@@ -801,6 +805,20 @@ public class BartsyApplication extends Application implements AppObservable {
 		file.delete();
 	}
 	
+	/**
+	 * 
+	 * TODO - Synchronize Venue details
+	 * 
+	 */
+	synchronized private void updateVenueDetails(JSONObject json) {
+		try {
+			if(json.has("venueDetails")){
+				venueProfile = new Venue(json.getJSONObject("venueDetails"));
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * 
@@ -876,7 +894,8 @@ public class BartsyApplication extends Application implements AppObservable {
 
 	public String venueProfileID = null;
 	public String venueProfileName = null;
-
+	public Venue venueProfile = null;
+	
 	void loadVenueProfile() {
 		SharedPreferences sharedPref = getSharedPreferences(getResources()
 				.getString(R.string.config_shared_preferences_name),
