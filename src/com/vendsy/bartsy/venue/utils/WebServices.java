@@ -46,6 +46,7 @@ import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Cocktail;
 import com.vendsy.bartsy.venue.model.Ingredient;
+import com.vendsy.bartsy.venue.model.Menu;
 import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.model.Profile;
 
@@ -79,7 +80,7 @@ public class WebServices {
 	public static final String URL_HEART_BEAT_VENUE = DOMAIN_NAME + PROJECT_NAME + "venue/heartBeatVenue";
 	public static final String URL_SAVE_INGREDIENTS = DOMAIN_NAME + PROJECT_NAME + "inventory/saveIngredients";
 	public static final String URL_DELETE_INGREDIENTS = DOMAIN_NAME + PROJECT_NAME + "inventory/deleteIngredient";
-	public static final String URL_SAVE_COCKTAILS = DOMAIN_NAME + PROJECT_NAME + "inventory/saveCocktails";
+	public static final String URL_SAVE_SPECIAL_MENU = DOMAIN_NAME + PROJECT_NAME + "inventory/saveSpecialMenu";
 	public static final String URL_SET_VENUE_STATUS = DOMAIN_NAME + PROJECT_NAME + "venue/setVenueStatus";
 	public static final String URL_GET_PAST_ORDERS = DOMAIN_NAME + PROJECT_NAME + "order/getPastOrders";
 	public static final String URL_BARTSY_LOGIN = DOMAIN_NAME + PROJECT_NAME + "venue/venueLogin";
@@ -198,9 +199,7 @@ public class WebServices {
 		}
 
 		try {
-			response = WebServices.postRequest(
-					URL_GET_PAST_ORDERS, postData,
-					context);
+			response = WebServices.postRequest(URL_GET_PAST_ORDERS, postData,context);
 		} catch (Exception e) {
 		}
 		
@@ -503,22 +502,22 @@ public class WebServices {
 	 * @param context
 	 * @return response
 	 */
-	public static String saveCocktails(List<Cocktail> cocktails, String venueId, BartsyApplication context){
+	public static String saveMenu(List<Cocktail> cocktails, String menuName, String venueId, BartsyApplication context){
 		
 		try {
 			// Create Json object as a root element
 			JSONObject json = new JSONObject();
 			json.put("venueId", venueId);
-			
+			json.put("menuName", menuName);
 			// Create JSON Array for ingredients list
 			JSONArray array = new JSONArray();
 			for(Cocktail cocktail: cocktails){
 				array.put(cocktail.toJSON());
 			}
-			json.put("cocktails", array);
+			json.put("itemsList", array);
 			
 			// Web service call
-			String response = postRequest(URL_SAVE_COCKTAILS, json, context);
+			String response = postRequest(URL_SAVE_SPECIAL_MENU, json, context);
 			Log.i("SaveCocktails response: ",response);
 			return response;
 			

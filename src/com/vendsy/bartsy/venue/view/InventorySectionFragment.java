@@ -41,6 +41,7 @@ import com.vendsy.bartsy.venue.dialog.InventoryDialogFragment;
 import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Cocktail;
 import com.vendsy.bartsy.venue.model.Ingredient;
+import com.vendsy.bartsy.venue.model.Menu;
 import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
 
@@ -57,7 +58,6 @@ public class InventorySectionFragment extends Fragment {
 	private GridLayout itemsLayout;
 	private ArrayList<ImageView> categoriesArrowViews = new ArrayList<ImageView>();
 	private Button mixersTab;
-	private Button cocktailsTab;
 	private List<Ingredient> ingredients;
 	private List<Cocktail> cocktails;
 	private ScrollView categoryScrollView;
@@ -69,10 +69,16 @@ public class InventorySectionFragment extends Fragment {
 	
 	private BartsyApplication mApp;
 	
+	// Inventory tab list
+	private ArrayList<Button> tabButtons = new ArrayList<Button>();
+	
 	// Progress dialog
 	private ProgressDialog progressDialog;
 	// Handler 
 	private Handler handler = new Handler();
+	private LinearLayout menuLayout;
+	private List<Menu> menus;
+	private String selectedMenuName;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -180,7 +186,7 @@ public class InventorySectionFragment extends Fragment {
 					}
 					
 					// Save Cocktail Web service call
-					response = WebServices.saveCocktails(cocktails, venueId, mApp);
+					response = WebServices.saveMenu(cocktails,selectedMenuName, venueId, mApp);
 				}
 				
 				// To call UI thread
@@ -216,10 +222,20 @@ public class InventorySectionFragment extends Fragment {
 		// By default Spirits tab is selected, We need to show spirits inventory content
 		updateCategoriesView(Category.SPIRITS_TYPE);
 		
-		// Try to get spirits, mixers and cocktails tabs form the xml layout
-		spiritsTab = (Button) mRootView.findViewById(R.id.spiritsButton);
-		mixersTab = (Button) mRootView.findViewById(R.id.mixersButton);
-		cocktailsTab = (Button) mRootView.findViewById(R.id.cocktailsButton);
+		// Try to inflate spirits, mixers tabs form the xml layout
+		spiritsTab = getTabButton("Spirits");
+		mixersTab = getTabButton("Mixers");
+		
+		// Add default tabs to the layout
+		menuLayout = (LinearLayout) mRootView.findViewById(R.id.specialMenuLayout);
+		menuLayout.removeAllViews();
+		
+		menuLayout.addView(spiritsTab);
+		menuLayout.addView(mixersTab);
+		// Create dynamic special menu tabs
+		menus = DatabaseManager.getInstance().getAllMenus();
+		
+		prepareMenuTabs();
 		
 		// To set click listeners for all the tabs
 		spiritsTab.setOnClickListener(new OnClickListener() {
@@ -236,20 +252,53 @@ public class InventorySectionFragment extends Fragment {
 			}
 		});
 		
-		cocktailsTab.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				cocktailsTabSelected();
-			}
-		});
 	}
+	/**
+	 * Prepare tab buttons for multi menus
+	 */
+	private void prepareMenuTabs() {
+		if(menus!=null){
+			tabButtons.clear();
+			for(Menu menu:menus){
+				
+				// Create tab button and set the click listener
+				final Button tabButton = getTabButton(menu.getName());
+				tabButton.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						
+						cocktailsTabSelected(tabButton);
+					}
+				});
+					
+				tabButtons.add(tabButton);
+				menuLayout.addView(tabButton);
+			}
+		}
+	}
+
+	/**
+	 * Inflate tab button and return that object 
+	 *  
+	 * @return Button object
+	 */
+	private Button getTabButton(String text){
+		Button tabButton = (Button) inflater.inflate(R.layout.inventory_tab_button, null);
+		tabButton.setText(text);
+		
+		return tabButton;
+	}
+	
 	/**
 	 * Invokes when the spirits tab pressed
 	 */
 	private void spiritsTabSelected() {
 		spiritsTab.setBackgroundResource(R.drawable.tab_over);
 		mixersTab.setBackgroundResource(R.drawable.tab_bg);
-		cocktailsTab.setBackgroundResource(R.drawable.tab_bg);
+		
+		for(Button button : tabButtons){
+			button.setBackgroundResource(R.drawable.tab_bg);
+		}
 		
 		// Show categories view
 		categoryScrollView.setVisibility(View.VISIBLE);
@@ -263,7 +312,10 @@ public class InventorySectionFragment extends Fragment {
 	private void mixersTabSelected() {
 		spiritsTab.setBackgroundResource(R.drawable.tab_bg);
 		mixersTab.setBackgroundResource(R.drawable.tab_over);
-		cocktailsTab.setBackgroundResource(R.drawable.tab_bg);
+		
+		for(Button button : tabButtons){
+			button.setBackgroundResource(R.drawable.tab_bg);
+		}
 		
 		// Show categories view
 		categoryScrollView.setVisibility(View.VISIBLE);
@@ -274,13 +326,19 @@ public class InventorySectionFragment extends Fragment {
 	/**
 	 * Invokes when the spirits tab pressed
 	 */
-	private void cocktailsTabSelected() {
+	private void cocktailsTabSelected(Button selectedButton) {
+		
 		spiritsTab.setBackgroundResource(R.drawable.tab_bg);
 		mixersTab.setBackgroundResource(R.drawable.tab_bg);
-		cocktailsTab.setBackgroundResource(R.drawable.tab_over);
-		
+//		cocktailsTab.setBackgroundResource(R.drawable.tab_over);
+		for(Button button : tabButtons){
+			button.setBackgroundResource(R.drawable.tab_bg);
+		}
+		selectedButton.setBackgroundResource(R.drawable.tab_over);
 		// Hide categories view
 		categoryScrollView.setVisibility(View.INVISIBLE);
+		
+		selectedMenuName = selectedButton.getText().toString();
 		
 		updateCocktailView();
 	}
@@ -399,9 +457,9 @@ public class InventorySectionFragment extends Fragment {
 		    getPriceLayout(priceLayout, String.valueOf(ingredient.getPrice()), ingredient);
 		    
 		    itemsLayout.addView(itemView);
-		    
 		}
 	}
+	
 	/**
 	 * To create price layout
 	 * 
@@ -482,7 +540,7 @@ public class InventorySectionFragment extends Fragment {
 		selectedType = Category.COCKTAILS_TYPE;
 		
 		// To get Cocktails from the database
-		cocktails = DatabaseManager.getInstance().getCocktails();
+		cocktails = DatabaseManager.getInstance().getCocktails(selectedMenuName);
 		
 		// Make sure the list views are all empty
 		itemsLayout.removeAllViews();

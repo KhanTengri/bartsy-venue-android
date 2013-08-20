@@ -208,19 +208,19 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		CSVOptionsDialogFragment dialog = new CSVOptionsDialogFragment(){
 			@Override
 			protected void saveCSVFile(final InputStream is, final boolean autoUpload,
-					final int type) {
+					final int type, final String name) {
 				// Background thread
 				new Thread(){
 					public void run() {
 						// Cocktails selected
 						if(type==0){ 
 							// Clear existing data
-							DatabaseManager.getInstance().deleteAllCocktails();
+							DatabaseManager.getInstance().deleteAllCocktails(name);
 							// Save new data from CSV file 
-							Utilities.saveCocktailsFromCSVFile(getActivity(), is);
+							Utilities.saveCocktailsFromCSVFile(getActivity(), is, name);
 							
 							if(autoUpload){
-								mApp.uploadCocktailsDataToServer();
+								mApp.uploadCocktailsDataToServer(name);
 							}
 						}
 						else{ // Ingredients selected

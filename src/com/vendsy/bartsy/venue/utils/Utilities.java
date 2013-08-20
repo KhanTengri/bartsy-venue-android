@@ -35,11 +35,13 @@ import android.content.res.Resources;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import com.google.android.gms.internal.cp;
 import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.db.DatabaseManager;
 import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Cocktail;
 import com.vendsy.bartsy.venue.model.Ingredient;
+import com.vendsy.bartsy.venue.model.Menu;
 
 /**
  * Helper class providing methods and constants common to other classes in the
@@ -67,6 +69,8 @@ public final class Utilities {
 	 * Intent's extra that contains the message to be displayed.
 	 */
 	public static final String EXTRA_MESSAGE = "message";
+	
+	public static final String DEFAULT_MENU_NAME="Cocktails";
 
 	/**
 	 * Notifies UI to display a message.
@@ -176,7 +180,13 @@ public final class Utilities {
 	 * 
 	 * @param context
 	 */
-	public static void saveCocktailsFromCSVFile(Context context, InputStream is){
+	public static void saveCocktailsFromCSVFile(Context context, InputStream is, String menuName){
+		
+		// Make sure that menu name should not be empty or null
+		if(menuName==null || menuName.trim().equals("")){
+			menuName = DEFAULT_MENU_NAME;
+		}
+		
 		String data[] = null;
         // Try to read ingredients data from CSV file 
         try {
@@ -191,19 +201,30 @@ public final class Utilities {
                 data = reader.readNext();
                 
                 // To ignore empty categories and empty types
-                if(data != null && data.length>=9 && !data[1].trim().equals("") && !data[3].trim().equals("")) {
+                if(data != null && data.length>=10 && !data[1].trim().equals("") && !data[3].trim().equals("")) {
                 	// To set the properties for Ingredient model
                 	Cocktail cocktail = new Cocktail();
                 	cocktail.setName(data[0]);
                 	cocktail.setCategory(data[1]);
-                	
+                	// Try to get menu from db
+                	Menu menu = DatabaseManager.getInstance().getMenu(menuName);
+                	if(menu==null){
+                		// Create new menu record in Menu table
+                		menu = new Menu();
+                		menu.setName(menuName);
+                		DatabaseManager.getInstance().saveMenu(menu);
+                	}
+                	// Set all values
                 	cocktail.setAlcohol(data[2]);
                 	cocktail.setGlassType(data[3]);
                 	cocktail.setIngredients(data[4]);
                 	cocktail.setInstructions(data[5]);
                 	cocktail.setShopping(data[6]);
-                	cocktail.setPrice(Integer.parseInt(data[7]));
-                	cocktail.setAvailability("Yes".equals(data[8]));
+                	cocktail.setDescription(data[7]);
+                	cocktail.setPrice(Integer.parseInt(data[8]));
+                	cocktail.setAvailability("Yes".equals(data[9]));
+                	cocktail.setMenu(menu);
+                	
                 	// Here saving in the DB
                 	DatabaseManager.getInstance().saveCocktail(cocktail);
                 } 

@@ -23,11 +23,10 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.vendsy.bartsy.venue.R;
-import com.vendsy.bartsy.venue.db.DatabaseManager;
-import com.vendsy.bartsy.venue.utils.Utilities;
 
 /**
  * @author Seenu Malireddy
@@ -39,6 +38,7 @@ public class CSVOptionsDialogFragment extends DialogFragment  {
 	private Uri uri;
 	private CheckBox uploadCheckBox;
 	private int position;
+	private EditText nameText;
 	
 	private static final String TAG = "CSVOptionsDialogFragment";
 	
@@ -57,10 +57,10 @@ public class CSVOptionsDialogFragment extends DialogFragment  {
 		
 		String filePath = uri.getEncodedPath();
 		// Try to identify the type based on filename
-		if(filePath.contains("cocktails")){
-			position = 0;
-		}else{
+		if(filePath.toLowerCase().contains("ingredients")){
 			position = 1;
+		}else{
+			position = 0;
 		}
 	}
 
@@ -77,7 +77,7 @@ public class CSVOptionsDialogFragment extends DialogFragment  {
 	    
 	    categoriesSpinner = (Spinner)view.findViewById(R.id.categoriesList);
 	    uploadCheckBox = (CheckBox)view.findViewById(R.id.uploadCheckBox);
-	    
+	    nameText = (EditText)view.findViewById(R.id.nameText);
 	    
 	    updateCategoriesSpinner();
 	    
@@ -115,7 +115,8 @@ public class CSVOptionsDialogFragment extends DialogFragment  {
 	                AssetFileDescriptor afd = cr.openAssetFileDescriptor(uri, "r");
 	                InputStream is = cr.openInputStream(uri);
 	                if(is == null) return;
-	                saveCSVFile(is, uploadCheckBox.isChecked(), categoriesSpinner.getSelectedItemPosition());
+	                
+	                saveCSVFile(is, uploadCheckBox.isChecked(), categoriesSpinner.getSelectedItemPosition(), nameText.getText().toString());
 	            }
 	            catch(FileNotFoundException e){
 	                return;
@@ -129,14 +130,14 @@ public class CSVOptionsDialogFragment extends DialogFragment  {
 	            InputStream is=null;
 	            try{
 	                is = new FileInputStream(file);
-	                saveCSVFile(is, uploadCheckBox.isChecked(), categoriesSpinner.getSelectedItemPosition());
+	                saveCSVFile(is, uploadCheckBox.isChecked(), categoriesSpinner.getSelectedItemPosition(), nameText.getText().toString());
 	            }
 	            catch(FileNotFoundException e){
 	            }
 	        }
 	}
 	
-	protected void saveCSVFile(InputStream is, boolean autoUpload, int type){
+	protected void saveCSVFile(InputStream is, boolean autoUpload, int type, String name){
 		
 	}
 

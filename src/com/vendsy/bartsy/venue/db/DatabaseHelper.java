@@ -16,6 +16,7 @@ import com.j256.ormlite.table.TableUtils;
 import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Cocktail;
 import com.vendsy.bartsy.venue.model.Ingredient;
+import com.vendsy.bartsy.venue.model.Menu;
 
 /**
  * Database helper class used to manage the creation and upgrading of your
@@ -29,12 +30,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	private static final String DATABASE_NAME = "BartsyVenue.db";
 	// any time you make changes to your database objects, you may have to
 	// increase the database version
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 	// the DAO object we use to access the Ingredient table
 	private Dao<Ingredient, Integer> ingredientDao = null;
 	// the DAO object we use to access the Category table
 	private Dao<Category, Integer> categoryDao = null;
 	private Dao<Cocktail, Integer> cocktailDao;
+	private Dao<Menu, Integer> menuDao;
 
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -53,6 +55,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			TableUtils.createTable(connectionSource, Category.class);
 			TableUtils.createTable(connectionSource, Ingredient.class);
 			TableUtils.createTable(connectionSource, Cocktail.class);
+			TableUtils.createTable(connectionSource, Menu.class);
 			
 		} catch (SQLException e) {
 			Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
@@ -75,6 +78,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			TableUtils.dropTable(connectionSource, Ingredient.class, true);
 			TableUtils.dropTable(connectionSource, Cocktail.class, true);
 			TableUtils.dropTable(connectionSource, Category.class, true);
+			TableUtils.dropTable(connectionSource, Menu.class, true);
 			// after we drop the old databases, we create the new ones
 			onCreate(db, connectionSource);
 		} catch (SQLException e) {
@@ -117,6 +121,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			categoryDao = getDao(Category.class);
 		}
 		return categoryDao;
+	}
+	
+	/**
+	 * Returns the Database Access Object (DAO) for our Menu class. It
+	 * will create it or just give the cached value.
+	 */
+	public Dao<Menu, Integer> getMenuDao()
+			throws SQLException {
+		if (menuDao == null) {
+			menuDao = getDao(Menu.class);
+		}
+		return menuDao;
 	}
 
 	/**

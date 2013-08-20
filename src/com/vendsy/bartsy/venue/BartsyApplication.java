@@ -54,6 +54,7 @@ import com.vendsy.bartsy.venue.db.DatabaseManager;
 import com.vendsy.bartsy.venue.model.AppObservable;
 import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Cocktail;
+import com.vendsy.bartsy.venue.model.Menu;
 import com.vendsy.bartsy.venue.model.Order;
 import com.vendsy.bartsy.venue.model.Profile;
 import com.vendsy.bartsy.venue.model.Venue;
@@ -232,7 +233,7 @@ public class BartsyApplication extends Application implements AppObservable {
 				
 				// To read cocktails data from CSV file and save in the DB
 				try {
-					Utilities.saveCocktailsFromCSVFile(BartsyApplication.this, getAssets().open(Constants.COCKTAILS_CSV_FILE));
+					Utilities.saveCocktailsFromCSVFile(BartsyApplication.this, getAssets().open(Constants.COCKTAILS_CSV_FILE), null);
 				} catch (Exception e) {
 					Log.e(TAG, "Utilities.saveCocktailsFromCSVFile ::"+e.getMessage());
 				}
@@ -260,7 +261,7 @@ public class BartsyApplication extends Application implements AppObservable {
 				
 				uploadIngredientsDataToServer();
 			 	
-			 	uploadCocktailsDataToServer();
+			 	uploadCocktailsDataToServer(null);
 			}
 		}.start();
 	}
@@ -282,10 +283,14 @@ public class BartsyApplication extends Application implements AppObservable {
 	/**
 	 *  Get cocktails from the db and upload to server
 	 */
-	public void uploadCocktailsDataToServer() {
+	public void uploadCocktailsDataToServer(String menuName) {
+		// Make sure that menu name should not be empty or null
+		if(menuName==null || menuName.trim().equals("")){
+			menuName = Utilities.DEFAULT_MENU_NAME;
+		}
 		
-	 	List<Cocktail> cocktails = DatabaseManager.getInstance().getCocktails();
-	 	WebServices.saveCocktails(cocktails, venueProfileID, BartsyApplication.this);
+	 	List<Cocktail> cocktails = DatabaseManager.getInstance().getCocktails(menuName);
+	 	WebServices.saveMenu(cocktails,menuName, venueProfileID, BartsyApplication.this);
 	}
 
 	/**

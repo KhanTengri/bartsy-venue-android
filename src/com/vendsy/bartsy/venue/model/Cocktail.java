@@ -26,12 +26,16 @@ public class Cocktail {
 	@DatabaseField
 	private String instructions;
 	@DatabaseField
+	private String description;
+	@DatabaseField
 	private String shopping;
 	@DatabaseField
 	private int price;
 	@DatabaseField
 	private boolean availability;
 	
+	@DatabaseField(canBeNull = false, foreign = true, foreignAutoRefresh = true, columnName = "menu_id")
+	protected Menu menu;
 	
 	/**
 	 * It will return in the JSON format which is used in the web service call
@@ -41,7 +45,7 @@ public class Cocktail {
 	public JSONObject toJSON(){
 		JSONObject json = new JSONObject();
 		try {
-			json.put("cocktailId", String.valueOf(id));
+			json.put("menuId", String.valueOf(id));
 			json.put("available", availability);
 			json.put("name", name);
 			json.put("price", String.valueOf(price));
@@ -52,7 +56,7 @@ public class Cocktail {
 			json.put("ingredients", ingredients);
 			json.put("instructions", instructions);
 			json.put("shopping", shopping);
-			
+			json.put("description", description);
 		} catch (JSONException e) {	}
 		
 		return json;
@@ -174,5 +178,22 @@ public class Cocktail {
 	public void setShopping(String shopping) {
 		this.shopping = shopping;
 	}
+
+	public Menu getMenu() {
+		return menu;
+	}
+
+	public void setMenu(Menu menu) {
+		this.menu = menu;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
 	
 }

@@ -6,12 +6,14 @@ import java.util.List;
 
 import android.content.Context;
 
+import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.TableUtils;
 import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Cocktail;
 import com.vendsy.bartsy.venue.model.Ingredient;
+import com.vendsy.bartsy.venue.model.Menu;
 
 /**
  * @author Seenu Malireddy
@@ -115,6 +117,29 @@ public class DatabaseManager {
 	}
 	
 	/**
+	 * Get Menu based on the menu name
+	 * 
+	 * @param name
+	 */
+	public Menu getMenu(String name) {
+		try {
+			QueryBuilder<Menu, Integer> builder = dbHelper
+					.getMenuDao().queryBuilder();
+			builder.where().eq("name", name);
+			
+			PreparedQuery<Menu> query = builder.prepare();
+			List<Menu> menuList = dbHelper.getMenuDao().query(query);
+			
+			if(menuList!=null && menuList.size()>0){
+				return menuList.get(0);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
 	 * To get list of ingredients by category from the db
 	 * 
 	 * @param id
@@ -135,19 +160,42 @@ public class DatabaseManager {
 	}
 	
 	/**
-	 * To get list of cocktails by category from the db
+	 * To get list of cocktails by category from the db by menu name
 	 * 
 	 * @param id
 	 * @return
 	 */
-	public List<Cocktail> getCocktails() {
+	public List<Cocktail> getCocktails(String menuName) {
+		// Try to get menu data by using menu name 
+		Menu menu = getMenu(menuName);
+		if(menu==null){
+			return null;
+		}
 		try {
-			return dbHelper.getCocktailDao().queryForAll();
+			QueryBuilder<Cocktail, Integer> builder = dbHelper
+					.getCocktailDao().queryBuilder();
+			builder.where().eq("menu_id", menu.getId());
+			
+			PreparedQuery<Cocktail> query = builder.prepare();
+			
+			return dbHelper.getCocktailDao().query(query);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
+	
+	
+	public List<Menu> getAllMenus() {
+		// Try to get all menus
+		try {
+			return dbHelper.getMenuDao().queryForAll();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	/**
 	 *  Delete all the records of the Ingredient table
 	 */
@@ -161,12 +209,19 @@ public class DatabaseManager {
 	}
 	
 	/**
-	 *  Delete all the records of the Cocktails table
+	 *  Delete all the records of the Cocktails table based on menu name
 	 */
-	public void deleteAllCocktails(){
+	public void deleteAllCocktails(String menuName){
 		try {
-			TableUtils.clearTable(dbHelper.getConnectionSource(),
-					Cocktail.class);
+			// Try to get menu data by using menu name 
+			Menu menu = getMenu(menuName);
+			if(menu==null){
+				return;
+			}
+			
+			DeleteBuilder<Cocktail, Integer> db = dbHelper.getCocktailDao().deleteBuilder();
+			db.where().eq("menu_id", menu.getId());
+			dbHelper.getCocktailDao().delete(db.prepare());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -181,6 +236,19 @@ public class DatabaseManager {
 		try {
 			dbHelper.getSectionDao().createOrUpdate(category);
 
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Save menu data in db
+	 * 
+	 * @param menu
+	 */
+	public void saveMenu(Menu menu) {
+		try {
+			dbHelper.getMenuDao().createOrUpdate(menu);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
