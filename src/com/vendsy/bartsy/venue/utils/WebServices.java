@@ -60,13 +60,13 @@ public class WebServices {
 
 	// Google API project id registered to use GCM.
 //	public static final String SENDER_ID = "227827031375";
-//	public static final String SENDER_ID = "605229245886"; // dev 
-	public static final String SENDER_ID = "560663323691"; // prod
+	public static final String SENDER_ID = "605229245886"; // dev 
+//	public static final String SENDER_ID = "560663323691"; // prod
 	
 	// Server
 //	public static final String DOMAIN_NAME = "http://192.168.0.172:8080/";
-//	public static final String DOMAIN_NAME = "http://54.235.76.180:8080/";		// dev
-	public static final String DOMAIN_NAME = "http://app.bartsy.vendsy.com/"; 	// prod
+	public static final String DOMAIN_NAME = "http://54.235.76.180:8080/";		// dev
+//	public static final String DOMAIN_NAME = "http://app.bartsy.vendsy.com/"; 	// prod
 
 	// Current ApiVersion number
 	public static final String 	API_VERSION="3";
