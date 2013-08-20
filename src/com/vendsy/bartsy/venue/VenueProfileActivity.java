@@ -91,15 +91,13 @@ public class VenueProfileActivity extends Activity implements OnClickListener,  
 			}
 		});
 		
-//		// Get the activity input 
+		// Get the activity input 
 		try {
 			venue = loadInput(mApp);
 		} catch (Exception e) {
 			// Invalid input
 			e.printStackTrace();
 			Log.e(TAG, "Invalid input");
-//			finish();
-			return;
 		}
 
 		LayoutParams layout = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
