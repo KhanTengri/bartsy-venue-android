@@ -256,14 +256,15 @@ public class BartsyApplication extends Application implements AppObservable {
 	 * Upload Ingredients and cocktails to the server in background
 	 */
 	public synchronized void uploadDataToServerInBackground() {
-		new Thread(){
-			public void run() {
-				
-				uploadIngredientsDataToServer();
-			 	
-			 	uploadCocktailsDataToServer(null);
-			}
-		}.start();
+		
+//		new Thread(){
+//			public void run() {
+//				
+//				uploadIngredientsDataToServer();
+//			 	
+//			 	uploadCocktailsDataToServer(null);
+//			}
+//		}.start();
 	}
 	
 	public void uploadIngredientsDataToServer(){
