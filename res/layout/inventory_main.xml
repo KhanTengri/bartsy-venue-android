@@ -7,46 +7,16 @@
     android:background="#dddddd"
     android:gravity="center_horizontal"
     android:orientation="vertical" >
-
-    <LinearLayout
-        android:layout_width="fill_parent"
+	<ScrollView 
+	    android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
-        <Button
-            android:id="@+id/spiritsButton"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:background="@drawable/tab_over"
-            android:text="Spirits"
-            android:textColor="#000000"
-            android:textSize="16dp"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/mixersButton"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:background="@drawable/tab_bg"
-            android:text="Mixers"
-            android:textColor="#000000"
-            android:textSize="16dp"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/cocktailsButton"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:background="@drawable/tab_bg"
-            android:text="Cocktails"
-            android:textColor="#000000"
-            android:textSize="16dp"
-            android:textStyle="bold" />
-    </LinearLayout>
-	
+        android:background="@drawable/tab_bg">
+        <LinearLayout android:id="@+id/specialMenuLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        </LinearLayout>
+	</ScrollView>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
