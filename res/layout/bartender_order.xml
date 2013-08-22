@@ -255,18 +255,17 @@
                                        android:layout_height="wrap_content"
                                        android:text="Details" />
 
+                                   <Button
+                                       android:id="@+id/view_order_button_negative"
+                                       android:layout_width="wrap_content"
+                                       android:layout_height="wrap_content"
+                                       android:text="Reject" />
+
                                    <LinearLayout
                                        android:id="@+id/view_order_actions"
                                        android:layout_width="match_parent"
                                        android:layout_height="fill_parent"
                                        android:gravity="center_vertical" >
-
-                                       <Button
-                                           android:id="@+id/view_order_button_negative"
-                                           android:layout_width="wrap_content"
-                                           android:layout_height="wrap_content"
-                                           android:layout_weight="20"
-                                           android:text="Reject" />
 
                                        <Button
                                            android:id="@+id/view_order_button_positive"

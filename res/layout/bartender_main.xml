@@ -81,6 +81,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/accepted_orders"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="1dp"
