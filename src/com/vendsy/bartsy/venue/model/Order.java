@@ -259,16 +259,28 @@ public class Order  {
 
 	public void println(PrintWriter out) {
 		
+	    DecimalFormat df = new DecimalFormat();
+		df.setMaximumFractionDigits(0);
+		df.setMinimumFractionDigits(0);
+		
 		out.println("\rBartsy Order #" + orderId + "\r");
 		out.println(new Date() + "\r");
-		out.println(recipientNickname + "\r");
-		out.println();
-		out.println();
+		out.println("For: " + recipientNickname + "\r");
 		for (Item item : items) {
-			out.println("\r" + item.getTitle() + "...    $" + item.getPrice());
+			out.println("\r__________________________\n\r");
+			out.println("\r" + item.getTitle() + " $" + df.format(Double.parseDouble(item.getPrice())));
+			if (item.has(item.getOptionsDescription()))
+				out.println("\r" + item.getOptionsDescription());
+			if (item.has(item.getSpecialInstructions()))
+				out.println("\r" + item.getSpecialInstructions());
 		}
+		
+		df.setMaximumFractionDigits(2);
+		df.setMinimumFractionDigits(2);
+		
 		out.println("\r__________________________");
-		out.println("\rTotal:             $" + totalAmount + "\n");
+		out.println("\rTax: $" + df.format(taxAmount) + "  Tip: $" + df.format(tipAmount));
+		out.println("\r            Total: $" + df.format(totalAmount) + "\r\n");
 	}
 	
 	
@@ -329,7 +341,7 @@ public class Order  {
 		switch (status) {
 		case ORDER_STATUS_NEW:
 			last_status = status;
-			status = ORDER_STATUS_READY;
+			status = ORDER_STATUS_IN_PROGRESS;
 			break;
 		case ORDER_STATUS_IN_PROGRESS:
 			last_status = status;
@@ -575,22 +587,28 @@ public class Order  {
 	 * 
 	 * @param order
 	 * @return 
+	 * @throws Exception 
 	 */
-	public View pastOrdersView(LayoutInflater inflater) {
+	public View pastOrdersView(LayoutInflater inflater) throws Exception {
 		
 		// Extract time from UTC field
         Date date = Utilities.getLocalDateFromGMTString(createdDate.replace("T", " ").replace("Z", ""), "yyyy-MM-dd HH:mm:ss");;
         String time = new SimpleDateFormat("MM/dd/yy HH:mm", Locale.getDefault()).format(date);
 		
         // Don't display order placed before beta starts
-/*        SimpleDateFormat betaDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        Date betaDate;
-		betaDate = betaDateFormat.parse("2013-07-15 10:15:00");
-        if (date.before(betaDate)) {
+        SimpleDateFormat betaDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Date betaDate = null;
+		try {
+			betaDate = betaDateFormat.parse("2013-08-20 18:00:00");
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        if (betaDate != null && date.before(betaDate)) {
         	// Don't show rows before the beta start date
         	throw new Exception("");
         }
- */       
+       
 		final View view = inflater.inflate(R.layout.orders_past_row, null);
 
 

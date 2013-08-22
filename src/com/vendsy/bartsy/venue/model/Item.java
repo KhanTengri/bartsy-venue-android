@@ -214,5 +214,12 @@ public class Item {
 		this.itemId = drinkId;
 	}
 	
+	public String getSpecialInstructions() {
+		return specialInstructions;
+	}
+
+	public void setSpecialInstructions(String specialInstructions) {
+		this.specialInstructions = specialInstructions;
+	}
 	
 }
