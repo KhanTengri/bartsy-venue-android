@@ -505,14 +505,14 @@ public class BartsyApplication extends Application implements AppObservable {
 		
 		try 
 	    {
-		    Socket sock = new Socket(ip, 9100);
-		    PrintWriter oStream = new PrintWriter(sock.getOutputStream());
 			for (Order order : addedOrders) {
+			    Socket sock = new Socket(ip, 9100);
+			    PrintWriter oStream = new PrintWriter(sock.getOutputStream());
 				order.println(oStream);
+		        oStream.print("\n\n\n");
+		        oStream.close();
+		        sock.close(); 
 			}
-	        oStream.print("\n\n\n");
-	        oStream.close();
-	        sock.close(); 
 	    }
 	    catch (UnknownHostException e) 
 	    {
