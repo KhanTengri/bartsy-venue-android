@@ -122,11 +122,19 @@ public class PastOrdersFragment extends Fragment{
 					JSONObject json = null;
 					json = array.getJSONObject(i);
 					Order order = new Order(json);
-					ordersTableLayout.addView(order.pastOrdersView(mInflater));
-					
-					// Add tip and total
-					tipAmount += order.tipAmount;
-					totalAmount += order.totalAmount;
+					try {
+						
+						// try to add the view
+						ordersTableLayout.addView(order.pastOrdersView(mInflater));
+
+						// Add tip and total
+						tipAmount += order.tipAmount;
+						totalAmount += order.totalAmount;
+
+					} catch (Exception e) {
+						// Simply skip this entry in case of error
+						e.printStackTrace();
+					}
 				}
 			}
 		} catch (JSONException e) {
