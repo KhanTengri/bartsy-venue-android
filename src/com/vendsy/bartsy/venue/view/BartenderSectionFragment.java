@@ -358,6 +358,11 @@ public class BartenderSectionFragment extends Fragment implements OnClickListene
 			// Process all orders for that user that are currently in this state
 			Log.v(TAG, "Clicked on order positive button");
 			order.nextPositiveState();	
+			
+			// If we're not showing the in progress state column in the UI, move status again
+			if (mRootView.findViewById(R.id.accepted_orders).getVisibility() == View.GONE) 
+				order.nextPositiveState();	
+			
 			Log.v(TAG, "Child matches parent - update status to " + order.status);
 			
 			mApp.update(Constants.defaultUpdateDelay); //- this will get called automatically in the next cycle, don't call it now to make UI more snappy
