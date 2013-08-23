@@ -35,6 +35,7 @@ public class InventoryDialogFragment extends DialogFragment  {
 	private Spinner categoriesSpinner;
 	private Category selectedCategory;
 	private String type;
+	private View view;
 	
     public String getType() {
 		return type;
@@ -69,7 +70,6 @@ public class InventoryDialogFragment extends DialogFragment  {
 	
 	    // Inflate and set the layout for the dialog
 	    // Pass null as the parent view because its going in the dialog layout
-	    View view = null;
 	    if(type!=null && !type.equals(Category.COCKTAILS_TYPE)){
 	    	view = inflater.inflate(R.layout.dialog_inventory, null);
 	    }else{
@@ -118,7 +118,12 @@ public class InventoryDialogFragment extends DialogFragment  {
 			// Here, Saving in the database
 			DatabaseManager.getInstance().saveIngredient(ingredient);
 		}else{
-			Cocktail cocktail = new Cocktail(name, "", "", "");
+			
+			Cocktail cocktail = new Cocktail();
+			// Set all values to the cocktails object from menu 
+			cocktail.setIngredients(((EditText)view.findViewById(R.id.ingredientsText)).getText().toString());
+			cocktail.setInstructions(((EditText)view.findViewById(R.id.instructionsText)).getText().toString());
+			
 			// Here, Saving in the database
 			DatabaseManager.getInstance().saveCocktail(cocktail);
 		}
