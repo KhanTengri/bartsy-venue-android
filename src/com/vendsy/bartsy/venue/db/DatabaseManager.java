@@ -96,6 +96,19 @@ public class DatabaseManager {
 	}
 	
 	/**
+	 * Delete Menu data in db
+	 * 
+	 * @param Menu
+	 */
+	public void deleteMenu(Menu menu) {
+		try {
+			dbHelper.getMenuDao().delete(menu);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * To get list of categories based on the type
 	 * 
 	 * @see Category class contains the different types 
