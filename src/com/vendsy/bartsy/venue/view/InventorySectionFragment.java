@@ -12,7 +12,6 @@ import org.json.JSONObject;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.res.Resources.Theme;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -28,8 +27,6 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -38,6 +35,7 @@ import com.vendsy.bartsy.venue.BartsyApplication;
 import com.vendsy.bartsy.venue.R;
 import com.vendsy.bartsy.venue.db.DatabaseManager;
 import com.vendsy.bartsy.venue.dialog.InventoryDialogFragment;
+import com.vendsy.bartsy.venue.dialog.RenameMenuDialogFragment;
 import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Cocktail;
 import com.vendsy.bartsy.venue.model.Ingredient;
@@ -79,6 +77,10 @@ public class InventorySectionFragment extends Fragment {
 	private LinearLayout menuLayout;
 	private List<Menu> menus;
 	private String selectedMenuName;
+	private Button renameButton;
+	protected Menu selectedMenu;
+	protected Button selectedTabButton;
+	private Button deleteButton;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -95,11 +97,42 @@ public class InventorySectionFragment extends Fragment {
 		itemsLayout = (GridLayout) mRootView.findViewById(R.id.itemsLayout);
 		categoriesList = (LinearLayout) mRootView.findViewById(R.id.categoryLayout);
 		categoryScrollView = (ScrollView) mRootView.findViewById(R.id.categoryScrollView);
+		
+		// Try to get the buttons from view 
 		saveButton = (Button) mRootView.findViewById(R.id.saveButton);
 		addButton = (Button) mRootView.findViewById(R.id.addButton);
+		renameButton = (Button) mRootView.findViewById(R.id.renameButton);
+		deleteButton = (Button) mRootView.findViewById(R.id.deleteButton);
+				
+		// Set click listener for all buttons
+		renameButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// Make sure that selected menu is not empty
+				if(selectedMenu!=null){
+					// Initiate Rename dialog
+					RenameMenuDialogFragment dialog = new RenameMenuDialogFragment(){
+						@Override
+						protected void proceedRenameSyscall() {
+							// Rename menu Sys call
+							renameMenuAction(getNameText().getText().toString());
+						}
+					};
+					dialog.setName(selectedMenu.getName());
+					dialog.show(getActivity().getSupportFragmentManager(),"Add New");
+				}
+			}
+		});
+		
+		deleteButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				deleteMenuAction();
+			}
+		});
 		
 		saveButton.setOnClickListener(new OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
 				saveAction();
@@ -111,20 +144,17 @@ public class InventorySectionFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				// Make sure that category selected before.
-				if(selectedCategory==null){
+				if(!Category.COCKTAILS_TYPE.equals(selectedType) || selectedCategory==null){
 					Toast.makeText(getActivity(), "Please select any category", Toast.LENGTH_LONG).show();
 					return;
 				}
-				
 				// Initiate inventory dialog
 				InventoryDialogFragment dialog = new InventoryDialogFragment(){
 					@Override
 					protected void saveAction() {
 						super.saveAction();
 						updateRightView();
-						
 					}
-
 				};
 				dialog.setType(selectedType);
 				dialog.setSelectedCategory(selectedCategory);
@@ -134,14 +164,126 @@ public class InventorySectionFragment extends Fragment {
 		
 		updateInventoryView();
 
-		// To get venue Id from the application global variable
+		// Get venue Id from the application global variable
 		venueId = mApp.venueProfileID;
 		
         return mRootView;
 	}
+	/**
+	 *  Rename menu sys call
+	 */
+	protected void renameMenuAction(final String newMenuName) {
+		// Display Progress dialog
+		progressDialog = Utilities.progressDialog(getActivity(),"Renaming..");
+		progressDialog.show();
+		// Background thread to call Sys call
+		new Thread(){
+			public void run() {
+				final String response = WebServices.renameMenu(selectedMenu.getName(), newMenuName, mApp);
+				
+				handler.post(new Runnable() {
+					
+					@Override
+					public void run() {
+						progressDialog.dismiss();
+						try {
+							final JSONObject json = new JSONObject(response);
+							// Success case
+							if(json.has("errorCode") && json.getString("errorCode").equals("0")){
+								
+								selectedMenu.setName(newMenuName);
+								DatabaseManager.getInstance().saveMenu(selectedMenu);
+								
+								selectedTabButton.setText(newMenuName);
+							}else{
+								Toast.makeText(getActivity(), json.getString("errorMessage"), Toast.LENGTH_LONG).show();
+							}
+						} catch (JSONException e) {
+								Toast.makeText(getActivity(), "Rename failed", Toast.LENGTH_LONG).show();
+						}
+					}
+				});
+				
+			}
+		}.start();
+	}
 	
 	/**
-	 * To update the layout based on the type
+	 * Delete menu from the database and server as well
+	 * 
+	 */
+	private void deleteMenuAction(){
+		
+		// To Setup confirmation dialog
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setMessage("Are you sure do you want to delete?")
+				.setCancelable(false)
+				.setPositiveButton("Yes",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id){
+								
+								deleteMenuSysCall();
+							}
+						})
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+						return;
+					}
+				});
+		
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+	
+	/**
+	 *  Delete menu sys call
+	 */
+	private void deleteMenuSysCall() {
+		// Display Progress dialog
+		progressDialog = Utilities.progressDialog(getActivity(),"Deleting..");
+		progressDialog.show();
+		new Thread(){
+			public void run() {
+				final String response = WebServices.deleteMenu(selectedMenu.getName(), mApp);
+				
+				handler.post(new Runnable() {
+					
+					@Override
+					public void run() {
+						progressDialog.dismiss();
+						try {
+							final JSONObject json = new JSONObject(response);
+							// Success case
+							if(json.has("errorCode") && json.getString("errorCode").equals("0")){
+								// Remove local data of selected menu 
+								DatabaseManager.getInstance().deleteMenu(selectedMenu);
+								menus.remove(selectedMenu);
+								selectedMenuName=null;
+								selectedMenu=null;
+								
+								// Remove tab button from the view
+								tabButtons.remove(selectedTabButton);
+								menuLayout.removeView(selectedTabButton);
+								itemsLayout.removeAllViews();
+								
+							}else{
+								Toast.makeText(getActivity(), json.getString("errorMessage"), Toast.LENGTH_LONG).show();
+							}
+						} catch (JSONException e) {
+								Toast.makeText(getActivity(), "Rename failed", Toast.LENGTH_LONG).show();
+						}
+					}
+				});
+				
+			}
+		}.start();
+	}
+
+	/**
+	 * Update the layout based on the type
 	 */
 	private void updateRightView() {
 				
@@ -153,7 +295,7 @@ public class InventorySectionFragment extends Fragment {
 	}
 	
 	/**
-	 *  To save updated custom drinks information and send to the server 
+	 *  Save updated custom drinks information and send to the server 
 	 */
 	private void saveAction() {
 		// Error handling
@@ -165,7 +307,7 @@ public class InventorySectionFragment extends Fragment {
 		progressDialog.show();
 		
 		
-		// To call web service in background
+		// Call web service in background
 		new Thread(){
 			private String response;
 
@@ -189,7 +331,7 @@ public class InventorySectionFragment extends Fragment {
 					response = WebServices.saveMenu(cocktails,selectedMenuName, venueId, mApp);
 				}
 				
-				// To call UI thread
+				// Call UI thread
 				handler.post(new Runnable() {
 					
 					@Override
@@ -242,6 +384,9 @@ public class InventorySectionFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				spiritsTabSelected();
+				// Hide rename and delete buttons
+				renameButton.setVisibility(View.GONE);
+				deleteButton.setVisibility(View.GONE);
 			}
 		});
 		
@@ -249,6 +394,9 @@ public class InventorySectionFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				mixersTabSelected();
+				// Hide rename and delete buttons
+				renameButton.setVisibility(View.GONE);
+				deleteButton.setVisibility(View.GONE);
 			}
 		});
 		
@@ -259,15 +407,19 @@ public class InventorySectionFragment extends Fragment {
 	private void prepareMenuTabs() {
 		if(menus!=null){
 			tabButtons.clear();
+			
 			for(Menu menu:menus){
 				
+				final Menu menuObj = menu;
 				// Create tab button and set the click listener
 				final Button tabButton = getTabButton(menu.getName());
 				tabButton.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						
-						cocktailsTabSelected(tabButton);
+						selectedMenu = menuObj;
+						selectedTabButton = tabButton;
+						cocktailsTabSelected();
 					}
 				});
 					
@@ -326,7 +478,10 @@ public class InventorySectionFragment extends Fragment {
 	/**
 	 * Invokes when the spirits tab pressed
 	 */
-	private void cocktailsTabSelected(Button selectedButton) {
+	private void cocktailsTabSelected() {
+		// Display rename and delete buttons
+		renameButton.setVisibility(View.VISIBLE);
+		deleteButton.setVisibility(View.VISIBLE);
 		
 		spiritsTab.setBackgroundResource(R.drawable.tab_bg);
 		mixersTab.setBackgroundResource(R.drawable.tab_bg);
@@ -334,11 +489,11 @@ public class InventorySectionFragment extends Fragment {
 		for(Button button : tabButtons){
 			button.setBackgroundResource(R.drawable.tab_bg);
 		}
-		selectedButton.setBackgroundResource(R.drawable.tab_over);
+		selectedTabButton.setBackgroundResource(R.drawable.tab_over);
 		// Hide categories view
 		categoryScrollView.setVisibility(View.INVISIBLE);
 		
-		selectedMenuName = selectedButton.getText().toString();
+		selectedMenuName = selectedTabButton.getText().toString();
 		
 		updateCocktailView();
 	}
@@ -386,7 +541,7 @@ public class InventorySectionFragment extends Fragment {
 					
 					updateIngredientsView((Category)categoryItem.getTag());
 					
-					//To hide all category arrows
+					// To hide all category arrows
 					hideCategoryArrows();
 					arrowView.setVisibility(View.VISIBLE);
 				}

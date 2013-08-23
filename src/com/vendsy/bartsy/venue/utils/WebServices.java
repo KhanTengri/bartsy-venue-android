@@ -84,7 +84,8 @@ public class WebServices {
 	public static final String URL_SET_VENUE_STATUS = DOMAIN_NAME + PROJECT_NAME + "venue/setVenueStatus";
 	public static final String URL_GET_PAST_ORDERS = DOMAIN_NAME + PROJECT_NAME + "order/getPastOrders";
 	public static final String URL_BARTSY_LOGIN = DOMAIN_NAME + PROJECT_NAME + "venue/venueLogin";
-	
+	public static final String URL_RENAME_MENU = DOMAIN_NAME + PROJECT_NAME + "inventory/renameMenu";
+	public static final String URL_DELETE_MENU = DOMAIN_NAME + PROJECT_NAME + "inventory/deleteMenu";
 	
 	/**
 	 * Make sure we have internet
@@ -154,11 +155,8 @@ public class WebServices {
 		
 		Log.i(TAG, "<=== postRequest response: " + url + ", " + response);
 		
-		
 		return response;
-
 	}
-
 	
 	/**
 	 * To get list of menu list
@@ -235,8 +233,7 @@ public class WebServices {
 				}
 				try {
 
-					HttpURLConnection conn = (HttpURLConnection) myFileUrl
-							.openConnection();
+					HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
 					conn.setDoInput(true);
 					conn.connect();
 					InputStream is = conn.getInputStream();
@@ -527,7 +524,59 @@ public class WebServices {
 		
 		return null;
 	}
-
+	
+	/**
+	 * Rename existing menu name with new name
+	 * 
+	 * @param oldMenuName
+	 * @param newMenuName
+	 * @param context
+	 * @return response
+	 */
+	public static String renameMenu( String oldMenuName, String newMenuName, BartsyApplication context){
+		try {
+			// Create Json object to post data
+			JSONObject json = new JSONObject();
+			json.put("venueId", context.venueProfileID);
+			json.put("oldMenuName", oldMenuName);
+			json.put("newMenuName", newMenuName);
+			
+			// Web service call
+			String response = postRequest(URL_RENAME_MENU, json, context);
+			Log.i("Rename Menu Response: ",response);
+			return response;
+			
+		} catch (JSONException e) {
+		} catch (Exception e) {
+		}
+		return null;
+	}
+	/**
+	 * Delete menu based on the menu name
+	 * 
+	 * @param menuName
+	 * @param context
+	 * 
+	 * @return response
+	 */
+	public static String deleteMenu(String menuName, BartsyApplication context){
+		try {
+			// Create Json object to post data
+			JSONObject json = new JSONObject();
+			json.put("venueId", context.venueProfileID);
+			json.put("menuName", menuName);
+			
+			// Web service call
+			String response = postRequest(URL_DELETE_MENU, json, context);
+			Log.i("Delete Menu Response: ",response);
+			return response;
+			
+		} catch (JSONException e) {
+		} catch (Exception e) {
+		}
+		return null;
+	}
+	
 	/**
 	 * Service call to change order status
 	 * 
