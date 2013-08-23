@@ -144,7 +144,7 @@ public class InventorySectionFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				// Make sure that category selected before.
-				if(!Category.COCKTAILS_TYPE.equals(selectedType) || selectedCategory==null){
+				if(!Category.COCKTAILS_TYPE.equals(selectedType) && selectedCategory==null){
 					Toast.makeText(getActivity(), "Please select any category", Toast.LENGTH_LONG).show();
 					return;
 				}
