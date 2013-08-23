@@ -65,12 +65,6 @@ public class Cocktail {
 	public Cocktail(){
 		
 	}
-	public Cocktail(String name, String category, String glassType, String alcohol){
-		this.name = name;
-		this.category = category;
-		this.glassType = glassType;
-		this.alcohol = alcohol;
-	}
 	
 	/**
 	 * @return the id
