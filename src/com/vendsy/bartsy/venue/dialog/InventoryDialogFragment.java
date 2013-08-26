@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -23,6 +24,7 @@ import com.vendsy.bartsy.venue.db.DatabaseManager;
 import com.vendsy.bartsy.venue.model.Category;
 import com.vendsy.bartsy.venue.model.Cocktail;
 import com.vendsy.bartsy.venue.model.Ingredient;
+import com.vendsy.bartsy.venue.model.Menu;
 
 /**
  * @author Seenu Malireddy
@@ -36,6 +38,8 @@ public class InventoryDialogFragment extends DialogFragment  {
 	private Category selectedCategory;
 	private String type;
 	private View view;
+	
+	private Menu menu;
 	
     public String getType() {
 		return type;
@@ -52,6 +56,14 @@ public class InventoryDialogFragment extends DialogFragment  {
 
 	public void setSelectedCategory(Category selectedCategory) {
 		this.selectedCategory = selectedCategory;
+	}
+	
+	public Menu getMenu() {
+		return menu;
+	}
+
+	public void setMenu(Menu menu) {
+		this.menu = menu;
 	}
 
 	// Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
@@ -72,14 +84,14 @@ public class InventoryDialogFragment extends DialogFragment  {
 	    // Pass null as the parent view because its going in the dialog layout
 	    if(type!=null && !type.equals(Category.COCKTAILS_TYPE)){
 	    	view = inflater.inflate(R.layout.dialog_inventory, null);
+	    	// Configure spinner
+	    	categoriesSpinner = (Spinner)view.findViewById(R.id.categoriesList);
+	 	    updateCategoriesSpinner();
 	    }else{
 	    	view = inflater.inflate(R.layout.dialog_cocktails, null);
 	    }
 	    
 	    nameText = (EditText)view.findViewById(R.id.nameText);
-	    
-	    categoriesSpinner = (Spinner)view.findViewById(R.id.categoriesList);
-	    updateCategoriesSpinner();
 	    
 	    builder.setView(view)
 	    // Add action buttons
@@ -121,8 +133,19 @@ public class InventoryDialogFragment extends DialogFragment  {
 			
 			Cocktail cocktail = new Cocktail();
 			// Set all values to the cocktails object from menu 
+			cocktail.setName(name);
+			cocktail.setGlassType(((EditText)view.findViewById(R.id.glassTypeText)).getText().toString());
+			
+			if(((CheckBox)view.findViewById(R.id.alcoholCheckBox)).isChecked()){
+				cocktail.setAlcohol("Alcoholic");
+			}else{
+				cocktail.setAlcohol("Non Alcoholic");
+			}
 			cocktail.setIngredients(((EditText)view.findViewById(R.id.ingredientsText)).getText().toString());
 			cocktail.setInstructions(((EditText)view.findViewById(R.id.instructionsText)).getText().toString());
+			cocktail.setDescription(((EditText)view.findViewById(R.id.descriptionText)).getText().toString());
+			cocktail.setShopping(((EditText)view.findViewById(R.id.shoppingText)).getText().toString());
+			cocktail.setMenu(menu);
 			
 			// Here, Saving in the database
 			DatabaseManager.getInstance().saveCocktail(cocktail);

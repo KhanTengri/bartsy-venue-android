@@ -81,6 +81,7 @@ public class InventorySectionFragment extends Fragment {
 	protected Menu selectedMenu;
 	protected Button selectedTabButton;
 	private Button deleteButton;
+	private Button newMenuButton;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -103,7 +104,8 @@ public class InventorySectionFragment extends Fragment {
 		addButton = (Button) mRootView.findViewById(R.id.addButton);
 		renameButton = (Button) mRootView.findViewById(R.id.renameButton);
 		deleteButton = (Button) mRootView.findViewById(R.id.deleteButton);
-				
+		newMenuButton = (Button)mRootView.findViewById(R.id.newMenuButton);
+		
 		// Set click listener for all buttons
 		renameButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -113,14 +115,29 @@ public class InventorySectionFragment extends Fragment {
 					// Initiate Rename dialog
 					RenameMenuDialogFragment dialog = new RenameMenuDialogFragment(){
 						@Override
-						protected void proceedRenameSyscall() {
+						protected void proceedToSaveName() {
 							// Rename menu Sys call
 							renameMenuAction(getNameText().getText().toString());
 						}
 					};
 					dialog.setName(selectedMenu.getName());
-					dialog.show(getActivity().getSupportFragmentManager(),"Add New");
+					dialog.show(getActivity().getSupportFragmentManager(),"Rename");
 				}
+			}
+		});
+		
+		newMenuButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// Initiate dialog to take menu name
+				RenameMenuDialogFragment dialog = new RenameMenuDialogFragment(){
+					@Override
+					protected void proceedToSaveName() {
+						createNewMenuAction(getNameText().getText().toString());
+					}
+
+				};
+				dialog.show(getActivity().getSupportFragmentManager(),"New Menu");
 			}
 		});
 		
@@ -158,6 +175,7 @@ public class InventorySectionFragment extends Fragment {
 				};
 				dialog.setType(selectedType);
 				dialog.setSelectedCategory(selectedCategory);
+				dialog.setMenu(selectedMenu);
 				dialog.show(getActivity().getSupportFragmentManager(),"Add New");
 			}
 		});
@@ -169,6 +187,26 @@ public class InventorySectionFragment extends Fragment {
 		
         return mRootView;
 	}
+	
+	/**
+	 *  Create menu in the local database
+	 *  
+	 * @param name - Menu name
+	 */
+	private void createNewMenuAction(String name) {
+		// Initiate menu and set value for the name
+		Menu menu = new Menu();
+		menu.setName(name);
+		
+		//Save menu in the local database
+		DatabaseManager.getInstance().saveMenu(menu);
+		
+		// Required to select newly created menu tab and refresh the content view
+		selectedTabButton = createTabButton(menu);
+		selectedMenu = menu;
+		cocktailsTabSelected();
+	}
+	
 	/**
 	 *  Rename menu sys call
 	 */
@@ -272,8 +310,8 @@ public class InventorySectionFragment extends Fragment {
 							}else{
 								Toast.makeText(getActivity(), json.getString("errorMessage"), Toast.LENGTH_LONG).show();
 							}
-						} catch (JSONException e) {
-								Toast.makeText(getActivity(), "Rename failed", Toast.LENGTH_LONG).show();
+						} catch (Exception e) {
+								Toast.makeText(getActivity(), "Delete failed", Toast.LENGTH_LONG).show();
 						}
 					}
 				});
@@ -407,28 +445,30 @@ public class InventorySectionFragment extends Fragment {
 	private void prepareMenuTabs() {
 		if(menus!=null){
 			tabButtons.clear();
-			
 			for(Menu menu:menus){
-				
-				final Menu menuObj = menu;
-				// Create tab button and set the click listener
-				final Button tabButton = getTabButton(menu.getName());
-				tabButton.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						
-						selectedMenu = menuObj;
-						selectedTabButton = tabButton;
-						cocktailsTabSelected();
-					}
-				});
-					
-				tabButtons.add(tabButton);
-				menuLayout.addView(tabButton);
+				createTabButton(menu);
 			}
 		}
 	}
 
+	private Button createTabButton(final Menu menu) {
+		// Create tab button and set the click listener
+		final Button tabButton = getTabButton(menu.getName());
+		tabButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				
+				selectedMenu = menu;
+				selectedTabButton = tabButton;
+				cocktailsTabSelected();
+			}
+		});
+		tabButtons.add(tabButton);
+		menuLayout.addView(tabButton);
+		
+		return tabButton;
+	}
+	
 	/**
 	 * Inflate tab button and return that object 
 	 *  
@@ -705,7 +745,7 @@ public class InventorySectionFragment extends Fragment {
 		
 		for (Cocktail cocktail : cocktails) {
 
-			final View itemView = inflater.inflate(R.layout.ingredient_item, null);
+			final View itemView = inflater.inflate(R.layout.special_menu_item, null);
 		    TextView itemTextView = (TextView) itemView.findViewById(R.id.ingredientItemText);
 		    itemTextView.setText(cocktail.getName());
 		    
@@ -722,15 +762,12 @@ public class InventorySectionFragment extends Fragment {
 				}
 			});
 		    
-//		    // To set more information in the view
-//		    LinearLayout moreLayout = (LinearLayout)itemView.findViewById(R.id.moreInfoLayout);
-//		    moreLayout.setVisibility(View.VISIBLE);
-//		    
-//		    TextView ingredientsText = (TextView) itemView.findViewById(R.id.ingredientsText);
-//		    ingredientsText.setText(cocktail.getIngredients());
-//		    
-//		    TextView instructionsText = (TextView) itemView.findViewById(R.id.instructionsText);
-//		    instructionsText.setText(cocktail.getInstructions());
+		    // To set more information in the view
+		    ((TextView) itemView.findViewById(R.id.ingredientsText)).setText(cocktail.getIngredients());
+		    ((TextView) itemView.findViewById(R.id.instructionsText)).setText(cocktail.getInstructions());
+		    ((TextView) itemView.findViewById(R.id.shoppingText)).setText(cocktail.getShopping());
+		    ((TextView) itemView.findViewById(R.id.alcoholicText)).setText(cocktail.getAlcohol());
+		    ((TextView) itemView.findViewById(R.id.glassTypeText)).setText(cocktail.getGlassType());
 		    
 		    // To add Price layout to the item view
 		    LinearLayout priceLayout = (LinearLayout) itemView.findViewById(R.id.priceLayout);

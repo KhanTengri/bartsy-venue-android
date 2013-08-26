@@ -63,7 +63,8 @@ public class Cocktail {
 	}
 	
 	public Cocktail(){
-		
+		// TODO Category is empty for now
+		category = "";
 	}
 	
 	/**
