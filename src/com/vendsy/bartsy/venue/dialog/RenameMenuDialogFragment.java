@@ -90,9 +90,9 @@ public class RenameMenuDialogFragment extends DialogFragment  {
 			nameText.setError("Please enter name");
 			return;
 		}
-		proceedRenameSyscall();
+		proceedToSaveName();
 	}
 	// This method implementation is responsible for calling method.
-	protected void proceedRenameSyscall() {}
+	protected void proceedToSaveName() {}
 	
 }
