@@ -84,6 +84,7 @@ public class WebServices {
 	public static final String URL_SET_VENUE_STATUS = DOMAIN_NAME + PROJECT_NAME + "venue/setVenueStatus";
 	public static final String URL_GET_PAST_ORDERS = DOMAIN_NAME + PROJECT_NAME + "order/getPastOrders";
 	public static final String URL_BARTSY_LOGIN = DOMAIN_NAME + PROJECT_NAME + "venue/venueLogin";
+	public static final String URL_GET_VENUE_DETAILS = DOMAIN_NAME + PROJECT_NAME + "venue/getVenueDetails";
 	public static final String URL_RENAME_MENU = DOMAIN_NAME + PROJECT_NAME + "inventory/renameMenu";
 	public static final String URL_DELETE_MENU = DOMAIN_NAME + PROJECT_NAME + "inventory/deleteMenu";
 	
@@ -638,6 +639,32 @@ public class WebServices {
 
 			// Sync service call
 			response = postRequest(URL_SYNC_WITH_SERVER, json, context);
+
+			// Return response in JSON object
+			return new JSONObject(response);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * Service call to get venue details from server
+	 * 
+	 * @param venueId
+	 * @param context
+	 */
+	public static JSONObject syncVenueDetails(final BartsyApplication context) {
+
+		try {
+			String response;
+			// To get all checked in profiles and open orders data based on the venue Id
+			JSONObject json = new JSONObject();
+			json.put("venueId", context.venueProfileID);
+
+			// Sync service call
+			response = postRequest(URL_GET_VENUE_DETAILS, json, context);
 
 			// Return response in JSON object
 			return new JSONObject(response);

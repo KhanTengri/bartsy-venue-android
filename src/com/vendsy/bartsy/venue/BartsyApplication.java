@@ -248,9 +248,9 @@ public class BartsyApplication extends Application implements AppObservable {
 				
 			}
 		}.start();
-		
-		
 	}
+	
+	
 
 	/**
 	 * Upload Ingredients and cocktails to the server in background
@@ -444,9 +444,6 @@ public class BartsyApplication extends Application implements AppObservable {
 	
 			// Synchronize people 
 			updatePeople(json);
-			
-			// Get venue details
-			updateVenueDetails(json);
 			
 			// Get remote orders list
 			ArrayList<Order> remoteOrders = extractOrders(json);
@@ -809,21 +806,6 @@ public class BartsyApplication extends Application implements AppObservable {
 		
 		File file = new File(getFilesDir()  + File.separator + getResources().getString(R.string.config_venue_profile_picture));
 		file.delete();
-	}
-	
-	/**
-	 * 
-	 * TODO - Synchronize Venue details
-	 * 
-	 */
-	synchronized private void updateVenueDetails(JSONObject json) {
-		try {
-			if(json.has("venueDetails")){
-				venueProfile = new Venue(json.getJSONObject("venueDetails"));
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	/**
