@@ -74,37 +74,31 @@ public class VenueProfileActivity extends Activity implements OnClickListener,  
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.venue_profile);
 		
-		// Setup Action bar
-		ActionBar actionBar = getActionBar();
-		// Enable the custom view to add login button
-		actionBar.setDisplayShowCustomEnabled(true);
-		// Inflate the view and set as custom view for action bar
-		LayoutInflater inflator = (LayoutInflater) this .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View customView = inflator.inflate(R.layout.login_actionbar, null);
-		// Set login button click listener
-		Button login = (Button) customView.findViewById(R.id.loginButton);
-		login.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				new LoginDialog(VenueProfileActivity.this).show();
-			}
-		});
-		
-		// Get the activity input 
-		try {
-			venue = loadInput(mApp);
-		} catch (Exception e) {
-			// Invalid input
-			e.printStackTrace();
-			Log.e(TAG, "Invalid input");
-		}
-
-		LayoutParams layout = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-		actionBar.setCustomView(customView, layout);
-		
 		// Set up pointers
 		mApp = (BartsyApplication) getApplication();
+		
+		venue = mApp.venueProfile;
+		
+		if(venue==null){
+			// Setup Action bar
+			ActionBar actionBar = getActionBar();
+			// Enable the custom view to add login button
+			actionBar.setDisplayShowCustomEnabled(true);
+			// Inflate the view and set as custom view for action bar
+			LayoutInflater inflator = (LayoutInflater) this .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			View customView = inflator.inflate(R.layout.login_actionbar, null);
+			// Set login button click listener
+			Button login = (Button) customView.findViewById(R.id.loginButton);
+			login.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					new LoginDialog(VenueProfileActivity.this).show();
+				}
+			});
+			LayoutParams layout = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+			actionBar.setCustomView(customView, layout);
+		}
 		
 		// Try to get all form elements from the XML
 		venueImage = (ImageView)findViewById(R.id.view_profile_venue_image);
@@ -118,15 +112,14 @@ public class VenueProfileActivity extends Activity implements OnClickListener,  
 		venueImage.setImageBitmap(bitmap);
 		venueImage.setTag(bitmap);
 		
+		// Try to get fields from the view
 		locuId = (EditText) findViewById(R.id.locuId);
 		wifiName = (EditText) findViewById(R.id.wifiName);
 		wifiPassword = (EditText) findViewById(R.id.wifiPassword);
 		orderTimeOut = (EditText) findViewById(R.id.orderTimeOut);
-		
 		managerUsernameEditText = (EditText) findViewById(R.id.managerUserNameEditText);
 		managerPasswordEditText = (EditText) findViewById(R.id.managerPasswordEditText);
 		confirmPasswordEditText = (EditText) findViewById(R.id.confirmPasswordEditText);
-		
 		orderTimeOut = (EditText) findViewById(R.id.orderTimeOut);
 		
 		// Add click listener for venue image
@@ -158,45 +151,52 @@ public class VenueProfileActivity extends Activity implements OnClickListener,  
 			return;
 		}
 		
-//		locuId.setText("");
-		wifiName.setText(venue.getWifiName());
-		wifiPassword.setText(venue.getWifiPassword());
-		
-		orderTimeOut.setText(venue.getCancelOrderTime());
-		
-		((EditText) findViewById(R.id.taxRateEdit)).setText(venue.getTotalTaxRate());
-		
-		((EditText) findViewById(R.id.accountNumberEditText)).setText("");
-		((EditText) findViewById(R.id.managerNameEditText)).setText("");
-		((EditText) findViewById(R.id.managerUserNameEditText)).setText("");
-		((EditText) findViewById(R.id.managerPasswordEditText)).setText("");
-		((EditText) findViewById(R.id.vendsyRepNameEditText)).setText("");
-		((EditText) findViewById(R.id.vendsyRepEmailEditText)).setText("");
-		((EditText) findViewById(R.id.vendsyRepPhoneEditText)).setText("");
-		((EditText) findViewById(R.id.locuSectionEditText)).setText("");
-		((EditText) findViewById(R.id.venueNameEditText)).setText("");
-		((EditText) findViewById(R.id.addressEditText)).setText("");
-		((EditText) findViewById(R.id.phoneEditText)).setText("");
-	}
-	
-	/**
-	 * Sets the input of this activity and makes it valid
-	 */
-	public static final void setInput(BartsyApplication context, Venue venue) {
-		Utilities.savePref(context, R.string.VenueProfileActivity_input_status, ACTIVITY_INPUT_VALID);
-		context.mVenueProfileActivityInput = venue;
-	}
-	
-	private Venue loadInput(BartsyApplication context) throws Exception {
-
-		// Make sure the input is valid
-		if (Utilities.loadPref(this, R.string.VenueProfileActivity_input_status, ACTIVITY_INPUT_VALID) != ACTIVITY_INPUT_VALID) {		
-			Log.e(TAG, "Invalid activity input - exiting...");
-			Utilities.removePref(this, R.string.VenueProfileActivity_input_status);
-			throw new Exception();
+		if(Utilities.has(venue.getName())){
+			((EditText) findViewById(R.id.venueNameEditText)).setText(venue.getName());
+		}
+		if(Utilities.has(venue.getAddress())){
+			((EditText) findViewById(R.id.addressEditText)).setText(venue.getAddress());
+		}
+		if(Utilities.has(venue.getWifiName())){
+			wifiName.setText(venue.getWifiName());
+		}
+		if(Utilities.has(venue.getWifiPassword())){
+			wifiPassword.setText(venue.getWifiPassword());
+		}
+		if(Utilities.has(venue.getCancelOrderTime())){
+			orderTimeOut.setText(venue.getCancelOrderTime());
+		}
+		if(Utilities.has(venue.getTotalTaxRate())){
+			((EditText) findViewById(R.id.taxRateEdit)).setText(venue.getTotalTaxRate());
+		}
+		if(Utilities.has(venue.getManagerEmail())){
+			((EditText) findViewById(R.id.managerUserNameEditText)).setText(venue.getManagerEmail());
+		}
+		if(Utilities.has(venue.getManagerName())){
+			((EditText) findViewById(R.id.managerNameEditText)).setText(venue.getManagerName());
+		}
+		if(Utilities.has(venue.getPhone())){
+			((EditText) findViewById(R.id.phoneEditText)).setText(venue.getPhone());
+		}
+		if(Utilities.has(venue.getManagerPassword())){
+			((EditText) findViewById(R.id.managerPasswordEditText)).setText(venue.getManagerPassword());
+		}
+		if(Utilities.has(venue.getManagerPassword())){
+			((EditText) findViewById(R.id.confirmPasswordEditText)).setText(venue.getManagerPassword());
+		}
+		if(Utilities.has(venue.getRepresentativeName())){
+			((EditText) findViewById(R.id.vendsyRepNameEditText)).setText(venue.getRepresentativeName());
+		}
+		if(Utilities.has(venue.getRepresentativeCell())){
+			((EditText) findViewById(R.id.vendsyRepPhoneEditText)).setText(venue.getRepresentativeCell());
+		}
+		if(Utilities.has(venue.getRepresentativeEmail())){
+			((EditText) findViewById(R.id.vendsyRepEmailEditText)).setText(venue.getRepresentativeEmail());
+		}
+		if(Utilities.has(venue.getLocuSection())){
+			((EditText) findViewById(R.id.locuSectionEditText)).setText(venue.getLocuSection());
 		}
 		
-		return mApp.mVenueProfileActivityInput;
 	}
 	
 	/**
@@ -204,16 +204,38 @@ public class VenueProfileActivity extends Activity implements OnClickListener,  
 	 */
 	private void createOpenAndCloseHoursView() {
 		
+		JSONObject json = null;
+		if(venue!=null && Utilities.has(venue.getHours())){
+			try {
+				json = new JSONObject(venue.getHours());
+			} catch (JSONException e) {	}
+		}
+		
 		hoursLayout = (LinearLayout) findViewById(R.id.hoursLayout);
 		
 		final String[] weeks={"M","T","W","T","F","S","S"}; // week names
+		final String[] weekKeyNames={"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"}; // keys in Json format
 		
 		for(int i=0;i<weeks.length;i++){
 			final View view = getLayoutInflater().inflate(R.layout.hours_item, null);
 			// set title for the row
 			TextView titleView = (TextView) view.findViewById(R.id.rowTitleView);
 			titleView.setText(weeks[i]);
-			
+			// Try to set open hours in the view
+			if(json!=null){
+				try {
+					JSONArray array = json.getJSONArray(weekKeyNames[i]);
+					if(array!=null && array.length()>0){
+						String hourString = array.getString(0);
+						// Try to split the string with ' - ' and set the hours in the edit views 
+						String[] hours = hourString.split("-");
+						if(hours.length==2){
+							((EditText)view.findViewById(R.id.openHourText)).setText(hours[0].trim());
+							((EditText)view.findViewById(R.id.closeHourText)).setText(hours[1].trim());
+						}
+					}
+				} catch (JSONException e) {}
+			}
 			hoursLayout.addView(view);
 		}
 	}
@@ -447,10 +469,26 @@ public class VenueProfileActivity extends Activity implements OnClickListener,  
 				postData.put("vendsyRepEmail", ((EditText) findViewById(R.id.vendsyRepEmailEditText)).getText().toString());
 				postData.put("vendsyRepPhone", ((EditText) findViewById(R.id.vendsyRepPhoneEditText)).getText().toString());
 				postData.put("locuSection", ((EditText) findViewById(R.id.locuSectionEditText)).getText().toString());
+				postData.put("locuUsername", ((EditText) findViewById(R.id.locuUsernameText)).getText().toString());
+				postData.put("locuPassword", ((EditText) findViewById(R.id.locuPasswordText)).getText().toString());
 				postData.put("venueName", ((EditText) findViewById(R.id.venueNameEditText)).getText().toString());
 				postData.put("address", ((EditText) findViewById(R.id.addressEditText)).getText().toString());
 				postData.put("phone", ((EditText) findViewById(R.id.phoneEditText)).getText().toString());
 				
+				boolean isPickupLocution = ((CheckBox) findViewById(R.id.pickup_available)).isChecked();
+				boolean tableOrdering = ((CheckBox) findViewById(R.id.tableOrderingCheckBox)).isChecked();
+				
+				postData.put("isPickupLocution", isPickupLocution);
+				postData.put("tableOrdering", tableOrdering);
+				
+				if (isPickupLocution){
+					postData.put("pickupLocations", ((EditText) findViewById(R.id.pickupLocationsText)).getText().toString());
+				}
+				
+				if(tableOrdering){
+					postData.put("deliveryTables", ((EditText) findViewById(R.id.tableOrderingText)).getText().toString());
+				}
+					
 				// Save printer IP address if present
 				String printerIp = ((EditText) findViewById(R.id.printer_ip_address)).getText().toString();
 				if (Utilities.has(printerIp))
