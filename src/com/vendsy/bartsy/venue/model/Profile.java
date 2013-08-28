@@ -113,9 +113,16 @@ public class Profile {
 	}
 
 	public View updateView(View view) {
-
-		ImageView profileImageView = ((ImageView) view.findViewById(R.id.view_customer_details_picture));
-		profileImageView.setImageBitmap(image);
+		// Update the profile image - if the image doesn't exist locally, get it from the server 
+		ImageView profileImageView = (ImageView) view.findViewById(R.id.view_user_list_image_resource);
+		if(profileImageView==null){
+			profileImageView = (ImageView) view.findViewById(R.id.view_customer_details_picture);
+		}
+		if (image == null && !imageDownloaded) {
+			WebServices.downloadImage(this.profileImageUrl, this, profileImageView);
+		} else {
+			profileImageView.setImageBitmap(image);
+		}
 
 		// Update customer visible name
 		((TextView) view.findViewById(R.id.view_customer_details_name)).setText(getName());
