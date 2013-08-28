@@ -3,6 +3,7 @@ package com.vendsy.bartsy.venue;
 import java.io.InputStream;
 import java.util.Locale;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.ActionBar;
@@ -47,6 +48,7 @@ import com.vendsy.bartsy.venue.dialog.CodeDialogFragment;
 import com.vendsy.bartsy.venue.dialog.PeopleDialogFragment;
 import com.vendsy.bartsy.venue.model.AppObservable;
 import com.vendsy.bartsy.venue.model.Order;
+import com.vendsy.bartsy.venue.model.Venue;
 import com.vendsy.bartsy.venue.utils.Constants;
 import com.vendsy.bartsy.venue.utils.Utilities;
 import com.vendsy.bartsy.venue.utils.WebServices;
@@ -464,12 +466,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
 		case R.id.action_profile:
 			
-			VenueProfileActivity.setInput(mApp, mApp.venueProfile);
+			editProfileSelected();
 			
-			Intent intent = new Intent().setClass(this,	VenueProfileActivity.class);
-			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			this.startActivity(intent);
 			break;
 			
 		case R.id.action_settings:
@@ -487,15 +485,60 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	/**
+	 * Load venue profile data from the server if it is not exist in the local memory.
+	 */
+	private void editProfileSelected() {
+		if(mApp.venueProfile==null){
+			// Start progress dialog from here
+			progressDialog = Utilities.progressDialog(this, "Loading..");
+			progressDialog.show();
+			
+			// Get profile data from server in background
+			new Thread(){
+				public void run() {
+					final JSONObject json = WebServices.syncVenueDetails(mApp);
+					handler.post(new Runnable() {
+						@Override
+						public void run() {
+							// Stop progress dialog
+							progressDialog.dismiss();
+							// Try to parse response and set venue Profile object in application object
+							try {
+								if(json!=null && json.has("venueDetails")){
+									mApp.venueProfile = new Venue(json.getJSONObject("venueDetails"));
+									showVenueProfile();
+								}
+							} catch (JSONException e) {
+							}
+						}
+					});
+				}
+			}.start();
+		}else{
+			showVenueProfile();
+		}
+	}
+	
+	/**
+	 * Display venue profile activity 
+	 */
+	private void showVenueProfile() {
+		
+//		VenueProfileActivity.setInput(mApp, mApp.venueProfile);
+		
+		Intent intent = new Intent().setClass(this,	VenueProfileActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		startActivity(intent);
+		this.startActivity(intent);
+	}
 
 	private void updateActionBarStatus() {
 
 		Log.v(TAG, "updateChannelState()");
 
 		if (mApp.venueProfileID == null || mApp.venueProfileName == null)
-			getActionBar()
-					.setTitle(
-							"Invalid venue configuration. Please uninstall then reinstall Bartsy.");
+			getActionBar().setTitle("Invalid venue configuration. Please uninstall then reinstall Bartsy.");
 		else
 			getActionBar().setTitle(mApp.venueProfileName);
 
