@@ -548,7 +548,6 @@ public class VenueProfileActivity extends Activity implements OnClickListener,  
 					} catch (Exception e) {
 					Log.d("Venue Reg", "Exception :: " + e);
 				}
-
 			}
 		}.start();
 		
