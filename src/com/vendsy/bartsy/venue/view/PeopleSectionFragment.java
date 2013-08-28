@@ -3,33 +3,33 @@
  */
 package com.vendsy.bartsy.venue.view;
 
-import com.google.android.gms.plus.model.people.Person;
-import com.vendsy.bartsy.venue.MainActivity;
-import com.vendsy.bartsy.venue.R;
-import com.vendsy.bartsy.venue.BartsyApplication;
-import com.vendsy.bartsy.venue.dialog.PeopleDialogFragment;
-import com.vendsy.bartsy.venue.model.Profile;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
-import android.widget.LinearLayout;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+
+import com.vendsy.bartsy.venue.BartsyApplication;
+import com.vendsy.bartsy.venue.MainActivity;
+import com.vendsy.bartsy.venue.R;
+import com.vendsy.bartsy.venue.adapter.PeopleListAdapter;
 
 /**
  * @author peterkellis
  *
  */
-public class PeopleSectionFragment extends Fragment implements OnClickListener {
+public class PeopleSectionFragment extends Fragment{
 
 	View mRootView = null;
 	LayoutInflater mInflater = null;
 	ViewGroup mContainer = null;
-	LinearLayout mPeopleListView = null;
+	ListView mPeopleListView = null;
 	public BartsyApplication mApp = null;
+	private PeopleListAdapter mPeopleAdapter;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -40,11 +40,22 @@ public class PeopleSectionFragment extends Fragment implements OnClickListener {
 		mInflater = inflater;
 		mContainer = container; 
 		mRootView = inflater.inflate(R.layout.users_main, container, false);
-		mPeopleListView = (LinearLayout) mRootView.findViewById(R.id.view_singles);
+		mPeopleListView = (ListView) mRootView.findViewById(R.id.view_singles);
 		
 		// Make sure the fragment pointed to by the activity is accurate
 		mApp = (BartsyApplication) getActivity().getApplication();
 		((MainActivity) getActivity()).mPeopleFragment = this;		
+		
+		mPeopleAdapter = new PeopleListAdapter(getActivity(), R.layout.customer_details, mApp.mPeople);
+		mPeopleListView.setAdapter(mPeopleAdapter);
+		mPeopleListView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 
 		updatePeopleView();
         
@@ -62,19 +73,9 @@ public class PeopleSectionFragment extends Fragment implements OnClickListener {
 		if (mPeopleListView == null)
 			return;
 
-		// Make sure the list view is empty
-		mPeopleListView.removeAllViews();
-
-		// Add any existing people in the layout, one by one
-		
 		Log.v("Bartsy", "mApp.mPeople list size = " + mApp.mPeople.size());
-
-		for (Profile profile : mApp.mPeople) {
-			Log.v("Bartsy", "Adding a user item to the layout");
-			profile.view = mInflater.inflate(R.layout.user_item, mContainer, false);
-			profile.updateView(this); // sets up view specifics and sets listener to this
-			mPeopleListView.addView(profile.view);
-		}
+		
+		mPeopleAdapter.notifyDataSetChanged();
 	}
 	
 	@Override 
@@ -91,18 +92,5 @@ public class PeopleSectionFragment extends Fragment implements OnClickListener {
 		// Because the fragment may be destroyed while the activity persists, remove pointer from activity
 		((MainActivity) getActivity()).mPeopleFragment = null;
 	}
-	
-    @Override
-    public void onClick(View v) {
-    	
-        // Create an instance of the dialog fragment and show it
-//        DialogFragment dialog = new UserProfileDialog();
-//        dialog.show(getActivity().getSupportFragmentManager(), "User profile");
-        
-        // Create an instance of the dialog fragment and show it
-//        PeopleDialogFragment dialog = new PeopleDialogFragment();
-//        dialog.mUser = (Profile) v.getTag();
-//        dialog.show(getActivity().getSupportFragmentManager(), "User profile");
-    }
 	
 }
