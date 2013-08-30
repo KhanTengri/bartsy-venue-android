@@ -1,0 +1,34 @@
+Ingredient,Type,Category,Price,Availability
+Well Vodka,Spirit,Vodka,7,Yes
+Absolut Vodka,Spirit,Vodka,9,Yes
+Grey Goose Vodka,Spirit,Vodka,10,Yes
+Well Gin,Spirit,Gin,7,Yes
+Bombay Saphire Gin,Spirit,Gin,8,Yes
+Well Rum,Spirit,Rum,7,Yes
+Bacardi Rum,Spirit,Rum,9,Yes
+Well Tequila,Spirit,Tequila,7,Yes
+Patron Tequila,Spirit,Tequila,10,Yes
+Jose Cuervo Tequila,Spirit,Tequila,9,Yes
+Well Bourbon,Spirit,Bourbon,7,Yes
+Bulleit Bourbon,Spirit,Bourbon,9,Yes
+Jack Daniels Bourbon,Spirit,Bourbon,9,Yes
+Well Irish Whiskey,Spirit,Irish Whiskey,7,Yes
+Jameson Irish Whiskey,Spirit,Irish Whiskey,9,Yes
+Well Scoth,Spirit,Scotch,7,Yes
+Johnny Walker Black Scotch,Spirit,Scotch,10,Yes
+Sambuca,Spirit,Liqueur,10,Yes
+Soda,Mixer,Add-ons,0,Yes
+Tonic,Mixer,Add-ons,0,Yes
+Cranberry,Mixer,Add-ons,0,Yes
+O.J.,Mixer,Add-ons,0,Yes
+Sprite,Mixer,Add-ons,0,Yes
+Coke,Mixer,Add-ons,0,Yes
+Diet Coke,Mixer,Add-ons,0,Yes
+Red Bull,Mixer,Add-ons,2,Yes
+Diet Red Bull,Mixer,Add-ons,2,No
+Double,Mixer,Add-ons,3,Yes
+As a martini,Mixer,Modifications,3,Yes
+On the rocks,Mixer,Modifications,2,Yes
+No ice,Mixer,Modifications,0,Yes
+Light ice,Mixer,Modifications,0,Yes
+Extra ice,Mixer,Modifications,0,Yes
