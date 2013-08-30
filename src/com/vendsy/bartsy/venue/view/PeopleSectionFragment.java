@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.vendsy.bartsy.venue.dialog.ProfileDialogFragment;
 import com.vendsy.bartsy.venue.BartsyApplication;
 import com.vendsy.bartsy.venue.MainActivity;
 import com.vendsy.bartsy.venue.R;
@@ -50,10 +51,10 @@ public class PeopleSectionFragment extends Fragment{
 		mPeopleListView.setAdapter(mPeopleAdapter);
 		mPeopleListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				// TODO Auto-generated method stub
-				
+			public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg) {
+				ProfileDialogFragment dialog = new ProfileDialogFragment();
+				dialog.mUser = mApp.mPeople.get(position) ;
+//				dialog.show(getActivity().getFragmentManager(),"ProfileDialogFragment");
 			}
 		});
 

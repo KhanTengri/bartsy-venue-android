@@ -141,6 +141,35 @@ public class Profile {
 		return view;
 	}
 	
+	public View updateDialogView(View view) {
+		// Update the profile image - if the image doesn't exist locally, get it from the server 
+		ImageView profileImageView = (ImageView) view.findViewById(R.id.view_user_list_image_resource);
+		if(profileImageView==null){
+			profileImageView = (ImageView) view.findViewById(R.id.view_customer_details_picture);
+		}
+		if (image == null && !imageDownloaded) {
+			WebServices.downloadImage(this.profileImageUrl, this, profileImageView);
+		} else {
+			profileImageView.setImageBitmap(image);
+		}
+
+		// Update customer visible name
+		((TextView) view.findViewById(R.id.view_customer_details_name)).setText(getName());
+
+		// Update customer details
+		
+		String checkin = getFirstCheckInDate() == null ? "-" : Utilities.getFriendlyDate(getFirstCheckInDate(), "d MMM yyyy HH:mm:ss 'GMT'");
+		String order   = getFirstOrderDate() == null ? "-" : Utilities.getFriendlyDate(getFirstOrderDate(), "d MMM yyyy HH:mm:ss 'GMT'");
+		
+		String details = "Customer since: " + checkin + 
+				"\nFirst Bartsy order: " + order + 
+				"\n" + getOrderCount() + " total, " + getLast30DaysOrderCount() + " recent orders" +
+				"\n" + getCheckInCount() + " recent, " + getLast30DaysCheckInCount() + " total visits";
+		((TextView) view.findViewById(R.id.view_customer_details_info)).setText(details);
+		
+		return view;
+	}
+	
 	
 	public String getDisplayName() {
 		return displayName;
