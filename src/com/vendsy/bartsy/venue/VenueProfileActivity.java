@@ -196,7 +196,12 @@ public class VenueProfileActivity extends Activity implements OnClickListener,  
 		if(Utilities.has(venue.getLocuSection())){
 			((EditText) findViewById(R.id.locuSectionEditText)).setText(venue.getLocuSection());
 		}
-		
+		if(Utilities.has(venue.getLocuUsername())){
+			((EditText) findViewById(R.id.locuUsernameText)).setText(venue.getLocuUsername());
+		}
+		if(Utilities.has(venue.getLocuPassword())){
+			((EditText) findViewById(R.id.locuPasswordText)).setText(venue.getLocuPassword());
+		}
 	}
 	
 	/**
@@ -473,7 +478,7 @@ public class VenueProfileActivity extends Activity implements OnClickListener,  
 				postData.put("locuPassword", ((EditText) findViewById(R.id.locuPasswordText)).getText().toString());
 				postData.put("venueName", ((EditText) findViewById(R.id.venueNameEditText)).getText().toString());
 				postData.put("address", ((EditText) findViewById(R.id.addressEditText)).getText().toString());
-				postData.put("phone", ((EditText) findViewById(R.id.phoneEditText)).getText().toString());
+				postData.put("phoneNumber", ((EditText) findViewById(R.id.phoneEditText)).getText().toString());
 				
 				boolean isPickupLocution = ((CheckBox) findViewById(R.id.pickup_available)).isChecked();
 				boolean tableOrdering = ((CheckBox) findViewById(R.id.tableOrderingCheckBox)).isChecked();
