@@ -39,7 +39,7 @@ public class Venue {
 	private String locuUsername;
 	private String locuPassword;
 	private String locuSection;
-	private String phone;
+	private String phoneNumber;
 	
 	
 	/**
@@ -122,7 +122,7 @@ public class Venue {
 			locuPassword = json.getString("locuPassword");
 		}
 		if(json.has("phone")){
-			phone = json.getString("phone");
+			phoneNumber = json.getString("phone");
 		}
 		if(json.has("venuePassword")){
 			managerPassword = json.getString("venuePassword");
@@ -362,11 +362,11 @@ public class Venue {
 	}
 
 	public String getPhone() {
-		return phone;
+		return phoneNumber;
 	}
 
 	public void setPhone(String phone) {
-		this.phone = phone;
+		this.phoneNumber = phone;
 	}
 
 	public String getManagerPassword() {
